@@ -1,0 +1,231 @@
+<style>
+    body {
+        margin: 0;
+    }
+
+    .slidetoolbarContainer a {
+        color: #333;
+        text-decoration: none;
+        outline: 0;
+    }
+
+    .slidetoolbarContainer {
+        position: fixed;
+        _position: absolute;
+        _overflow-y: hidden;
+        top: 0;
+        left: 0;
+        width: 60px;
+        height: 100%;
+        z-index: 499;
+    }
+
+    .slidetoolbarv2 {
+        background: #e6e6e6;
+        width: 60px;
+        height: 100%;
+        left: -50px;
+        position: relative;
+    }
+
+    .slidetoolbarv2 .applist {
+        padding-top: 63px;
+        font-size: 12px;
+    }
+
+    .slidetoolbarv2 .appitem {
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+    .slidetoolbarv2 .content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding-left: 50px;
+        width: 210px;
+        height: 68px;
+        border: 1px solid #e6e6e6;
+        border-left: 0;
+        overflow: hidden;
+        background: #f7f7f7;
+    }
+
+    .slidetoolbarv2 .flipping:hover .content, .slidetoolbarv2 .content {
+        display: none;
+    }
+
+    .slidetoolbarContainer .g-fr {
+        float: right;
+    }
+
+    .slidetoolbarv2 .icon-img {
+        display: block;
+        margin: 8px auto;
+        height: 32px;
+        width: 32px;
+    }
+
+    .slidetoolbarv2 .flipping .icon, .slidetoolbarv2 .flipping:hover .icon, .slidetoolbarv2 .icon {
+        position: relative;
+        display: block;
+        padding: 1px 0;
+        height: 68px;
+        color: #1d1b1b;
+        text-align: center;
+        border: 0;
+        background: transparent;
+    }
+
+    .slidetoolbarv2 .link {
+        padding-top: 3px;
+        line-height: 46px;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .slidetoolbarv2 .link, .slidetoolbarv2 .desc {
+        display: block;
+        overflow: hidden;
+        padding-left: 10px;
+        width: 127px;
+        height: 40px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .logo {
+        background: #cacaca;
+        display: block;
+        overflow: hidden;
+    }
+
+    .logo img {
+        width: 100%;
+        height: auto;
+    }
+
+    .logo-title {
+        display: block;
+        font-size: 8px;
+        padding: 5px 1px;
+        font-weight: 900;
+        text-align: center;
+        color: #ffffff;
+        background-color: #827d6e;
+    }
+
+    .appitem.appitem-hook:hover {
+        background: #d6d6d6;
+        font-size: 13px;
+    }
+
+    .appitem.appitem-hook:hover .icon-img {
+        width: 35px !important;
+        height: 35px !important;
+    }
+
+    .appitem.appitem-hook:hover .content.content-hook {
+        display: block !important;
+    }
+
+    .hive-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    .hive-load {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+    }
+</style>
+<div class="hive" style="position: relative">
+    <div id="slidetoolbarContainer" class="slidetoolbarContainer" data-rm="default" style="display: block;">
+        <a class="logo">
+            <img src="/app/static/img/logo-80*80.png">
+        </a>
+        <div class="logo-title">
+            工蜂小智
+        </div>
+        <div class="slidetoolbarv2" monkey="slidetoolbar" style="left: 0px;">
+            <div class="applist">
+                <div class="appitem appitem-hook" data-jshover="appitem-jshover">
+                    <div class="content content-hook">
+                        <a href="/app/page/admin/index.html" class="g-fr" title="第一次的Gal">
+                            <img class="img" src="http://sc1.hao123img.com/res/img/moe/0817zc.jpg"></a>
+                        <a href="/app/page/admin/index.html" class="link">数据统计/分析/监控</a><a
+                            href="/app/page/admin/index.html" class="desc">实时数据统计分析监控</a>
+                    </div>
+                    <a href="/app/page/admin/index.html" class="icon icon-hook">
+                        <img class="icon-img" src="/app/static/img/icon/home.png">首页</a>
+                </div>
+                <div class="appitem appitem-hook" data-jshover="appitem-jshover">
+                    <div class="content content-hook">
+                        <a href="http://v.hao123.baidu.com/dongman/18218.htm" class="g-fr"
+                           title="猪猪侠">
+                            <img class="img" src="http://sc0.hao123img.com/res/img/moe/0817zc1.jpg"></a><a
+                            href="http://v.hao123.baidu.com/dongman/18218.htm" class="link">平台帐号绑定</a><a
+                            href="http://v.hao123.baidu.com/dongman/18218.htm" class="desc">支持简书/知乎/微博/搜狐</a></div>
+                    <a href="http://v.hao123.baidu.com/dongman/" class="icon icon-hook">
+                        <img class="icon-img"
+                             src="/app/static/img/icon/head.png">帐号</a>
+                </div>
+                <div class="appitem appitem-hook" data-jshover="appitem-jshover">
+                    <div class="content content-hook">
+                        <a href="http://video.hao123.baidu.com/Game_Live" class="g-fr" title="英雄联盟职业联赛">
+                            <img class="img"
+                                 src="http://sc1.hao123img.com/res/r/image/2017-08-03/cfcd36a64ebdd544ac1e5dad6b732528.jpg"></a>
+                        <a href="http://video.hao123.baidu.com/Game_Live" class="link">英雄联盟职业联赛</a><a
+                            href="http://video.hao123.baidu.com/Game_Live" class="desc">2017LPL夏季赛重播</a></div>
+                    <a href="http://video.hao123.baidu.com/Game_Live" class="icon icon-hook">
+                        <img class="icon-img"
+                             src="/app/static/img/icon/edit.png">编辑器</a>
+                </div>
+                <div class="appitem appitem-hook" data-jshover="appitem-jshover">
+                    <div class="content content-hook">
+                        <a href="http://www.hao123.com/mid/9882050281034178873"
+                           class="g-fr" title="男女平等价值观">
+                            <img class="img"
+                                 src="http://sc1.hao123img.com/res/r/image/2017-08-17/ed157c320aa30d594cb94dc2c35c585e.jpg"></a><a
+                            href="http://www.hao123.com/mid/9882050281034178873" class="link">男女平等价值观</a><a
+                            href="http://www.hao123.com/mid/9882050281034178873" class="desc">我们的理解和认识</a></div>
+                    <a href="http://tuijian.hao123.com/?type=rec" class="icon icon-hook">
+                        <img class="icon-img"
+                             src="/app/static/img/icon/content.png">内容管理</a>
+                </div>
+                <div class="appitem appitem-hook" data-jshover="appitem-jshover">
+                    <div class="content content-hook">
+                        <a href='' class="g-fr" title="妹子强力吐槽直男癌">
+                            <img class="img" src="http://sc0.hao123img.com/res/r/image/2017-08-16/470825601353ac729648d5a86ea28c45.jpg">
+                        </a>
+                        <a href='' class="link">妹子强力吐槽直男癌</a>
+                        <a href='' class="desc">他们绝逼交不到女盆友</a></div>
+                    <a href="http://www.hao123.com/video/fun" class="icon icon-hook">
+                        <img class="icon-img"
+                             src="/app/static/img/icon/article.png">文章库</a>
+                </div>
+                <div class="appitem appitem-hook" data-jshover="appitem-jshover">
+                    <div class="content content-hook">
+                        <a href="http://report.12377.cn:13225/toreportinputNormal_anis.do" class="g-fr" title="有害信息举报专区">
+                            <img class="img"
+                                 src="http://s0.hao123img.com/res/r/image/2017-03-13/2708666b8eed77d16a4ab4bc4870719b.png"></a><a
+                            href="http://report.12377.cn:13225/toreportinputNormal_anis.do" class="link">有害信息举报专区</a><a
+                            href="http://report.12377.cn:13225/toreportinputNormal_anis.do" class="desc">中国互联网举报中心</a>
+                    </div>
+                    <a href="http://www.12377.cn/" class="icon icon-hook">
+                        <img class="icon-img" src="/app/static/img/icon/setting.png">设置
+                    </a>
+                </div>
+            </div>
+        </div>
+        <a href="#" hidefocus="true" class="slidetoolbar-closebtn" id="slidetoolbar-btn" monkey="slidetoolbar"
+           title="收起" style="display: inline;"></a>
+    </div>
+    <iframe class="hive-iframe" class="" src="http://localhost:8080/app/page/admin/index.html"></iframe>
+    <div class="hive-load">
+
+    </div>
+</div>
