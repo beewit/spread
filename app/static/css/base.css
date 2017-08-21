@@ -1,0 +1,138 @@
+body, html {
+    height: 100%;
+}
+
+input {
+    outline: none
+}
+
+.margin-auto {
+    margin: 0 auto;
+}
+
+.h-100 {
+    height: 100%;
+}
+
+.h-99 {
+    height: 99%;
+}
+
+.h-98 {
+    height: 98%;
+}
+
+.edit-body-div .tpl-portlet-components {
+    width: 1000px;
+    padding: 0px !important;
+    overflow: inherit;
+}
+
+.edit-body-div .tpl-portlet-components .portlet-title .caption {
+    line-height: 48px;
+    padding: 0;
+    padding-left: 12px;
+}
+
+.edit-body-div .tpl-portlet-components .portlet-title {
+    margin-bottom: 0;
+}
+
+.edit-div {
+    padding-top: 0px;
+    min-height: 800px;
+}
+
+.edit-left {
+    width: 50px;
+    height: 100%;
+    float: left;
+    background-color: #f7f7f7;
+    min-height: 800px;
+}
+
+.edit-left-nav a {
+    display: block;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    color: #8c8c8c;
+
+}
+
+.edit-left-nav a img {
+    width: 30px
+}
+
+.edit-left-nav a:hover, .edit-left-nav a.active {
+    background-color: #fff;
+    border: 1px solid #e2e2e2;
+    border-right: none;
+}
+
+.edit-left-nav a.none:hover {
+    background-color: #f7f7f7;
+    border: none;
+}
+
+.edit-right {
+    width: 948px;
+    height: 100%;
+    float: right;
+    padding: 10px 20px;
+}
+
+.edit-title {
+    font-size: 26px;
+    display: block;
+    width: 100%;
+    line-height: 30px;
+    padding: 10px 0;
+    color: #8a8a8a;
+}
+
+.handle-div {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+    background-color: #fff;
+    border-top: 1px solid #e4e4e4;
+}
+
+.handle-div button {
+    margin: 0 10px;
+}
+
+.table-img tr td img {
+    width: 50px;
+}
+
+.table-img-big tr td img {
+    height: 80px;
+    width: 120px;
+
+}
+
+.table-rang tr td img {
+    border-radius: 50%;
+}
+
+.hive-menu {
+    max-height: 700px;
+    overflow-y: auto;
+}
+
+.hive-menu li {
+    padding: 10px !important;
+    font-size: 14px;
+
+}
+.hive-menu-div li{
+    cursor: pointer;
+}
+.hive-menu-div li:hover, .hive-menu-div li.active {
+    color:#fff;
+    background-color: #49b2f5;
+}

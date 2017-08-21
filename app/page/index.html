@@ -1,6 +1,17 @@
+<script>
+    var host;
+    if (location.href.indexOf("127.0.0.1") > -1) {
+        host = "http://127.0.0.1:8080"
+        document.write("<script src=\"/app/static/js/inject.js\">" + "</scr" + "ipt>")
+    }
+</script>
 <style>
     body {
         margin: 0;
+    }
+
+    .hive * {
+        box-sizing: initial !important;
     }
 
     .slidetoolbarContainer a {
@@ -17,11 +28,16 @@
         left: 0;
         width: 60px;
         height: 100%;
-        z-index: 499;
+        z-index: 99999999;
+        filter: progid:DXImageTransform.Microsoft.Shadow(color='#969696', Direction=135, Strength=5); /*for ie6,7,8*/
+        background-color: #ccc;
+        -moz-box-shadow: 2px 2px 5px #969696; /*firefox*/
+        -webkit-box-shadow: 2px 2px 5px #969696; /*webkit*/
+        box-shadow: 2px 2px 5px #969696; /*opera或ie9*/
     }
 
     .slidetoolbarv2 {
-        background: #e6e6e6;
+        background: #f5f5f5;
         width: 60px;
         height: 100%;
         left: -50px;
@@ -36,19 +52,24 @@
     .slidetoolbarv2 .appitem {
         position: relative;
         margin-bottom: 10px;
+        cursor: pointer;
     }
 
     .slidetoolbarv2 .content {
         position: absolute;
         top: 0;
         left: 0;
-        padding-left: 50px;
-        width: 210px;
+        padding-left: 65px;
+        padding-right: 25px;
         height: 68px;
         border: 1px solid #e6e6e6;
         border-left: 0;
         overflow: hidden;
-        background: #f7f7f7;
+        background: #fff;
+        filter: progid:DXImageTransform.Microsoft.Shadow(color='#969696', Direction=135, Strength=5);
+        -moz-box-shadow: 1px 1px 10px #ffb9b9;
+        -webkit-box-shadow: 1px 1px 10px #ffb9b9;
+        box-shadow: 1px 1px 10px #ffb9b9;
     }
 
     .slidetoolbarv2 .flipping:hover .content, .slidetoolbarv2 .content {
@@ -57,6 +78,7 @@
 
     .slidetoolbarContainer .g-fr {
         float: right;
+        display: none;
     }
 
     .slidetoolbarv2 .icon-img {
@@ -88,7 +110,7 @@
         display: block;
         overflow: hidden;
         padding-left: 10px;
-        width: 127px;
+        /*width: 127px;*/
         height: 40px;
         white-space: nowrap;
         text-overflow: ellipsis;
@@ -115,6 +137,10 @@
         background-color: #827d6e;
     }
 
+    .appitem.appitem-hook.active {
+        background: #fff !important;
+    }
+
     .appitem.appitem-hook:hover {
         background: #d6d6d6;
         font-size: 13px;
@@ -133,99 +159,298 @@
         width: 100%;
         height: 100%;
         border: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        background-color: #fff;
+        display: none;
+    }
+
+    .hive-iframe-div {
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .hive-iframe-div.active .hive-iframe {
+        display: block !important;
     }
 
     .hive-load {
         width: 100%;
         height: 100%;
-        position: absolute;
+        position: fixed;
         top: 0;
+        background-color: rgba(124, 142, 169, 0.62);
+        z-index: 9998;
+        text-align: center;
     }
+
+    .hive-load-tip {
+        margin-top: 200px;
+    }
+
+    .hive-load-tip span {
+        padding: 20px;
+        background-color: #2C3E50;
+        color: #fff;
+        font-weight: 800;
+        display: block;
+        width: 250px;
+        margin: auto;
+        text-align: center;
+        line-height: 26px;
+    }
+
+    .hive-load-tip span img {
+        float: left;
+        height: 50px;
+    }
+
+    .hive-load-tip span p {
+        margin: 0;
+    }
+
+    i.tagging {
+        text-shadow: none;
+        font-weight: 300;
+        margin-left: 1px;
+        margin-right: 6px;
+        background-color: #36c6d3;
+        border-radius: 1000px;
+        color: #fff !important;
+        padding: 2px 8px !important;
+        float: right;
+        position: absolute;
+        font-style: normal;
+        top: 10px !important;
+        font-size: 12px !important;
+        font-weight: 900;
+    }
+
+    .tagging-danger {
+        background-color: #ed6b75 !important;
+    }
+
+    /* 定义keyframe动画，命名为blink */
+
+    @keyframes blink {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 1;
+        }
+        50.01% {
+            opacity: 0;
+        }
+        /* 注意这里定义50.01%立刻透明度为０，可以设置闪烁效果 */
+        100% {
+            opacity: 0;
+        }
+    }
+
+    /* 添加兼容性前缀 */
+
+    @-webkit-keyframes blink {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 1;
+        }
+        50.01% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 0;
+        }
+    }
+
+    @-moz-keyframes blink {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 1;
+        }
+        50.01% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 0;
+        }
+    }
+
+    @-ms-keyframes blink {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 1;
+        }
+        50.01% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 0;
+        }
+    }
+
+    @-o-keyframes blink {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 1;
+        }
+        50.01% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 0;
+        }
+    }
+
+    /* 定义blink类*/
+    .blink {
+        animation: blink .75s linear infinite;
+        /* 其它浏览器兼容性前缀 */
+        -webkit-animation: blink .75s linear infinite;
+        -moz-animation: blink .75s linear infinite;
+        -ms-animation: blink .75s linear infinite;
+        -o-animation: blink .75s linear infinite;
+        color: #dd4814;
+    }
+
+    .cut-out {
+        position: absolute;
+        font-size: 16px;
+        z-index: 99999999;
+        border-radius: 50%;
+        line-height: 50px;
+        display: none;
+        width: 50px;
+        text-align: center;
+        color: #fff !important;
+        left: 5px;
+        bottom: 10px;
+        cursor: pointer;
+    }
+
+    .cut-out img {
+        width: 50px;
+        height: 50px;
+    }
+
 </style>
 <div class="hive" style="position: relative">
     <div id="slidetoolbarContainer" class="slidetoolbarContainer" data-rm="default" style="display: block;">
+        <a class="cut-out" title="点击可以收起主页面">
+            <img data-src="/app/static/img/icon/back.png">
+        </a>
         <a class="logo">
-            <img src="/app/static/img/logo-80*80.png">
+            <img data-src="/app/static/img/logo-80*80.png">
         </a>
         <div class="logo-title">
             工蜂小智
         </div>
         <div class="slidetoolbarv2" monkey="slidetoolbar" style="left: 0px;">
             <div class="applist">
-                <div class="appitem appitem-hook" data-jshover="appitem-jshover">
+                <div class="appitem appitem-hook" data-href="/app/page/admin/index.html">
                     <div class="content content-hook">
-                        <a href="/app/page/admin/index.html" class="g-fr" title="第一次的Gal">
+                        <a class="g-fr" title="第一次的Gal">
                             <img class="img" src="http://sc1.hao123img.com/res/img/moe/0817zc.jpg"></a>
-                        <a href="/app/page/admin/index.html" class="link">数据统计/分析/监控</a><a
-                            href="/app/page/admin/index.html" class="desc">实时数据统计分析监控</a>
+                        <a class="link">数据统计/分析/监控</a>
+                        <a class="desc">实时数据统计分析监控</a>
                     </div>
-                    <a href="/app/page/admin/index.html" class="icon icon-hook">
-                        <img class="icon-img" src="/app/static/img/icon/home.png">首页</a>
+                    <a class="icon icon-hook">
+                        <img class="icon-img" data-src="/app/static/img/icon/home.png">首页
+                    </a>
                 </div>
-                <div class="appitem appitem-hook" data-jshover="appitem-jshover">
+                <div class="appitem appitem-hook" data-href="/app/page/admin/form-news.html">
                     <div class="content content-hook">
-                        <a href="http://v.hao123.baidu.com/dongman/18218.htm" class="g-fr"
-                           title="猪猪侠">
-                            <img class="img" src="http://sc0.hao123img.com/res/img/moe/0817zc1.jpg"></a><a
-                            href="http://v.hao123.baidu.com/dongman/18218.htm" class="link">平台帐号绑定</a><a
-                            href="http://v.hao123.baidu.com/dongman/18218.htm" class="desc">支持简书/知乎/微博/搜狐</a></div>
-                    <a href="http://v.hao123.baidu.com/dongman/" class="icon icon-hook">
-                        <img class="icon-img"
-                             src="/app/static/img/icon/head.png">帐号</a>
+                        <a class="g-fr" title="消息通知">
+                            <img class="img" src="http://s0.hao123img.com/res/r/image/2017-03-13/2708666b8eed77d16a4ab4bc4870719b.png"></a>
+                        <a class="link">消息通知</a>
+                        <a class="desc">数据分发/抓取完成/系统消息</a>
+                    </div>
+                    <a class="icon icon-hook">
+                        <img class="icon-img" data-src="/app/static/img/icon/news.png">消息
+                        <i class="tagging tagging-danger blink">
+                            12
+                        </i>
+                    </a>
                 </div>
-                <div class="appitem appitem-hook" data-jshover="appitem-jshover">
+                <div class="appitem appitem-hook" data-href="/app/page/admin/account/list.html">
                     <div class="content content-hook">
-                        <a href="http://video.hao123.baidu.com/Game_Live" class="g-fr" title="英雄联盟职业联赛">
+                        <a class="g-fr" title="平台帐号绑定">
+                            <img class="img" src="http://sc0.hao123img.com/res/img/moe/0817zc1.jpg"></a>
+                        <a class="link">平台帐号绑定</a>
+                        <a class="desc">支持简书/知乎/微博/搜狐</a>
+                    </div>
+                    <a class="icon icon-hook">
+                        <img class="icon-img" data-src="/app/static/img/icon/head.png">帐号
+                    </a>
+                </div>
+                <div class="appitem appitem-hook" data-href="/app/page/admin/content/edit.html">
+                    <div class="content content-hook">
+                        <a class="g-fr" title="内容编辑器">
                             <img class="img"
                                  src="http://sc1.hao123img.com/res/r/image/2017-08-03/cfcd36a64ebdd544ac1e5dad6b732528.jpg"></a>
-                        <a href="http://video.hao123.baidu.com/Game_Live" class="link">英雄联盟职业联赛</a><a
-                            href="http://video.hao123.baidu.com/Game_Live" class="desc">2017LPL夏季赛重播</a></div>
-                    <a href="http://video.hao123.baidu.com/Game_Live" class="icon icon-hook">
-                        <img class="icon-img"
-                             src="/app/static/img/icon/edit.png">编辑器</a>
+                        <a class="link">提前准备好编辑内容</a>
+                        <a class="desc">可以定时发送出去哦</a></div>
+                    <a class="icon icon-hook">
+                        <img class="icon-img" data-src="/app/static/img/icon/edit.png">编辑器</a>
                 </div>
-                <div class="appitem appitem-hook" data-jshover="appitem-jshover">
+                <div class="appitem appitem-hook" data-href="/app/page/admin/content/list.html">
                     <div class="content content-hook">
-                        <a href="http://www.hao123.com/mid/9882050281034178873"
-                           class="g-fr" title="男女平等价值观">
-                            <img class="img"
-                                 src="http://sc1.hao123img.com/res/r/image/2017-08-17/ed157c320aa30d594cb94dc2c35c585e.jpg"></a><a
-                            href="http://www.hao123.com/mid/9882050281034178873" class="link">男女平等价值观</a><a
-                            href="http://www.hao123.com/mid/9882050281034178873" class="desc">我们的理解和认识</a></div>
-                    <a href="http://tuijian.hao123.com/?type=rec" class="icon icon-hook">
-                        <img class="icon-img"
-                             src="/app/static/img/icon/content.png">内容管理</a>
+                        <a class="g-fr" title="单图文适用于所有平台">
+                            <img class="img" src="http://sc1.hao123img.com/res/r/image/2017-08-17/ed157c320aa30d594cb94dc2c35c585e.jpg"></a>
+                        <a class="link">单图文适用于所有平台</a>
+                        <a class="desc">千挑万选精美图文</a>
+                    </div>
+                    <a class="icon icon-hook">
+                        <img class="icon-img" data-src="/app/static/img/icon/content.png">内容模板
+                    </a>
                 </div>
-                <div class="appitem appitem-hook" data-jshover="appitem-jshover">
+                <div class="appitem appitem-hook" data-href="/app/page/admin/article/index.html">
                     <div class="content content-hook">
-                        <a href='' class="g-fr" title="妹子强力吐槽直男癌">
+                        <a class="g-fr" title="工蜂小智精选文章">
                             <img class="img" src="http://sc0.hao123img.com/res/r/image/2017-08-16/470825601353ac729648d5a86ea28c45.jpg">
                         </a>
-                        <a href='' class="link">妹子强力吐槽直男癌</a>
-                        <a href='' class="desc">他们绝逼交不到女盆友</a></div>
-                    <a href="http://www.hao123.com/video/fun" class="icon icon-hook">
+                        <a class="link">工蜂小智精选文章</a>
+                        <a class="desc">亿万数据尽在工蜂数据</a></div>
+                    <a class="icon icon-hook">
                         <img class="icon-img"
-                             src="/app/static/img/icon/article.png">文章库</a>
+                             data-src="/app/static/img/icon/article.png">文章库</a>
                 </div>
-                <div class="appitem appitem-hook" data-jshover="appitem-jshover">
+                <div class="appitem appitem-hook" data-href="/app/page/admin/setting/updatePwd.html">
                     <div class="content content-hook">
-                        <a href="http://report.12377.cn:13225/toreportinputNormal_anis.do" class="g-fr" title="有害信息举报专区">
-                            <img class="img"
-                                 src="http://s0.hao123img.com/res/r/image/2017-03-13/2708666b8eed77d16a4ab4bc4870719b.png"></a><a
-                            href="http://report.12377.cn:13225/toreportinputNormal_anis.do" class="link">有害信息举报专区</a><a
-                            href="http://report.12377.cn:13225/toreportinputNormal_anis.do" class="desc">中国互联网举报中心</a>
+                        <a class="g-fr" title="设置">
+                            <img class="img" src="http://s0.hao123img.com/res/r/image/2017-03-13/2708666b8eed77d16a4ab4bc4870719b.png"></a>
+                        <a class="link">帐号设置</a>
+                        <a class="desc">修改密码/喜好设置</a>
                     </div>
-                    <a href="http://www.12377.cn/" class="icon icon-hook">
-                        <img class="icon-img" src="/app/static/img/icon/setting.png">设置
+                    <a class="icon icon-hook">
+                        <img class="icon-img" data-src="/app/static/img/icon/setting.png">设置
                     </a>
                 </div>
             </div>
         </div>
-        <a href="#" hidefocus="true" class="slidetoolbar-closebtn" id="slidetoolbar-btn" monkey="slidetoolbar"
-           title="收起" style="display: inline;"></a>
     </div>
-    <iframe class="hive-iframe" class="" src="http://localhost:8080/app/page/admin/index.html"></iframe>
+    <div class="hive-iframe-div">
+        <iframe class="hive-iframe" data-src="/app/page/admin/index.html"></iframe>
+    </div>
     <div class="hive-load">
-
+        <div class="hive-load-tip">
+            <span>
+                <img data-src="/app/static/img/icon/ball-triangle.svg">
+                <p>
+                    小智正在工作中<br>请不要随意操作哦
+                </p>
+            </span>
+        </div>
     </div>
 </div>
