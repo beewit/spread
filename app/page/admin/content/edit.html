@@ -32,18 +32,19 @@
             </div>
             <div class="tpl-block edit-div">
                 <div class="edit-left edit-left-nav">
-                    <a class="none">平台</a>
-                    <a class="active"><img src="/app/static/img/icon/jianshu.jpg"></a>
+                    <a class="none" style="line-height: 22px;font-size: 16px;margin: 5px;">支持平台</a>
+                    <a><img src="/app/static/img/icon/jianshu.jpg"></a>
                     <a><img src="/app/static/img/icon/zhihu.jpg"></a>
                     <a><img src="/app/static/img/icon/sina.jpg"></a>
                     <a><img src="/app/static/img/icon/toutiao.jpg"></a>
                     <a><img src="/app/static/img/icon/wechat.jpg"></a>
                 </div>
                 <div class="edit-right">
+                    <div id="menuEditor"></div>
                     <input name="title" class="edit-title" placeholder="输入文字标题">
                     <hr style="margin-top: 0">
-                    <div id="myEditor" style="width:100%;height:700px;">
-                        <p>这里我可以写一些输入提示</p>
+                    <div id="contentEditor" style="width:100%;height:700px;">
+                        <div class="initContent">请输入正文</div>
                     </div>
                 </div>
             </div>
@@ -59,24 +60,13 @@
     <button type="button" class="am-btn am-btn-default am-btn-danger">关闭</button>
 </div>
 
-<script type="text/javascript" src="/app/static/js/plugs/umeditor/third-party/jquery.min.js"></script>
-<script type="text/javascript" src="/app/static/js/plugs/umeditor/third-party/template.min.js"></script>
-<script type="text/javascript" charset="utf-8" src="/app/static/js/plugs/umeditor/umeditor.config.js"></script>
-<script type="text/javascript" charset="utf-8" src="/app/static/js/plugs/umeditor/_examples/editor_api.js"></script>
-<script type="text/javascript" src="/app/static/js/plugs/umeditor/lang/zh-cn/zh-cn.js"></script>
-
+<script type="text/javascript" src="/app/static/js/plugs/wangEditor/release/wangEditor.js"></script>
 <script type="text/javascript">
-    var um = UM.getEditor('myEditor', {
-        //focus时自动清空初始化时的内容
-        autoClearinitialContent: true,
-        //关闭字数统计
-        wordCount: false,
-        //关闭elementPath
-        elementPathEnabled: false,
-        //默认的编辑区域高度
-        initialFrameHeight: 630
-        //更多其他参数，请参考umeditor.config.js中的配置项
-    });
+    var E = window.wangEditor;
+
+    var editor1 = new E('#menuEditor', '#contentEditor')
+    editor1.create()
+
 </script>
 </body>
 

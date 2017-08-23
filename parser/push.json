@@ -1,0 +1,20 @@
+{
+    "title": "简书",
+    "domain": "http://www.jianshu.com",
+    "loginUrl": "https://www.jianshu.com/sign_in",
+    "identity": "remember_user_token",
+    "writer": "http://www.jianshu.com/writer#/",
+    "fill": [
+        {
+            "selector": "ID",
+            "selectorName": "share-modal",
+            "handle": "Click",
+            "sleep": "1000",
+
+            "js": "alert(1)",
+            "jsParam": {"hiveHtml": "hiveHtml", "host": "host"},
+            "param": "title",
+            "result": "已发布"
+        }
+    ]
+}

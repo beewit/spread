@@ -79,16 +79,33 @@ input {
     width: 948px;
     height: 100%;
     float: right;
-    padding: 10px 20px;
 }
 
 .edit-title {
-    font-size: 26px;
+    font-size: 30px;
     display: block;
     width: 100%;
     line-height: 30px;
-    padding: 10px 0;
+    padding: 10px 20px;
     color: #8a8a8a;
+}
+
+.initContent {
+    color: #b3b3b3;
+}
+
+#menuEditor {
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+}
+
+.w-e-text {
+    overflow-y: auto !important;
+}
+
+#contentEditor {
+    padding: 0 10px;
 }
 
 .handle-div {
