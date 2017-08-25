@@ -79,9 +79,9 @@ func RunPush(rule string, paramMap map[string]string) (bool, string, error) {
 	global.Page.Navigate(pj.Domain)
 
 	//Login Identity
-	_, flog := checkIdentity(pj.Domain, pj.Identity)
+	_, flog := checkIdentity(pj.Identity)
 	if !flog {
-		flog, _ = setCookieLogin(pj.Domain, pj.Identity)
+		flog, _ = setCookieLogin(pj.Domain)
 		if !flog {
 			global.Page.Navigate(pj.LoginUrl)
 			//Sending messages to users requires landing
@@ -190,7 +190,7 @@ func checkLogin(domain string, identity string) (bool, string) {
 			break
 		}
 
-		c, f := checkIdentity(domain, identity)
+		c, f := checkIdentity(identity)
 		flog = f
 
 		if flog {
@@ -212,8 +212,8 @@ func checkLogin(domain string, identity string) (bool, string) {
 	return flog, result
 }
 
-func setCookieLogin(doman string, identity string) (bool, error) {
-	cookieRd, err := global.RD.GetString(doman)
+func setCookieLogin(doMan string) (bool, error) {
+	cookieRd, err := global.RD.GetString(doMan)
 	if err != nil {
 		return false, err
 	}
@@ -226,7 +226,7 @@ func setCookieLogin(doman string, identity string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	global.Page.Navigate(doman)
+	global.Page.Navigate(doMan)
 	for i := range cks {
 		cc := cks[i]
 		global.Page.SetCookie(cc)
@@ -234,7 +234,7 @@ func setCookieLogin(doman string, identity string) (bool, error) {
 	return true, nil
 }
 
-func checkIdentity(doman string, identity string) ([]*http.Cookie, bool) {
+func checkIdentity(identity string) ([]*http.Cookie, bool) {
 	c, err := global.Page.GetCookies()
 	if err != nil {
 		return nil, false
