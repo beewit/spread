@@ -103,7 +103,7 @@ func RunPush(rule string, paramMap map[string]string) (bool, string, error) {
 		p := pj.Fill[i]
 		switch p.Handle {
 		case Click:
-			println("Click：",findSelection(p.Selector, p.SelectorName).String())
+			println("Click：", findSelection(p.Selector, p.SelectorName).String())
 			findSelection(p.Selector, p.SelectorName).Click()
 			break
 		case DoubleClick:
@@ -248,7 +248,7 @@ func checkIdentity(doman string, identity string) ([]*http.Cookie, bool) {
 }
 
 func main() {
-	pf := PushFillJson{
+	pf := &PushFillJson{
 		"ID",
 		"share-modal",
 		"",
@@ -262,8 +262,8 @@ func main() {
 
 	var pfs []PushFillJson
 
-	pfs = append(pfs, pf)
-	pf = PushFillJson{
+	pfs = append(pfs, *pf)
+	pf = &PushFillJson{
 		"ID2",
 		"share-modal2",
 		"123456",
@@ -274,7 +274,7 @@ func main() {
 		"title",
 		"已发布",
 	}
-	pfs = append(pfs, pf)
+	pfs = append(pfs, *pf)
 	st := PushJson{
 		"简书",
 		"http://www.jianshu.com",
