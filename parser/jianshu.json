@@ -1,0 +1,42 @@
+{
+  "title": "简书",
+  "domain": "http://www.jianshu.com",
+  "loginUrl": "https://www.jianshu.com/sign_in",
+  "identity": "remember_user_token",
+  "writerUrl": "http://www.jianshu.com/writer#/",
+  "fill": [
+    {
+      "handle": "Js",
+      "sleep": 5,
+      "js": "$('#new-note a').click()"
+    },
+    {
+      "handle": "Js",
+      "sleep": 5,
+      "js": "$('#note_title').val(title)",
+      "jsParam": {
+        "title": "title/v"
+      }
+    },
+    {
+      "handle": "Js",
+      "sleep": 5,
+      "js": "$('.kalamu-area').html(content);$(\"a[data-action='trigger-save']\").click()",
+      "jsParam": {
+        "content": "content/v"
+      }
+    },
+    {
+      "handle": "Js",
+      "sleep": 5,
+      "js": "$('#publish-button').click()"
+    },
+    {
+      "handle": "Text",
+      "Selector": "selector",
+      "SelectorName": "#share-modal .modal-header",
+      "sleep": 3,
+      "result": "已发布"
+    }
+  ]
+}

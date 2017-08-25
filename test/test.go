@@ -1,14 +1,15 @@
 package main
 
 import (
-	"fmt"
-
-	"net/url"
-
+	"time"
 )
 
 func main() {
-	u, _ := url.Parse("http://www.baidu.com/index.html")
-	fmt.Println(u.Host)
+	test_1()
+	println("我这执行了test_2")
+}
 
+func test_1() {
+	time.Sleep(10 * time.Second)
+	println("我这执行了test_1")
 }

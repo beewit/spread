@@ -41,10 +41,9 @@
                 </div>
                 <div class="edit-right">
                     <div id="menuEditor"></div>
-                    <input name="title" class="edit-title" placeholder="输入文字标题">
+                    <input name="title" id="title" class="edit-title" placeholder="输入文字标题">
                     <hr style="margin-top: 0">
                     <div id="contentEditor" style="width:100%;height:700px;">
-                        <div class="initContent">请输入正文</div>
                     </div>
                 </div>
             </div>
@@ -56,17 +55,38 @@
 <div class="handle-div">
     <button type="button" class="am-btn am-btn-default am-btn-success">保存素材</button>
     <button type="button" class="am-btn am-btn-default am-btn-secondary">预览</button>
-    <button type="button" class="am-btn am-btn-default am-btn-warning">一键发布</button>
+    <button type="button" class="am-btn am-btn-default am-btn-warning" id="publish">一键发布</button>
     <button type="button" class="am-btn am-btn-default am-btn-danger">关闭</button>
 </div>
-
+<script src="/app/page/admin/assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="/app/static/js/plugs/wangEditor/release/wangEditor.js"></script>
 <script type="text/javascript">
     var E = window.wangEditor;
 
-    var editor1 = new E('#menuEditor', '#contentEditor')
-    editor1.create()
+    var editor = new E('#menuEditor', '#contentEditor')
+    editor.customConfig.uploadImgShowBase64 = true   // 使用 base64 保存图片
+    editor.create()
 
+    $(function () {
+        $("#publish").click(function () {
+            var title = $("#title").val();
+            var content = editor.txt.html();
+
+            $.ajax({
+                url: "/push/push",
+                type: 'POST',
+                dataType: "json",
+                data: {
+                    title: title,
+                    content: content
+                },
+                success: function (e) {
+                },
+                error: function (e) {
+                }
+            });
+        });
+    });
 </script>
 </body>
 

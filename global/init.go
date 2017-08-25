@@ -2,6 +2,7 @@ package global
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/beewit/beekit/conf"
 	"github.com/beewit/beekit/log"
@@ -27,6 +28,7 @@ var (
 )
 
 func injection() {
+	time.Sleep(300 * time.Millisecond)
 	arguments := map[string]interface{}{"hiveHtml": HiveHtml, "host": Host}
 	js := ";$(function () {$('body').append(hiveHtml)});" + HiveJs
 	Page.RunScript(js, arguments, nil)
@@ -34,5 +36,5 @@ func injection() {
 
 func PageNavigate(url string) {
 	Page.Navigate(url)
-	injection()
+	//go injection()
 }

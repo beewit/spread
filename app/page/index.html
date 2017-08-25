@@ -1,8 +1,11 @@
 <script>
-    var host;
-    if (location.href.indexOf("127.0.0.1") > -1) {
+    var host = "";
+    var injectJs = "<script src=\"" + host + "/app/static/js/inject.js\">" + "</scr" + "ipt>";
+    if (location.href.indexOf("127.0.0.1") <= -1) {
         host = "http://127.0.0.1:8080"
-        document.write("<script src=\"/app/static/js/inject.js\">" + "</scr" + "ipt>")
+        document.getElementsByTagName("body")[0].innerHTML += injectJs;
+    } else {
+        document.write(injectJs)
     }
 </script>
 <style>
@@ -178,8 +181,10 @@
     }
 
     .hive-load {
-        width: 100%;
-        height: 100%;
+        /*width: 100%;*/
+        /*height: 100%;*/
+        margin-left: -145px;
+        left: 50%;
         position: fixed;
         top: 0;
         background-color: rgba(124, 142, 169, 0.62);
@@ -188,12 +193,12 @@
     }
 
     .hive-load-tip {
-        margin-top: 200px;
+        /*margin-top: 200px;*/
     }
 
     .hive-load-tip span {
-        padding: 20px;
-        background-color: #2C3E50;
+        padding: 10px 20px;
+        background-color: rgba(234, 111, 90, 0.75);
         color: #fff;
         font-weight: 800;
         display: block;
@@ -446,7 +451,7 @@
     <div class="hive-iframe-div">
         <iframe class="hive-iframe" data-src="/app/page/admin/index.html"></iframe>
     </div>
-    <div class="hive-load">
+<!--    <div class="hive-load">
         <div class="hive-load-tip">
             <span>
                 <img data-src="/app/static/img/icon/ball-triangle.svg">
@@ -455,5 +460,5 @@
                 </p>
             </span>
         </div>
-    </div>
+    </div>-->
 </div>

@@ -1,9 +1,16 @@
 var time = 0;
-
+var host = "";
+if (location.href.indexOf("127.0.0.1") <= -1) {
+    host = "http://127.0.0.1:8080"
+}
 if (!window.jQuery) {
-    document.write("<script src=\"/app/page/admin/assets/js/jquery.min.js\">" + "</scr" + "ipt>");
-
-    time = 100;
+    var jqueryJs = "<script src=\"" + host + "/app/page/admin/assets/js/jquery.min.js\">" + "</scr" + "ipt>";
+    if (host != "") {
+        document.getElementsByTagName("body")[0].innerHTML += jqueryJs;
+    } else {
+        document.write(jqueryJs)
+    }
+    time = 300;
 }
 setTimeout(function () {
     $(function () {
@@ -59,3 +66,5 @@ setTimeout(function () {
     //调用函数，获取数值
     window.onresize = findDimensions;
 }, time)
+
+

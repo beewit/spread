@@ -1,0 +1,74 @@
+{
+  "title": "新浪微博",
+  "domain": "https://weibo.com",
+  "loginUrl": "https://weibo.com/login.php",
+  "writerUrl": "https://weibo.com/ttarticle/p/editor",
+  "identity": "SSOLoginState",
+  "sleep": 5,
+  "login": [
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "#loginname",
+      "Param": "loginName",
+      "sleep": 5
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "input[type=\"password\"]",
+      "Param": "loginPwd",
+      "sleep": 5
+    },
+    {
+      "handle": "Click",
+      "Selector": "XPath",
+      "SelectorName": "//*[@id=\"pl_login_form\"]/div/div[3]/div[6]/a/span",
+      "sleep": 5
+    }
+  ],
+  "fill": [
+    {
+      "handle": "Js",
+      "sleep": 5,
+      "js": "document.getElementsByClassName(\"bor\")[0].click()"
+    },
+    {
+      "handle": "Js",
+      "sleep": 5,
+      "js": "document.getElementsByClassName(\"W_input\")[0].value=title",
+      "jsParam": {
+        "title": "title/v"
+      }
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "#editor",
+      "Param": "content",
+      "sleep": 5
+    },
+    {
+      "handle": "Js",
+      "sleep": 5,
+      "js": "document.getElementsByClassName(\"btn_a\")[1].click()"
+    },
+    {
+      "handle": "Js",
+      "sleep": 5,
+      "js": "document.getElementsByClassName(\"W_btn_a\")[0].click()"
+    },
+    {
+      "handle": "Js",
+      "sleep": 5,
+      "js": "document.getElementsByName(\"follow_to_read\")[1].click();document.getElementsByClassName(\"W_btn_a\")[0].click()"
+    },
+    {
+      "handle": "Text",
+      "Selector": "selector",
+      "SelectorName": ".W_layer",
+      "sleep": 3,
+      "result": "已发布"
+    }
+  ]
+}

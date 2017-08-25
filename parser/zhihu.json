@@ -7,71 +7,70 @@
   "fill": [
     {
       "handle": "Js",
-      "sleep": 1,
-      "js": "document.getElementsByClassName(\"hive-load\")[0].className+=' hide';",
-      "sleep": 1
+      "sleep": 5,
+      "js": "document.getElementsByClassName(\"hive-load\")[0].className+=' hide';"
     },
     {
       "handle": "Fill",
       "Selector": "selector",
       "SelectorName": "textarea.Input",
       "Param": "title",
-      "sleep": 1
+      "sleep": 5
     },
     {
       "handle": "Fill",
       "Selector": "selector",
       "SelectorName": ".public-DraftEditor-content",
       "Param": "content",
-      "sleep": 2
+      "sleep": 5
     },
     {
       "handle": "Click",
       "Selector": "selector",
       "SelectorName": ".PublishPanel-triggerButton",
-      "sleep": 1
+      "sleep": 5
     },
     {
       "handle": "Fill",
       "Selector": "selector",
       "SelectorName": "input.preventCloseOnTarget",
       "SelectorVal": "广告",
-      "sleep": 3
+      "sleep": 5
     },
     {
       "handle": "Click",
       "Selector": "selector",
       "SelectorName": ".publish-suggest li",
-      "sleep": 1
+      "sleep": 5
     },
-    { 
+    {
       "handle": "Js",
       "js": "document.getElementsByClassName(\"publish-row\")[0].click()",
-      "sleep": 2
+      "sleep": 5
     },
     {
       "handle": "Click",
       "Selector": "selector",
       "SelectorName": ".publish-button",
-      "sleep": 1
+      "sleep": 5
     },
     {
       "handle": "Click",
       "Selector": "selector",
       "SelectorName": ".publish-columnLabel-0",
-      "sleep": 1
+      "sleep": 5
     },
     {
       "handle": "Click",
       "Selector": "selector",
       "SelectorName": ".publish-stepTwoButton",
-      "sleep": 1
+      "sleep": 5
     },
     {
       "handle": "Text",
       "Selector": "selector",
       "SelectorName": ".PostComment-orgTab .Tab button",
-      "sleep": 0,
+      "sleep": 3,
       "result": "还没有评论"
     }
   ]

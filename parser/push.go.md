@@ -163,3 +163,48 @@ func main() {
       "sleep": 0,
       "result": "已发布"
     }
+
+
+##新浪
+
+    {
+      "handle": "Js",
+      "sleep": 1,
+      "js": "document.getElementsByClassName(\"hive-load\")[0].className+=' hide';",
+      "sleep": 1
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".addopt a",
+      "sleep": 1
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "input[node-type=\"title\"]",
+      "Param": "title",
+      "sleep": 1
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "#editor",
+      "Param": "content",
+      "sleep": 1
+    },
+
+
+
+
+
+
+### 图片上传
+	global.Page.Navigate("http://www.baidu.com")
+	global.Page.Find(".soutu-btn").Click()
+	time.Sleep(10 * time.Second)
+	println(global.Page.Find(".UploadFile"))
+	global.Page.Find(".upload-pic").UploadFile("/home/zxblovelc/goProjects/src/github.com/beewit/spread/app/static/img/logo-80*80.png")
+	global.Page.RunScript("alert(1)", nil, nil)
+
+

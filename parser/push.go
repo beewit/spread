@@ -19,7 +19,9 @@ type PushJson struct {
 	LoginUrl  string `json:"loginUrl"`
 	Identity  string `json:"identity"`
 	WriterUrl string `json:"writerUrl"`
-	Fill      []PushFillJson
+	Sleep     int64 `json:"sleep"`
+	Fill      []PushFillJson `json:"fill"`
+	Login     []PushFillJson `json:"login"`
 }
 
 type PushFillJson struct {
@@ -57,14 +59,14 @@ const (
 	FindByClass  = "Class"
 )
 
-func getPushJson(rule string) (PushJson, error) {
+func getPushJson(rule string) (*PushJson, error) {
 	var pj PushJson
 	err := json.Unmarshal([]byte(rule), &pj)
 	if err != nil {
 		panic(err)
-		return PushJson{}, err
+		return &PushJson{}, err
 	} else {
-		return pj, nil
+		return &pj, nil
 	}
 }
 
@@ -76,83 +78,101 @@ func RunPush(rule string, paramMap map[string]string) (bool, string, error) {
 	if len(pj.Fill) <= 0 {
 		return false, pj.Title + "无发布规则配置", nil
 	}
-	global.Page.Navigate(pj.Domain)
-
-	//Login Identity
-	_, flog := checkIdentity(pj.Identity)
-	if !flog {
-		flog, _ = setCookieLogin(pj.Domain)
-		if !flog {
-			global.Page.Navigate(pj.LoginUrl)
-			//Sending messages to users requires landing
-		} else {
-			//设置Cookie
-			println("设置Cookie成功")
+	var flog bool
+	if pj.Login != nil && len(pj.Login) > 0 {
+		global.Navigate(pj.LoginUrl)
+		//Login Set UserName And Password
+		println("Login Set UserName And Password")
+		for i := 0; i < len(pj.Login); i++ {
+			handleSelection(&pj.Login[i], paramMap)
 		}
 		flog, _ = checkLogin(pj.Domain, pj.Identity)
 	} else {
-		println("已经是登陆状态")
+		global.Navigate(pj.Domain)
+		//Login Identity
+		_, flog = checkIdentity(pj.Identity)
+		if !flog {
+			flog, _ = setCookieLogin(pj.Domain)
+			if !flog {
+				global.Navigate(pj.LoginUrl)
+				//Sending messages to users requires landing
+			} else {
+				//设置Cookie
+				println("设置Cookie成功")
+			}
+			flog, _ = checkLogin(pj.Domain, pj.Identity)
+		} else {
+			println("已经是登陆状态")
+		}
 	}
 	if !flog {
 		return false, pj.Title + "登陆失败", nil
 	}
-	global.Navigate(pj.WriterUrl)
-	//var jsArgs map[string]interface{}
-	var jsResult string
-	for i := 0; i < len(pj.Fill); i++ {
-		p := pj.Fill[i]
-		switch p.Handle {
-		case Click:
-			println("Click：", findSelection(p.Selector, p.SelectorName).String())
-			findSelection(p.Selector, p.SelectorName).Click()
-			break
-		case DoubleClick:
-			findSelection(p.Selector, p.SelectorName).DoubleClick()
-			break
-		case Check:
-			findSelection(p.Selector, p.SelectorName).Check()
-		case Uncheck:
-			findSelection(p.Selector, p.SelectorName).Uncheck()
-		case Select:
-			findSelection(p.Selector, p.SelectorName).Select(p.SelectorVal)
-		case Submit:
-			findSelection(p.Selector, p.SelectorName).Submit()
-		case Fill:
-			var text string
-			if p.SelectorVal == "" {
-				text = paramMap[p.Param]
-			} else {
-				text = p.SelectorVal
-			}
-			findSelection(p.Selector, p.SelectorName).Fill(text)
-			break
-		case Text:
-			result, _ := findSelection(p.Selector, p.SelectorName).Text()
-			if p.Result != "" {
-				if strings.Contains(result, p.Result) {
-					return true, result, nil
-				}
-			}
-		case RunScript:
-			if p.JsParam != nil {
-				for key, value := range p.JsParam {
-					v := string(value.(string))
-					if strings.Contains(v, "/v") {
-						v = strings.Replace(v, "/v", "", 1)
-						p.JsParam[key] = paramMap[v]
-					}
-					println("JsParam", key, p.JsParam[key])
-				}
-			}
-			println("执行JS：", p.Js)
-			global.Page.RunScript(p.Js, p.JsParam, &jsResult)
-			break
-		}
-		if p.Sleep > 0 {
-			time.Sleep(time.Duration(p.Sleep) * time.Second)
-		}
+	if pj.Sleep > 0 {
+		time.Sleep(time.Duration(pj.Sleep) * time.Second)
 	}
-	return false, "无结果", nil
+	global.Navigate(pj.WriterUrl)
+	for i := 0; i < len(pj.Fill); i++ {
+		handleSelection(&pj.Fill[i], paramMap)
+	}
+	return true, "全部执行完成", nil
+}
+
+func handleSelection(p *PushFillJson, paramMap map[string]string) (bool, string, error) {
+	var jsResult string
+	switch p.Handle {
+	case Click:
+		println("Click：", findSelection(p.Selector, p.SelectorName).String())
+		findSelection(p.Selector, p.SelectorName).Click()
+		break
+	case DoubleClick:
+		findSelection(p.Selector, p.SelectorName).DoubleClick()
+		break
+	case Check:
+		findSelection(p.Selector, p.SelectorName).Check()
+	case Uncheck:
+		findSelection(p.Selector, p.SelectorName).Uncheck()
+	case Select:
+		findSelection(p.Selector, p.SelectorName).Select(p.SelectorVal)
+	case Submit:
+		findSelection(p.Selector, p.SelectorName).Submit()
+	case Fill:
+		var text string
+		if p.SelectorVal == "" {
+			text = paramMap[p.Param]
+		} else {
+			text = p.SelectorVal
+		}
+		println("Fill：", findSelection(p.Selector, p.SelectorName).String(), p.Selector, p.SelectorName, text)
+		findSelection(p.Selector, p.SelectorName).Fill(text)
+		break
+	case Text:
+		result, _ := findSelection(p.Selector, p.SelectorName).Text()
+		if p.Result != "" {
+			if strings.Contains(result, p.Result) {
+				println("执行结果：", result)
+				return true, result, nil
+			}
+		}
+	case RunScript:
+		if p.JsParam != nil {
+			for key, value := range p.JsParam {
+				v := string(value.(string))
+				if strings.Contains(v, "/v") {
+					v = strings.Replace(v, "/v", "", 1)
+					p.JsParam[key] = paramMap[v]
+				}
+				println("JsParam", key, p.JsParam[key])
+			}
+		}
+		println("执行JS：", p.Js)
+		global.Page.RunScript(p.Js, p.JsParam, &jsResult)
+		break
+	}
+	if p.Sleep > 0 {
+		time.Sleep(time.Duration(p.Sleep) * time.Second)
+	}
+	return true, p.Handle + "执行完成", nil
 }
 
 func findSelection(selector string, selectorName string) *agouti.Selection {
@@ -226,7 +246,7 @@ func setCookieLogin(doMan string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	global.Page.Navigate(doMan)
+	global.Navigate(doMan)
 	for i := range cks {
 		cc := cks[i]
 		global.Page.SetCookie(cc)
@@ -281,7 +301,9 @@ func main() {
 		"https://www.jianshu.com/sign_in",
 		"remember_user_token",
 		"http://www.jianshu.com/writer#/",
+		1000,
 		pfs,
+		nil,
 	}
 
 	b, err := json.Marshal(st)

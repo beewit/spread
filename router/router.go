@@ -20,4 +20,6 @@ func Router() {
 
 func handlerConfig(e *echo.Echo) {
 	e.POST("/auth/identity", handler.Identity)
+
+	e.POST("/push/push", handler.Push)
 }
