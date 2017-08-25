@@ -4,10 +4,11 @@
   "loginUrl": "https://www.jianshu.com/sign_in",
   "identity": "remember_user_token",
   "writerUrl": "http://www.jianshu.com/writer#/",
+  "sleep": 5,
   "fill": [
     {
       "handle": "Js",
-      "sleep": 5,
+      "sleep": 3,
       "js": "$('#new-note a').click()"
     },
     {

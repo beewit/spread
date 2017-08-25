@@ -32,6 +32,8 @@ func start() {
 		//		flog, result, err2 := handler.PushComm("十年前，大家都在哼《认真的雪》。十年后，大家都在唱薛之谦", "你创业卖衣服开火锅店年入百万，你写段子爆红大江南北，你上综艺节目频频曝光是为了什么呢？—做音乐。 前几日，亲戚们小聚。 酒足饭饱之后，众人提议去KTV亮亮嗓子，可把我们这些...", rule)
 		//		println("简书分发", flog, result, err2)
 
+		//global.Navigate("https://www.zhihu.com")
+
 		global.Page.Navigate(global.Host)
 
 		//		paramMap := map[string]string{

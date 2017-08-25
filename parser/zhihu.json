@@ -4,6 +4,7 @@
   "loginUrl": "https://www.zhihu.com/#signin",
   "identity": "z_c0",
   "writerUrl": "https://zhuanlan.zhihu.com/write",
+  "sleep": 3,
   "fill": [
     {
       "handle": "Js",

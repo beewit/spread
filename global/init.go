@@ -30,11 +30,13 @@ var (
 func injection() {
 	time.Sleep(300 * time.Millisecond)
 	arguments := map[string]interface{}{"hiveHtml": HiveHtml, "host": Host}
-	js := ";$(function () {$('body').append(hiveHtml)});" + HiveJs
+	//js := ";$(function () {$('body').append(hiveHtml)});" + HiveJs
+	//js := ";document.getElementsByTagName(\"body\")[0].innerHTML += hiveHtml;" + HiveJs
+	js := "var hiveHtmlDiv = document.createElement('div');hiveHtmlDiv.innerHTML=hiveHtml;document.body.appendChild(hiveHtmlDiv);" + HiveJs
 	Page.RunScript(js, arguments, nil)
 }
 
 func PageNavigate(url string) {
 	Page.Navigate(url)
-	//go injection()
+	go injection()
 }

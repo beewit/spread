@@ -14,12 +14,12 @@ import (
 )
 
 type PushJson struct {
-	Title     string `json:"title"`
-	Domain    string `json:"domain"`
-	LoginUrl  string `json:"loginUrl"`
-	Identity  string `json:"identity"`
-	WriterUrl string `json:"writerUrl"`
-	Sleep     int64 `json:"sleep"`
+	Title     string         `json:"title"`
+	Domain    string         `json:"domain"`
+	LoginUrl  string         `json:"loginUrl"`
+	Identity  string         `json:"identity"`
+	WriterUrl string         `json:"writerUrl"`
+	Sleep     int64          `json:"sleep"`
 	Fill      []PushFillJson `json:"fill"`
 	Login     []PushFillJson `json:"login"`
 }
@@ -108,10 +108,10 @@ func RunPush(rule string, paramMap map[string]string) (bool, string, error) {
 	if !flog {
 		return false, pj.Title + "登陆失败", nil
 	}
+	global.Navigate(pj.WriterUrl)
 	if pj.Sleep > 0 {
 		time.Sleep(time.Duration(pj.Sleep) * time.Second)
 	}
-	global.Navigate(pj.WriterUrl)
 	for i := 0; i < len(pj.Fill); i++ {
 		handleSelection(&pj.Fill[i], paramMap)
 	}

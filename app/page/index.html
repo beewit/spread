@@ -1,13 +1,3 @@
-<script>
-    var host = "";
-    var injectJs = "<script src=\"" + host + "/app/static/js/inject.js\">" + "</scr" + "ipt>";
-    if (location.href.indexOf("127.0.0.1") <= -1) {
-        host = "http://127.0.0.1:8080"
-        document.getElementsByTagName("body")[0].innerHTML += injectJs;
-    } else {
-        document.write(injectJs)
-    }
-</script>
 <style>
     body {
         margin: 0;
@@ -449,16 +439,43 @@
         </div>
     </div>
     <div class="hive-iframe-div">
-        <iframe class="hive-iframe" data-src="/app/page/admin/index.html"></iframe>
+        <iframe class="hive-iframe" id="hive-iframe" data-src="/app/page/admin/index.html"></iframe>
     </div>
-<!--    <div class="hive-load">
-        <div class="hive-load-tip">
-            <span>
-                <img data-src="/app/static/img/icon/ball-triangle.svg">
-                <p>
-                    小智正在工作中<br>请不要随意操作哦
-                </p>
-            </span>
-        </div>
-    </div>-->
+    <!--    <div class="hive-load">
+            <div class="hive-load-tip">
+                <span>
+                    <img data-src="/app/static/img/icon/ball-triangle.svg">
+                    <p>
+                        小智正在工作中<br>请不要随意操作哦
+                    </p>
+                </span>
+            </div>
+        </div>-->
 </div>
+
+<script>
+    if (location.href.indexOf("127.0.0.1") <= -1 || location.href.indexOf("localhost") <= -1) {
+        loadScript("/app/static/js/inject.js");
+    }
+
+    function loadScript(url, callback) {
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        if (typeof(callback) != "undefined") {
+            if (script.readyState) {
+                script.onreadystatechange = function () {
+                    if (script.readyState == "loaded" || script.readyState == "complete") {
+                        script.onreadystatechange = null;
+                        callback();
+                    }
+                };
+            } else {
+                script.onload = function () {
+                    callback();
+                };
+            }
+        }
+        script.src = url;
+        document.body.appendChild(script);
+    }
+</script>
