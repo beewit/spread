@@ -1,0 +1,78 @@
+{
+  "title": "知乎",
+  "domain": "https://www.zhihu.com",
+  "loginUrl": "https://www.zhihu.com/#signin",
+  "identity": "z_c0",
+  "writerUrl": "https://zhuanlan.zhihu.com/write",
+  "fill": [
+    {
+      "handle": "Js",
+      "sleep": 1,
+      "js": "document.getElementsByClassName(\"hive-load\")[0].className+=' hide';",
+      "sleep": 1
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "textarea.Input",
+      "Param": "title",
+      "sleep": 1
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": ".public-DraftEditor-content",
+      "Param": "content",
+      "sleep": 2
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".PublishPanel-triggerButton",
+      "sleep": 1
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "input.preventCloseOnTarget",
+      "SelectorVal": "广告",
+      "sleep": 3
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".publish-suggest li",
+      "sleep": 1
+    },
+    { 
+      "handle": "Js",
+      "js": "document.getElementsByClassName(\"publish-row\")[0].click()",
+      "sleep": 2
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".publish-button",
+      "sleep": 1
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".publish-columnLabel-0",
+      "sleep": 1
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".publish-stepTwoButton",
+      "sleep": 1
+    },
+    {
+      "handle": "Text",
+      "Selector": "selector",
+      "SelectorName": ".PostComment-orgTab .Tab button",
+      "sleep": 0,
+      "result": "还没有评论"
+    }
+  ]
+}
