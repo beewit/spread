@@ -43,7 +43,7 @@
                     <div id="menuEditor"></div>
                     <input name="title" id="title" class="edit-title" placeholder="输入文字标题">
                     <hr style="margin-top: 0">
-                    <div id="contentEditor" style="width:100%;height:700px;">
+                    <div id="contentEditor" style="width:100%;height:680px;">
                     </div>
                 </div>
             </div>
@@ -59,10 +59,10 @@
     <button type="button" class="am-btn am-btn-default am-btn-danger">关闭</button>
 </div>
 <script src="/app/page/admin/assets/js/jquery.min.js"></script>
+<script src="/app/page/admin/assets/js/common.js"></script>
 <script type="text/javascript" src="/app/static/js/plugs/wangEditor/release/wangEditor.js"></script>
 <script type="text/javascript">
     var E = window.wangEditor;
-
     var editor = new E('#menuEditor', '#contentEditor')
     editor.customConfig.uploadImgShowBase64 = true   // 使用 base64 保存图片
     editor.create()
@@ -85,6 +85,20 @@
                 error: function (e) {
                 }
             });
+        });
+        var tpl = Request["tpl"];
+        $.ajax({
+            url: "/api/template/" + tpl,
+            type: 'GET',
+            dataType: "json",
+            success: function (d) {
+                if (d.ret == 200) {
+                    $("#title").val(d.data.title)
+                    editor.txt.html(d.data.content)
+                }
+            },
+            error: function (d) {
+            }
         });
     });
 </script>

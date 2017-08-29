@@ -1,15 +1,31 @@
 package main
 
 import (
-	"time"
+	"fmt"
+	"github.com/beewit/beekit/utils/uhttp"
+	"github.com/beewit/spread/global"
+	"encoding/json"
 )
 
 func main() {
-	test_1()
-	println("我这执行了test_2")
-}
-
-func test_1() {
-	time.Sleep(10 * time.Second)
-	println("我这执行了test_1")
+	body, err := uhttp.Cmd(uhttp.Request{
+		Method: "GET",
+		URL:    global.API_SERVICE_DOMAN + "/api/template",
+	})
+	if err != nil {
+	}
+	var res map[string]interface{}
+	if err := json.Unmarshal(body, &res); err == nil {
+		for k, v := range res {
+			if k == "data" {
+				data, err2 := json.Marshal(v)
+				if err2 != nil {
+					println(err2.Error())
+				}
+				res[k] = string(data[:])
+			}
+		}
+		fmt.Sprintf("%+v", res)
+	} else {
+	}
 }

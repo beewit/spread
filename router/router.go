@@ -6,15 +6,22 @@ import (
 
 	"fmt"
 
+	"github.com/beewit/spread/api"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 func Router() {
 	e := echo.New()
+	e.Use(middleware.Gzip())
+	//e.Use(middleware.Logger())
+	//e.Use(middleware.CSRF())
+	//e.Use(middleware.CORS())
+	e.Use(middleware.Recover())
 	e.Static("/app", "app")
 	e.File("/", "app/page/index.html")
 	handlerConfig(e)
-	go e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", global.Port)))
+	go e.Logger.Fatal(e.Start(fmt.Sprintf(":%v", global.Port)))
 
 }
 
@@ -22,4 +29,8 @@ func handlerConfig(e *echo.Echo) {
 	e.POST("/auth/identity", handler.Identity)
 
 	e.POST("/push/push", handler.Push)
+
+	e.GET("/api/template", api.GetTemplateByList)
+
+	e.GET("/api/template/:id", api.GetTemplateById)
 }

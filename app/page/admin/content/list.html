@@ -23,7 +23,7 @@
         <div class="tpl-portlet-components">
             <div class="portlet-title">
                 <div class="caption font-green bold">
-                    <span class="am-icon-image"></span> 图文素材
+                    <span class="am-icon-image"></span> 营销模板
                 </div>
 
             </div>
@@ -43,19 +43,21 @@
                         <div class="am-input-group am-input-group-sm">
                             <input type="text" class="am-form-field">
                             <span class="am-input-group-btn">
-                                <button class="am-btn  am-btn-default am-btn-success tpl-am-btn-success am-icon-search" type="button"></button>
+                                <button class="am-btn  am-btn-default am-btn-success tpl-am-btn-success am-icon-search"
+                                        type="button"></button>
                             </span>
                         </div>
                     </div>
                 </div>
                 <div class="am-g am-margin-top">
-                    <div class="tpl-table-images">
+                    <div class="tpl-table-images" id="view">
 
                         <div class="am-u-sm-12 am-u-md-6 am-u-lg-4">
                             <div class="tpl-table-images-content">
                                 <div class="tpl-table-images-content-i-time">
                                     <span class="label label-danger">简书</span>
-                                    发布时间：2016-09-12</div>
+                                    发布时间：2016-09-12
+                                </div>
                                 <div class="tpl-i-title">
                                     [标题]“你的旅行，是什么颜色？” 晒照片，换北欧梦幻极光之旅！
                                 </div>
@@ -104,7 +106,8 @@
                             <div class="tpl-table-images-content">
                                 <div class="tpl-table-images-content-i-time">
                                     <span class="label label-danger">简书</span>
-                                    发布时间：2016-09-12</div>
+                                    发布时间：2016-09-12
+                                </div>
                                 <div class="tpl-i-title">
                                     [标题]“你的旅行，是什么颜色？” 晒照片，换北欧梦幻极光之旅！
                                 </div>
@@ -152,7 +155,8 @@
                             <div class="tpl-table-images-content">
                                 <div class="tpl-table-images-content-i-time">
                                     <span class="label label-danger">简书</span>
-                                    发布时间：2016-09-12</div>
+                                    发布时间：2016-09-12
+                                </div>
                                 <div class="tpl-i-title">
                                     [标题]“你的旅行，是什么颜色？” 晒照片，换北欧梦幻极光之旅！
                                 </div>
@@ -223,8 +227,68 @@
     </div>
 </div>
 <script src="../assets/js/jquery.min.js"></script>
-<script src="../assets/js/amazeui.min.js"></script>
-<script src="../assets/js/app.js"></script>
-</body>
+<script src="/app/static/js/plugs/layui/layui.all.js"></script>
 
+<script id="list" type="text/html">
+    {{#  layui.each(d.data, function(index, item){ }}
+    <div class="am-u-sm-12 am-u-md-6 am-u-lg-4">
+        <div class="tpl-table-images-content">
+            <div class="tpl-table-images-content-i-time">
+                <span class="label label-danger">{{ item.source }}</span>
+                发布时间：{{ item.ct_time }}
+            </div>
+            <div class="tpl-i-title">
+                {{ item.title }}
+            </div>
+            <a href="javascript:;" class="tpl-table-images-content-i">
+                <span class="tpl-table-images-content-i-shadow"></span>
+                <img src="{{ item.img }}" alt="">
+            </a>
+            <div class="tpl-table-images-content-block">
+                <div class="tpl-i-font">
+                    {{ item.content }}
+                </div>
+                <div class="am-btn-toolbar">
+                    <div class="am-btn-group am-btn-group-xs tpl-edit-content-btn">
+                        <a href="edit.html?tpl={{ item.id }}" class="am-btn am-btn-default am-btn-secondary"><span
+                                class="am-icon-edit"></span> 编辑
+                        </a>
+                        <a class="am-btn am-btn-default am-btn-danger"><span
+                                class="am-icon-trash-o"></span> 收藏
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{#  }); }}
+    {{#  if(d.data.length === 0){ }}
+    无数据
+    {{#  } }}
+</script>
+<script>
+    var laytpl;
+    var getTpl = list.innerHTML, view = document.getElementById('view');
+    layui.use('laytpl', function () {
+        laytpl = layui.laytpl;
+        getData();
+    });
+
+    function getData() {
+        $.ajax({
+            url: "/api/template",
+            type: 'GET',
+            dataType: "json",
+            success: function (d) {
+                laytpl(getTpl).render(d.data, function (html) {
+                    view.innerHTML = html;
+                });
+            },
+            error: function (d) {
+            }
+        });
+    }
+
+</script>
+</body>
 </html>

@@ -23,15 +23,17 @@ var (
 	Log      = log.Logger
 	IP       = CFG.Get("server.ip")
 	Port     = CFG.Get("server.port")
-	Host     = fmt.Sprintf("http://%s:%s", IP, Port)
+	Host     = fmt.Sprintf("http://%v:%v", IP, Port)
 	Navigate = PageNavigate
 )
+
+const API_SERVICE_DOMAN = "http://127.0.0.1:8090"
 
 func injection() {
 	time.Sleep(300 * time.Millisecond)
 	arguments := map[string]interface{}{"hiveHtml": HiveHtml, "host": Host}
+	//jquery
 	//js := ";$(function () {$('body').append(hiveHtml)});" + HiveJs
-	//js := ";document.getElementsByTagName(\"body\")[0].innerHTML += hiveHtml;" + HiveJs
 	js := "var hiveHtmlDiv = document.createElement('div');hiveHtmlDiv.innerHTML=hiveHtml;document.body.appendChild(hiveHtmlDiv);" + HiveJs
 	Page.RunScript(js, arguments, nil)
 }
