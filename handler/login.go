@@ -12,7 +12,7 @@ func SetClientToken(token string) *global.Account {
 	acc := api.CheckClientLogin(token)
 	if acc != nil {
 		//insert sqllite
-		flog, err := global.InsertToken(token)
+		flog, err := global.InsertToken(token,acc)
 		if err != nil {
 			global.Log.Error(err.Error())
 			return nil

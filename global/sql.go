@@ -2,17 +2,12 @@ package global
 
 import (
 	"github.com/beewit/beekit/utils/convert"
+	"github.com/beewit/beekit/utils"
+	"time"
 )
 
-func CreateLoginTokenTable() (int64, error) {
-	sql := `CREATE TABLE IF NOT EXISTS login_token (
-			  token VARCHAR(255)
-		   )`
-	return SLDB.Insert(sql)
-}
-
 func QueryLoginToken() (string, error) {
-	sql := `SELECT token FROM login_token LIMIT 1`
+	sql := `SELECT token FROM account_token LIMIT 1`
 	m, err := SLDB.Query(sql)
 	if err != nil {
 		return "", err
@@ -23,9 +18,11 @@ func QueryLoginToken() (string, error) {
 	return convert.ToString(m[0]["token"]), nil
 }
 
-func InsertToken(token string) (bool, error) {
-	sql := `DELETE FROM login_token;INSERT INTO login_token(token) values(?)`
-	x, err := SLDB.Insert(sql, token)
+func InsertToken(token string, acc *Account) (bool, error) {
+	iw, _ := utils.NewIdWorker(1)
+	id, _ := iw.NextId()
+	sql := `DELETE FROM account_token WHERE account_id=?;INSERT INTO account_token(id,account_id,token,ut_time) values(?,?,?,?)`
+	x, err := SLDB.Insert(sql,acc.Id, id, acc.Id, token, time.Now().Format("2006-01-02 15:04:05"))
 	if err != nil {
 		return false, err
 	}

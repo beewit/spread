@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/spread/global"
-	"github.com/beewit/beekit/utils/uhttp"
 	"time"
 	"fmt"
+	"github.com/beewit/beekit/utils/uhttp"
 )
 
 type Article struct {
@@ -38,7 +38,7 @@ func TestCreateTable(t *testing.T) {
 
 	//tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.HezrOWC6gyT06oTOoBDMs0_NYLNA59Fk2UhI2bZ25cU"
 
-	b, err := uhttp.PostForm("http://127.0.0.1:8081/pass/checkToken?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.Ul4N-Z_SOAQp01NaY-5Me2qOgJdGluHGzO1c_dCeT2s", nil)
+	b, err := uhttp.PostForm("http://sso.tbqbz.com/pass/checkToken?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.6K1L5xwnEnR6-CZYte7TwazbHrVt3f8L-0AOrfpT06I", nil)
 	//rp := utils.ToResultParam(b)
 	//if rp.Ret == utils.SUCCESS_CODE {
 	//	acc := global.ToInterfaceAccount(rp.Data)

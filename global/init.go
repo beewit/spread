@@ -27,7 +27,8 @@ var (
 	Port     = CFG.Get("server.port")
 	Host     = fmt.Sprintf("http://%v:%v", IP, Port)
 	Navigate = PageNavigate
-	Acc      Account
+	Acc      *Account
+	Platform    = map[string]int{"新浪微博": 1, "简书": 2, "知乎": 3}
 )
 
 const API_SERVICE_DOMAN = "http://127.0.0.1:8090"

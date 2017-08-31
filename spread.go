@@ -7,9 +7,11 @@ import (
 	"github.com/beewit/spread/router"
 	"github.com/sclevine/agouti"
 	"github.com/beewit/spread/api"
+	"runtime"
 )
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	start()
 	router.Router()
 }
@@ -18,6 +20,8 @@ func start() {
 	acc := CheckClientLogin()
 	if acc == nil {
 		load = global.API_SSO_DOMAN + "?backUrl=" + global.Host + "/ReceiveToken"
+	} else {
+		acc = global.Acc
 	}
 	global.Driver = agouti.ChromeDriver(agouti.ChromeOptions("args", []string{
 		"--start-maximized",
