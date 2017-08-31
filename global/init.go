@@ -27,6 +27,7 @@ var (
 	Port     = CFG.Get("server.port")
 	Host     = fmt.Sprintf("http://%v:%v", IP, Port)
 	Navigate = PageNavigate
+	Acc      Account
 )
 
 const API_SERVICE_DOMAN = "http://127.0.0.1:8090"

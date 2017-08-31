@@ -6,7 +6,7 @@ import (
 	"github.com/beewit/spread/global"
 	"github.com/beewit/spread/router"
 	"github.com/sclevine/agouti"
-	"github.com/beewit/spread/handler"
+	"github.com/beewit/spread/api"
 )
 
 func main() {
@@ -15,7 +15,8 @@ func main() {
 }
 func start() {
 	load := global.Host
-	if !CheckClientLogin() {
+	acc := CheckClientLogin()
+	if acc == nil {
 		load = global.API_SSO_DOMAN + "?backUrl=" + global.Host + "/ReceiveToken"
 	}
 	global.Driver = agouti.ChromeDriver(agouti.ChromeOptions("args", []string{
@@ -34,14 +35,14 @@ func start() {
 	}()
 }
 
-func CheckClientLogin() bool {
+func CheckClientLogin() *global.Account {
 	token, err := global.QueryLoginToken()
 	if err != nil {
 		global.Log.Error(err.Error())
 		panic(err)
 	}
 	if token == "" {
-		return false
+		return nil
 	}
-	return handler.CheckClientLogin(token)
+	return api.CheckClientLogin(token)
 }
