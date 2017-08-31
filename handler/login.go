@@ -6,7 +6,46 @@ import (
 	"github.com/beewit/spread/global"
 	"encoding/json"
 	"strings"
+	"github.com/beewit/beekit/utils/uhttp"
+	"github.com/beewit/beekit/utils"
+	"github.com/labstack/echo"
 )
+
+func CheckClientLogin(token string) bool {
+	b, err := uhttp.PostForm(global.API_SSO_DOMAN+"/pass/checkToken?token="+token, nil)
+	if err != nil {
+		global.Log.Error(err.Error())
+		return false
+	}
+	rp := utils.ToResultParam(b)
+	if rp.Ret != 200 {
+		return false
+	}
+	return true
+}
+
+func SetClientToken(token string) bool {
+	if CheckClientLogin(token) {
+		//insert sqllite
+		flog, err := global.InsertToken(token)
+		if err != nil {
+			global.Log.Error(err.Error())
+			return false
+		}
+		return flog
+	}
+	return false
+}
+
+func ReceiveToken(c echo.Context) error {
+	token := c.FormValue("token")
+	if token != "" {
+		if SetClientToken(token) {
+			return utils.Redirect(c, global.Host)
+		}
+	}
+	return utils.RedirectAndAlert(c, "登陆失败", global.API_SSO_DOMAN)
+}
 
 func SetLoginCookie() (bool, string) {
 	jsAccount, _ := global.RD.GetString("jianshu")
@@ -56,7 +95,7 @@ func CheckLogin(t string, domain string, identity string) (bool, string) {
 			global.RD.SetString(t, cookieJson)
 
 			//global.Page.Navigate(global.Url)
-			result="设置Cookie成功"
+			result = "设置Cookie成功"
 			break
 		}
 	}

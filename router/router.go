@@ -33,4 +33,6 @@ func handlerConfig(e *echo.Echo) {
 	e.GET("/api/template", api.GetTemplateByList)
 
 	e.GET("/api/template/:id", api.GetTemplateById)
+
+	e.GET("/ReceiveToken", handler.ReceiveToken)
 }

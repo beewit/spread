@@ -8,6 +8,7 @@ import (
 	"github.com/beewit/beekit/log"
 	"github.com/beewit/beekit/mysql"
 	"github.com/beewit/beekit/redis"
+	"github.com/beewit/beekit/sqlite"
 	"github.com/beewit/beekit/utils"
 	"github.com/sclevine/agouti"
 )
@@ -16,6 +17,7 @@ var (
 	CFG      = conf.New("config.json")
 	DB       = mysql.DB
 	RD       = redis.Cache
+	SLDB     = sqlite.DB
 	Driver   *agouti.WebDriver
 	Page     *agouti.Page
 	HiveHtml = utils.Read("app/page/index.html")
@@ -28,6 +30,7 @@ var (
 )
 
 const API_SERVICE_DOMAN = "http://127.0.0.1:8090"
+const API_SSO_DOMAN = "http://sso.tbqbz.com"
 
 func injection() {
 	time.Sleep(300 * time.Millisecond)

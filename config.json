@@ -11,6 +11,9 @@
     "maxOpenConns": "10",
     "maxIdleConns": "10"
   },
+  "sqlite": {
+    "database": "hive-spread.db"
+  },
   "redis": {
     "host": "127.0.0.1:6379",
     "database": "0",
@@ -19,7 +22,7 @@
     "maxIdleConns": "10"
   },
   "logger": {
-    "path": "hive.log",
+    "path": "spread.log",
     "level": "7",
     "maxdays": "10",
     "separate": "error"

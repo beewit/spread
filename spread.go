@@ -6,6 +6,7 @@ import (
 	"github.com/beewit/spread/global"
 	"github.com/beewit/spread/router"
 	"github.com/sclevine/agouti"
+	"github.com/beewit/spread/handler"
 )
 
 func main() {
@@ -13,6 +14,10 @@ func main() {
 	router.Router()
 }
 func start() {
+	load := global.Host
+	if !CheckClientLogin() {
+		load = global.API_SSO_DOMAN + "?backUrl=" + global.Host + "/ReceiveToken"
+	}
 	global.Driver = agouti.ChromeDriver(agouti.ChromeOptions("args", []string{
 		"--start-maximized",
 		"--disable-infobars",
@@ -25,7 +30,18 @@ func start() {
 		fmt.Println("Failed to open page.")
 	}
 	go func() {
-		global.Page.Navigate(global.Host)
+		global.Page.Navigate(load)
 	}()
+}
 
+func CheckClientLogin() bool {
+	token, err := global.QueryLoginToken()
+	if err != nil {
+		global.Log.Error(err.Error())
+		panic(err)
+	}
+	if token == "" {
+		return false
+	}
+	return handler.CheckClientLogin(token)
 }
