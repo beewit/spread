@@ -12,17 +12,20 @@ func Push(c echo.Context) error {
 
 	go func() {
 		println("开始执行简书分发")
-		rule := utils.Read(utils.JsonPath("parser", "jianshu.json"))
+		//   utils.JsonPath("parser", "./jianshu.json")
+		rule := utils.Read("./parser/jianshu.json")
 		flog, result, err2 := PushComm(title, content, rule)
 		println("简书分发", flog, result, err2)
 
 		println("开始执行知乎分发")
-		rule = utils.Read(utils.JsonPath("parser", "zhihu.json"))
+		//utils.JsonPath("parser", "./zhihu.json")
+		rule = utils.Read("./parser/zhihu.json")
 		flog, result, err2 = PushComm(title, content, rule)
 		println("知乎分发", flog, result, err2)
 
 		println("开始执行新浪分发")
-		rule = utils.Read(utils.JsonPath("parser", "sina.json"))
+		//utils.JsonPath("parser", "./sina.json")
+		rule = utils.Read("./parser/sina.json")
 		flog, result, err2 = PushComm(title, content, rule)
 		println("微博分发", flog, result, err2)
 	}()
