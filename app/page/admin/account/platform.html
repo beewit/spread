@@ -44,14 +44,18 @@
 <script src="../assets/js/static/js/common/common.ajax.js"></script>
 <script>
     $(function () {
-
+        loadUnion()
     });
 
     function loadUnion() {
         $.ajax({
-            url: "/union/list",
-            success: function () {
-
+            url: "/platform/list",
+            success: function (d) {
+                if (d.ret == 200) {
+                    for (var v in d.data) {
+                        console.log(v)
+                    }
+                }
             }
         });
     }

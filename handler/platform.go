@@ -2,8 +2,8 @@ package handler
 
 import (
 	"github.com/labstack/echo"
-	"hive/hive-sso/utils"
 	"github.com/beewit/spread/global"
+	"github.com/beewit/beekit/utils"
 )
 
 func PlatformList(c echo.Context) error {
