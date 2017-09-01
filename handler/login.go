@@ -6,13 +6,14 @@ import (
 	"github.com/labstack/echo"
 	"github.com/beewit/spread/api"
 	"github.com/beewit/beekit/log"
+	"github.com/beewit/spread/dao"
 )
 
 func SetClientToken(token string) *global.Account {
 	acc := api.CheckClientLogin(token)
 	if acc != nil {
 		//insert sqllite
-		flog, err := global.InsertToken(token,acc)
+		flog, err := dao.InsertToken(token, acc)
 		if err != nil {
 			global.Log.Error(err.Error())
 			return nil
@@ -31,8 +32,9 @@ func ReceiveToken(c echo.Context) error {
 	if token != "" {
 		acc := SetClientToken(token)
 		if acc != nil {
+			global.Acc = acc
 			return utils.Redirect(c, global.Host)
 		}
 	}
-	return utils.RedirectAndAlert(c, "登陆失败", global.API_SSO_DOMAN + "?backUrl=" + global.Host + "/ReceiveToken")
+	return utils.RedirectAndAlert(c, "登陆失败", global.API_SSO_DOMAN+"?backUrl="+global.Host+"/ReceiveToken")
 }

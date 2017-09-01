@@ -11,6 +11,7 @@ import (
 
 	"github.com/beewit/spread/global"
 	"github.com/sclevine/agouti"
+	"github.com/beewit/spread/dao"
 )
 
 type PushJson struct {
@@ -217,8 +218,8 @@ func checkLogin(domain string, identity string) (bool, string) {
 			cookieJson, _ := json.Marshal(c)
 
 			println(cookieJson)
-			global.RD.SetString(domain, cookieJson)
-
+			//global.RD.SetString(domain, cookieJson)
+			dao.SetUnionCookies(domain, string(cookieJson), global.Acc.Id)
 			result = "设置Cookie成功"
 			println(result)
 			break
@@ -233,7 +234,7 @@ func checkLogin(domain string, identity string) (bool, string) {
 }
 
 func setCookieLogin(doMan string) (bool, error) {
-	cookieRd, err := global.RD.GetString(doMan)
+	cookieRd, err := dao.GetUnionCookies(doMan, global.Acc.Id) //global.RD.GetString(doMan)
 	if err != nil {
 		return false, err
 	}

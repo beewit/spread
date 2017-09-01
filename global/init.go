@@ -7,7 +7,6 @@ import (
 	"github.com/beewit/beekit/conf"
 	"github.com/beewit/beekit/log"
 	"github.com/beewit/beekit/mysql"
-	"github.com/beewit/beekit/redis"
 	"github.com/beewit/beekit/sqlite"
 	"github.com/beewit/beekit/utils"
 	"github.com/sclevine/agouti"
@@ -16,7 +15,6 @@ import (
 var (
 	CFG      = conf.New("config.json")
 	DB       = mysql.DB
-	RD       = redis.Cache
 	SLDB     = sqlite.DB
 	Driver   *agouti.WebDriver
 	Page     *agouti.Page

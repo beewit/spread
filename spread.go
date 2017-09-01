@@ -8,6 +8,7 @@ import (
 	"github.com/sclevine/agouti"
 	"github.com/beewit/spread/api"
 	"runtime"
+	"github.com/beewit/spread/dao"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func start() {
 	if acc == nil {
 		load = global.API_SSO_DOMAN + "?backUrl=" + global.Host + "/ReceiveToken"
 	} else {
-		acc = global.Acc
+		global.Acc = acc
 	}
 	global.Driver = agouti.ChromeDriver(agouti.ChromeOptions("args", []string{
 		"--start-maximized",
@@ -40,7 +41,7 @@ func start() {
 }
 
 func CheckClientLogin() *global.Account {
-	token, err := global.QueryLoginToken()
+	token, err := dao.QueryLoginToken()
 	if err != nil {
 		global.Log.Error(err.Error())
 		panic(err)
