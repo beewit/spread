@@ -5,9 +5,9 @@ var layer, player;
 var win_name
 layui.use('layer', function () {
     layer = layui.layer;
-    player = window === window.top ? layer : (parent.window === parent.window.top) ? parent.layer :
-        (parent.parent.window === parent.parent.window.top ? parent.parent.layer : parent.parent.parent.layer);
-    win_name = parent.layer.getFrameIndex(window.name);
+    player = layui.layer;// = window === window.top ? layer : (parent.window === parent.window.top) ? parent.layer :
+    //(parent.parent.window === parent.parent.window.top ? parent.parent.layer : parent.parent.parent.layer);
+    win_name = player.getFrameIndex(window.name);
     //页面中弹窗处理
     $("body").delegate("[data-layer]", "click", function () {
         var asyn = $(this).attr("data-layer-asyn") || false;
@@ -304,7 +304,7 @@ function encrypt(str, pwd) {
         prand = (mult * prand + incr) % modu;
     }
     salt = salt.toString(16);
-    while (salt.length < 8)salt = "0" + salt;
+    while (salt.length < 8) salt = "0" + salt;
     enc_str += salt;
     return enc_str;
 }
