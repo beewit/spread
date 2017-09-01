@@ -34,5 +34,5 @@ func ReceiveToken(c echo.Context) error {
 			return utils.Redirect(c, global.Host)
 		}
 	}
-	return utils.RedirectAndAlert(c, "登陆失败", global.API_SSO_DOMAN)
+	return utils.RedirectAndAlert(c, "登陆失败", global.API_SSO_DOMAN + "?backUrl=" + global.Host + "/ReceiveToken")
 }
