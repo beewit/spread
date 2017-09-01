@@ -208,3 +208,12 @@ func main() {
 	global.Page.RunScript("alert(1)", nil, nil)
 
 
+### sina.json
+
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "#editor",
+      "Param": "content",
+      "sleep": 5
+    },

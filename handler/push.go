@@ -17,17 +17,18 @@ func Push(c echo.Context) error {
 		flog, result, err2 := PushComm(title, content, rule)
 		println("简书分发", flog, result, err2)
 
+		println("开始执行新浪分发")
+		//utils.JsonPath("parser", "./sina.json")
+		rule = utils.Read("./parser/sina.json")
+		flog, result, err2 = PushComm(title, content, rule)
+		println("微博分发", flog, result, err2)
+
 		println("开始执行知乎分发")
 		//utils.JsonPath("parser", "./zhihu.json")
 		rule = utils.Read("./parser/zhihu.json")
 		flog, result, err2 = PushComm(title, content, rule)
 		println("知乎分发", flog, result, err2)
 
-		println("开始执行新浪分发")
-		//utils.JsonPath("parser", "./sina.json")
-		rule = utils.Read("./parser/sina.json")
-		flog, result, err2 = PushComm(title, content, rule)
-		println("微博分发", flog, result, err2)
 	}()
 
 	return utils.Success(c, "正在发布中", "")

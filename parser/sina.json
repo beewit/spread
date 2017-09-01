@@ -42,11 +42,12 @@
       }
     },
     {
-      "handle": "Fill",
-      "Selector": "selector",
-      "SelectorName": "#editor",
-      "Param": "content",
-      "sleep": 5
+      "handle":"Js",
+      "sleep":5,
+      "js":"document.getElementById('editor').innerHTML=content",
+      "jsParam": {
+        "content": "content/v"
+      }
     },
     {
       "handle": "Js",
