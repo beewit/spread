@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"fmt"
 	"net/url"
 
 	"github.com/beewit/spread/global"
@@ -83,7 +82,7 @@ func RunPush(rule string, paramMap map[string]string) (bool, string, error) {
 	if pj.Login != nil && len(pj.Login) > 0 {
 		global.Navigate(pj.LoginUrl)
 		//Login Set UserName And Password
-		println("Login Set UserName And Password")
+		global.Log.Info("Login Set UserName And Password")
 		for i := 0; i < len(pj.Login); i++ {
 			handleSelection(&pj.Login[i], paramMap)
 		}
@@ -91,7 +90,7 @@ func RunPush(rule string, paramMap map[string]string) (bool, string, error) {
 	} else {
 		global.Navigate(pj.Domain)
 		//Login Identity
-		_, flog = checkIdentity(pj.Identity)
+		_, flog = CheckIdentity(pj.Identity)
 		if !flog {
 			flog, _ = setCookieLogin(pj.Domain)
 			if !flog {
@@ -99,11 +98,11 @@ func RunPush(rule string, paramMap map[string]string) (bool, string, error) {
 				//Sending messages to users requires landing
 			} else {
 				//设置Cookie
-				println("设置Cookie成功")
+				global.Log.Info("设置Cookie成功")
 			}
 			flog, _ = checkLogin(pj.Domain, pj.Identity)
 		} else {
-			println("已经是登陆状态")
+			global.Log.Info("已经是登陆状态")
 		}
 	}
 	if !flog {
@@ -123,7 +122,7 @@ func handleSelection(p *PushFillJson, paramMap map[string]string) (bool, string,
 	var jsResult string
 	switch p.Handle {
 	case Click:
-		println("Click：", findSelection(p.Selector, p.SelectorName).String())
+		global.Log.Info("Click：", findSelection(p.Selector, p.SelectorName).String())
 		findSelection(p.Selector, p.SelectorName).Click()
 		break
 	case DoubleClick:
@@ -144,14 +143,14 @@ func handleSelection(p *PushFillJson, paramMap map[string]string) (bool, string,
 		} else {
 			text = p.SelectorVal
 		}
-		println("Fill：", findSelection(p.Selector, p.SelectorName).String(), p.Selector, p.SelectorName, text)
+		global.Log.Info("Fill：", findSelection(p.Selector, p.SelectorName).String(), p.Selector, p.SelectorName, text)
 		findSelection(p.Selector, p.SelectorName).Fill(text)
 		break
 	case Text:
 		result, _ := findSelection(p.Selector, p.SelectorName).Text()
 		if p.Result != "" {
 			if strings.Contains(result, p.Result) {
-				println("执行结果：", result)
+				global.Log.Info("执行结果：", result)
 				return true, result, nil
 			}
 		}
@@ -163,10 +162,10 @@ func handleSelection(p *PushFillJson, paramMap map[string]string) (bool, string,
 					v = strings.Replace(v, "/v", "", 1)
 					p.JsParam[key] = paramMap[v]
 				}
-				println("JsParam", key, p.JsParam[key])
+				global.Log.Info("JsParam", key, p.JsParam[key])
 			}
 		}
-		println("执行JS：", p.Js)
+		global.Log.Info("执行JS：", p.Js)
 		global.Page.RunScript(p.Js, p.JsParam, &jsResult)
 		break
 	}
@@ -202,26 +201,26 @@ func checkLogin(domain string, identity string) (bool, string) {
 	result := ""
 	i := 0
 	for {
-		println("检测登陆状态")
+		global.Log.Info("检测登陆状态")
 		thisUrl, _ := global.Page.URL()
 		u, _ := url.Parse(domain)
 		if !strings.Contains(thisUrl, u.Host) {
 			result = "已经不在本网站了，结束检测登陆状态"
-			println(result)
+			global.Log.Info(result)
 			break
 		}
 
-		c, f := checkIdentity(identity)
+		c, f := CheckIdentity(identity)
 		flog = f
 
 		if flog {
 			cookieJson, _ := json.Marshal(c)
 
-			println(cookieJson)
+			global.Log.Info(string(cookieJson[:]))
 			//global.RD.SetString(domain, cookieJson)
 			dao.SetUnionCookies(domain, string(cookieJson), global.Acc.Id)
 			result = "设置Cookie成功"
-			println(result)
+			global.Log.Info(result)
 			break
 		}
 		i++
@@ -241,7 +240,7 @@ func setCookieLogin(doMan string) (bool, error) {
 	if cookieRd == "" {
 		return false, nil
 	}
-	println("获取Redis：" + cookieRd)
+	global.Log.Info("获取Redis：" + cookieRd)
 	var cks = []*http.Cookie{}
 	err = json.Unmarshal([]byte(cookieRd), &cks)
 	if err != nil {
@@ -255,7 +254,7 @@ func setCookieLogin(doMan string) (bool, error) {
 	return true, nil
 }
 
-func checkIdentity(identity string) ([]*http.Cookie, bool) {
+func CheckIdentity(identity string) ([]*http.Cookie, bool) {
 	c, err := global.Page.GetCookies()
 	if err != nil {
 		return nil, false
@@ -310,16 +309,16 @@ func main() {
 	b, err := json.Marshal(st)
 
 	if err != nil {
-		fmt.Println("encoding faild")
+		global.Log.Info("encoding faild")
 	} else {
 		j := string(b)
 		var pj PushJson
-		fmt.Println(j)
+		global.Log.Info(j)
 		err := json.Unmarshal(b, &pj)
 		if err != nil {
-			println(err.Error())
+			global.Log.Info(err.Error())
 		} else {
-			println("结果：" + pj.Title)
+			global.Log.Info("结果：" + pj.Title)
 		}
 	}
 

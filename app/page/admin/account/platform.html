@@ -9,42 +9,40 @@
 </head>
 <body>
 <div class="am-padding">
-    <ul class="am-avg-sm-4 am-avg-md-5 am-avg-lg-6 am-thumbnails union-ul am-margin-top-lg">
-        <li>
-            <img class="am-thumbnail" src="../assets/img/union/jianshu.png"/>
-            <span>微信</span>
-        </li>
-        <li>
-            <img class="am-thumbnail" src="../assets/img/union/jianshu.png"/>
-            <span>微信</span>
-        </li>
-        <li>
-            <img class="am-thumbnail" src="../assets/img/union/jianshu.png"/>
-            <span>微信</span>
-        </li>
-        <li>
-            <img class="am-thumbnail" src="../assets/img/union/jianshu.png"/>
-            <span>微信</span>
-        </li>
-        <li>
-            <img class="am-thumbnail" src="../assets/img/union/jianshu.png"/>
-            <span>微信</span>
-        </li>
-        <li>
-            <img class="am-thumbnail" src="../assets/img/union/jianshu.png"/>
-            <span>微信</span>
-        </li>
-        <li>
-            <img class="am-thumbnail" src="../assets/img/union/jianshu.png"/>
-            <span>微信</span>
-        </li>
+    <pre>
+        <span class="am-text-danger am-text-lg">温馨提示：点击平台进行帐号绑定，请在10分钟内登陆完成</span>
+    </pre>
+    <ul class="am-avg-sm-4 am-avg-md-5 am-avg-lg-6 am-thumbnails union-ul am-margin-top-lg" id="view">
     </ul>
 </div>
-<script src="../assets/js/jquery.min.js"></script>
-<script src="../assets/js/static/js/common/common.ajax.js"></script>
+
+<script id="list" type="text/html">
+    {{#  layui.each(d, function(index, item){ }}
+    <li data-val="{{ index }}">
+        <img class="am-thumbnail" src="../assets/img/union/{{ d[index] }}.png"/>
+        <span>{{ index }}</span>
+    </li>
+    {{#  }); }}
+    {{#  if(d == null){ }}
+    无数据
+    {{#  } }}
+</script>
+<script src="/app/page/admin/assets/js/jquery.min.js"></script>
+<script src="/app/static/js/plugs/layui/layui.all.js"></script>
+<script src="/app/page/admin/assets/js/common.ajax.js"></script>
+<script src="/app/page/admin/assets/js/common.js"></script>
 <script>
+    var laytpl;
+    var getTpl = list.innerHTML, view = document.getElementById('view');
+    layui.use('laytpl', function () {
+        laytpl = layui.laytpl;
+        loadUnion();
+    });
+
     $(function () {
-        loadUnion()
+        $("#view").delegate("li", "click", function () {
+            bindUnion($(this).attr("data-val"))
+        })
     });
 
     function loadUnion() {
@@ -52,9 +50,9 @@
             url: "/platform/list",
             success: function (d) {
                 if (d.ret == 200) {
-                    for (var v in d.data) {
-                        console.log(v)
-                    }
+                    laytpl(getTpl).render(d.data, function (html) {
+                        view.innerHTML = html;
+                    });
                 }
             }
         });
@@ -62,10 +60,10 @@
 
     function bindUnion(platform) {
         $.ajax({
-            url: "/union/bind",
-            data: {id: platform},
+            url: "/platform/bind",
+            data: {type: platform},
             success: function (d) {
-
+                player.msg(d.msg, {icon: 0, time: -1});
             }
         });
     }

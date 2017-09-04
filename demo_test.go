@@ -6,11 +6,12 @@ import (
 	"github.com/beewit/beekit/utils/convert"
 	"encoding/json"
 	"strconv"
-	"github.com/beewit/beekit/utils"
+	//	"github.com/beewit/beekit/utils"
 	"github.com/beewit/spread/global"
 	"time"
 	"fmt"
 	"github.com/beewit/beekit/utils/uhttp"
+	"strings"
 )
 
 type Article struct {
@@ -38,7 +39,7 @@ func TestCreateTable(t *testing.T) {
 
 	//tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.HezrOWC6gyT06oTOoBDMs0_NYLNA59Fk2UhI2bZ25cU"
 
-	b, err := uhttp.PostForm("http://sso.tbqbz.com/pass/checkToken?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.6K1L5xwnEnR6-CZYte7TwazbHrVt3f8L-0AOrfpT06I", nil)
+	b, err := uhttp.PostForm("http://127.0.0.1:8090/api/platform", nil)
 	//rp := utils.ToResultParam(b)
 	//if rp.Ret == utils.SUCCESS_CODE {
 	//	acc := global.ToInterfaceAccount(rp.Data)
@@ -47,21 +48,13 @@ func TestCreateTable(t *testing.T) {
 	//	t.Error(rp.Msg)
 	//}
 	//println(string(b[:]))
-	//if err != nil {
-	//	global.Log.Error(err.Error())
-	//	t.Error(b)
-	//}
+	if err != nil {
+		global.Log.Error(err.Error())
+		t.Error(b)
+	}
 
 	//str := `{"data":{"gender":null,"id":122068319091036160,"member_expir_time":null,"member_type_id":0,"member_type_name":null,"mobile":"18223277005","nickname":null,"photo":null},"msg":"有效token","ret":200}`
-	println(string(b[:]))
-	var rp utils.ResultParam
-	err = json.Unmarshal(b, &rp)
-	if err != nil {
-		println(err.Error())
-	} else {
-		acc := global.ToInterfaceAccount(rp.Data)
-		println(acc.Nickname)
-	}
+	println("----- " + string(b[:]))
 
 	//rp := utils.ToResultParam(b)
 	//if rp.Ret != 200 {
@@ -77,6 +70,18 @@ func TestCreateTable(t *testing.T) {
 	//token, err2 := global.QueryLoginToken()
 	//checkErr(t, err2)
 	//t.Log(token)
+}
+
+func TestSplitStr(t *testing.T) {
+	s := ".base>tr:eq(1) input@value"
+	str := strings.Split(s, ":")
+	global.Log.Warning("ONE:%s",str[0])
+	global.Log.Warning("TWO:%s",str[1])
+	if len(str) <= 1 {
+		t.Error(str)
+	} else {
+		t.Log(str)
+	}
 }
 
 func checkErr(t *testing.T, err error) {

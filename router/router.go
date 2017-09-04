@@ -36,6 +36,6 @@ func handlerConfig(e *echo.Echo) {
 
 	e.GET("/ReceiveToken", handler.ReceiveToken)
 
-	e.GET("/platform/list", handler.PlatformList)
+	e.POST("/platform/list", handler.PlatformList)
 	e.POST("/platform/bind", handler.PlatformUnionBind)
 }

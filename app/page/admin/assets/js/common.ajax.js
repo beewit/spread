@@ -1,5 +1,5 @@
 (function ($) {
-    var player = window === window.top ? layer : (parent.window === parent.window.top) ? parent.layer : (parent.parent.window === parent.parent.window.top ? parent.parent.layer : parent.parent.parent.layer);
+    var player = layer;//window === window.top ? layer : (parent.window === parent.window.top) ? parent.layer : (parent.parent.window === parent.parent.window.top ? parent.parent.layer : parent.parent.parent.layer);
     var _ajax = $.ajax;
     $.ajax = function (options) {
         var defaults = {
@@ -49,8 +49,8 @@
             success: function (json, textStatus) {
                 if (opt.err_tip) {
                     player.close(loadi);
-                    if (json.code != 200 && json.code != 404 && json.code != undefined && json.code != null) {
-                        if (json.code == 402) {
+                    if (json.ret != 200 && json.ret != 404 && json.ret != undefined && json.ret != null) {
+                        if (json.ret == 402) {
                             player.msg('登陆已失效..', {icon: 0, time: 1500}, function () {
                                 parent.location.href = json.data;
                             });
