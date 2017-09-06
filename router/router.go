@@ -6,6 +6,9 @@ import (
 
 	"fmt"
 
+	"net/http"
+
+	"github.com/GeertJohan/go.rice"
 	"github.com/beewit/spread/api"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -13,12 +16,16 @@ import (
 
 func Router() {
 	e := echo.New()
+
+	assetHandler := http.FileServer(rice.MustFindBox("app").HTTPBox())
+	e.GET("/app", echo.WrapHandler(assetHandler))
+	e.GET("/app/*", echo.WrapHandler(http.StripPrefix("/app/", assetHandler)))
 	e.Use(middleware.Gzip())
 	//e.Use(middleware.Logger())
 	//e.Use(middleware.CSRF())
 	//e.Use(middleware.CORS())
 	e.Use(middleware.Recover())
-	e.Static("/app", "app")
+	//e.Static("/app", "app")
 	e.File("/", "app/page/index.html")
 	handlerConfig(e)
 	go e.Logger.Fatal(e.Start(fmt.Sprintf(":%v", global.Port)))
