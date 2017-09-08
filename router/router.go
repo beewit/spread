@@ -5,10 +5,6 @@ import (
 	"github.com/beewit/spread/handler"
 
 	"fmt"
-
-	"net/http"
-
-	"github.com/GeertJohan/go.rice"
 	"github.com/beewit/spread/api"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -17,9 +13,8 @@ import (
 func Router() {
 	e := echo.New()
 
-	assetHandler := http.FileServer(rice.MustFindBox("app").HTTPBox())
-	e.GET("/app", echo.WrapHandler(assetHandler))
-	e.GET("/app/*", echo.WrapHandler(http.StripPrefix("/app/", assetHandler)))
+	e.Static("/app", "app")
+	e.File("/", "app/page/index.html")
 	e.Use(middleware.Gzip())
 	//e.Use(middleware.Logger())
 	//e.Use(middleware.CSRF())
