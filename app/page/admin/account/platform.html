@@ -18,9 +18,9 @@
 
 <script id="list" type="text/html">
     {{#  layui.each(d, function(index, item){ }}
-    <li data-val="{{ index }}">
-        <img class="am-thumbnail" src="../assets/img/union/{{ d[index] }}.png"/>
-        <span>{{ index }}</span>
+    <li data-val="{{ item.type }}">
+        <img class="am-thumbnail" src="{{ item.icon }}"/>
+        <span>{{ item.type }}</span>
     </li>
     {{#  }); }}
     {{#  if(d == null){ }}

@@ -14,7 +14,12 @@ import (
 )
 
 func PlatformList(c echo.Context) error {
-	return utils.Success(c, "", global.Platform)
+	m, err := api.GetPlatformList()
+	if err != nil || m == nil {
+		global.Log.Error(err.Error())
+		return utils.Error(c, "获取平台信息失败", nil)
+	}
+	return utils.Success(c, "", m)
 }
 
 func PlatformUnionBind(c echo.Context) error {
@@ -67,7 +72,7 @@ func UnionBind(m map[string]string) {
 		}
 		global.PageSuccessMsg("绑定帐号成功", global.Host)
 	} else {
-		global.PageErrorMsg("绑定帐号成功", global.Host)
+		global.PageErrorMsg("绑定帐号失败", global.Host)
 	}
 }
 

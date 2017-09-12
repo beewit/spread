@@ -25,6 +25,8 @@ func start() {
 		global.Acc = acc
 	}
 	global.Driver = agouti.ChromeDriver(agouti.ChromeOptions("args", []string{
+		"--gpu-process",
+		"--in-process-gpu",
 		"--start-maximized",
 		"--disable-infobars",
 		"--app=http://www.jq22.com/demo/svgloader-150105194218/",
