@@ -82,7 +82,7 @@
                                     <th class="table-set">操作</th>
                                 </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="view">
                                 <tr>
                                     <td>承诺一时的华丽</td>
                                     <td><a href="#">
@@ -184,9 +184,52 @@
 <script src="../assets/js/amazeui.min.js"></script>
 <script src="../assets/js/app.js"></script>
 <script src="/app/static/js/plugs/layui/layui.all.js"></script>
+<script src="../assets/js/common.ajax.js"></script>
 <script src="../assets/js/common.js"></script>
+<script id="list" type="text/html">
+    {{#  layui.each(d, function(index, item){ }}
+    <tr>
+        <td>承诺一时的华丽</td>
+        <td><a href="#">
+            <img src="/app/static/img/icon/wechat.jpg">
+        </a></td>
+        <td>微信</td>
+        <td class="am-hide-sm-only">2014年9月4日 7:28:47</td>
+        <td>
+            <div class="am-btn-toolbar">
+                <div class="am-btn-group am-btn-group-xs">
+                    <button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"><span
+                            class="am-icon-trash-o"></span> 删除
+                    </button>
+                </div>
+            </div>
+        </td>
+    </tr>
+    {{#  }); }}
+    {{#  if(d == null){ }}
+    无数据
+    {{#  } }}
+</script>
 <script>
+    var laytpl;
+    var getTpl = list.innerHTML, view = document.getElementById('view');
+    layui.use('laytpl', function () {
+        laytpl = layui.laytpl;
+        loadUnionList();
+    });
 
+    function loadUnionList() {
+        $.ajax({
+            url: "/platform/union/list",
+            success: function (d) {
+                if (d.ret == 200) {
+                    laytpl(getTpl).render(d.data, function (html) {
+                        view.innerHTML = html;
+                    });
+                }
+            }
+        });
+    }
 </script>
 </body>
 

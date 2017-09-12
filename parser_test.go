@@ -123,6 +123,5 @@ func TestMsg(t *testing.T) {
 	if err != nil {
 		fmt.Println("Failed to open page.")
 	}
-	global.Navigate("https://www.weibo.com/")
-	global.PageSuccessMsg("保存成功", global.Host)
+	global.Navigate("https://www.baidu.com/")
 }

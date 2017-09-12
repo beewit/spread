@@ -22,6 +22,15 @@ func PlatformList(c echo.Context) error {
 	return utils.Success(c, "", m)
 }
 
+func UnionList(c echo.Context) error {
+	m, err := dao.GetUnionList(global.Acc.Id)
+	if err != nil || m == nil {
+		global.Log.Error(err.Error())
+		return utils.Error(c, "获取平台信息失败", nil)
+	}
+	return utils.Success(c, "", m)
+}
+
 func PlatformUnionBind(c echo.Context) error {
 	t := c.FormValue("type")
 	if t == "" {

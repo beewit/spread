@@ -82,7 +82,7 @@ $hiveIframe.style.width = '0px';
 
 
 //each 待定
-var $dataSrc = document.querySelectorAll('[data-src]'); 
+var $dataSrc = document.querySelectorAll('[data-src]');
 for (var i = 0; i < $dataSrc.length; i++) {
     $dataSrc[i].src = host + $dataSrc[i].getAttribute("data-src");
 }
@@ -142,19 +142,14 @@ for (var i = 0; i < $cotOut.length; i++) {
     }, false);
 }
 
-
 if (local) {
     var $hiveIframeDiv = document.getElementsByClassName('hive-iframe-div')[0];
     $hiveIframeDiv.className += ' active';
     document.getElementById("hive-iframe").src = host + $hiveIframe.getAttribute('data-src');
 
 } else {
-    var $hive = document.getElementsByClassName('hive-site');
-    for (var k = 0; k < $hive.length; k++) {
-        var _className = $hive[k].className;
-        $hive[k].className = _className + ' active';
-    }
-
+    var $hive = document.getElementsByClassName('hive')[0];
+    $hive.className += " hive-site";
 }
 
 

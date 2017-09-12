@@ -40,4 +40,6 @@ func handlerConfig(e *echo.Echo) {
 
 	e.POST("/platform/list", handler.PlatformList)
 	e.POST("/platform/bind", handler.PlatformUnionBind)
+
+	e.POST("/platform/union/list", handler.UnionList)
 }

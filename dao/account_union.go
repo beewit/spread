@@ -49,6 +49,21 @@ func GetUnion(platform string, accId int64) (map[string]interface{}, error) {
 	return m[0], nil
 }
 
+func GetUnionList(accId int64) ([]map[string]interface{}, error) {
+	if global.Acc == nil {
+		return nil, nil
+	}
+	sql := `SELECT * FROM account_union WHERE account_id=? ORDER BY ut_time DESC`
+	m, err := global.SLDB.Query(sql, accId)
+	if err != nil {
+		return nil, err
+	}
+	if len(m) <= 0 {
+		return nil, nil
+	}
+	return m, nil
+}
+
 func UpdateUnionPhoto(nickname, photo, platform string, accId int64) (bool, error) {
 	if global.Acc == nil {
 		return false, nil
