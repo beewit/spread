@@ -23,12 +23,16 @@ func PlatformList(c echo.Context) error {
 }
 
 func UnionList(c echo.Context) error {
-	m, err := dao.GetUnionList(global.Acc.Id)
-	if err != nil || m == nil {
+	pageIndex := utils.GetPageIndex(c.FormValue("pageIndex"))
+	page, err := dao.GetUnionListPage(global.Acc.Id, pageIndex, global.PAGE_SIZE)
+	if err != nil {
 		global.Log.Error(err.Error())
-		return utils.Error(c, "获取平台信息失败", nil)
+		return utils.Error(c, "获取绑定帐号异常", nil)
 	}
-	return utils.Success(c, "", m)
+	if page == nil {
+		return utils.NullData(c)
+	}
+	return utils.Success(c, "", page)
 }
 
 func PlatformUnionBind(c echo.Context) error {
@@ -79,9 +83,9 @@ func UnionBind(m map[string]string) {
 				global.Log.Warning("修改帐号昵称和帐号信息，状态：", uFlog)
 			}
 		}
-		global.PageSuccessMsg("绑定帐号成功", global.Host)
+		global.PageSuccessMsg("绑定帐号成功", global.Host+"?lastUrl=/app/page/admin/content/list.html")
 	} else {
-		global.PageErrorMsg("绑定帐号失败", global.Host)
+		global.PageErrorMsg("绑定帐号失败", global.Host+"?lastUrl=/app/page/admin/content/list.html")
 	}
 }
 

@@ -64,6 +64,23 @@ func GetUnionList(accId int64) ([]map[string]interface{}, error) {
 	return m, nil
 }
 
+func GetUnionListPage(accId int64, pageIndex, pageSize int) (*utils.PageData, error) {
+	if global.Acc == nil {
+		return nil, nil
+	}
+	page, err := global.SLDB.QueryPage(&utils.PageTable{
+		Table:     "account_union",
+		Fields:    "*",
+		Where:     "account_id=? ORDER BY ut_time DESC",
+		PageIndex: pageIndex,
+		PageSize:  pageSize,
+	},accId)
+	if err != nil {
+		return nil, err
+	}
+	return page, nil
+}
+
 func UpdateUnionPhoto(nickname, photo, platform string, accId int64) (bool, error) {
 	if global.Acc == nil {
 		return false, nil

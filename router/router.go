@@ -32,9 +32,10 @@ func handlerConfig(e *echo.Echo) {
 
 	e.POST("/push/push", handler.Push)
 
-	e.GET("/api/template", api.GetTemplateByList)
+	e.POST("/api/template", api.GetTemplateByList)
 
-	e.GET("/api/template/:id", api.GetTemplateById)
+	e.POST("/api/template/:id", api.GetTemplateById)
+	e.POST("/api/template/update/refer/:id", api.UpdateTemplateRefterById)
 
 	e.GET("/ReceiveToken", handler.ReceiveToken)
 

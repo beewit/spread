@@ -30,8 +30,11 @@ var (
 	Platform = map[string]int{"新浪微博": 1, "简书": 2, "知乎": 3}
 )
 
-const API_SERVICE_DOMAN = "http://hive.tbqbz.com"
-const API_SSO_DOMAN = "http://sso.tbqbz.com"
+const (
+	API_SERVICE_DOMAN = "http://127.0.0.1:8090" //"http://hive.tbqbz.com"
+	API_SSO_DOMAN     = "http://sso.tbqbz.com"
+	PAGE_SIZE         = 10
+)
 
 func injection() {
 	time.Sleep(300 * time.Millisecond)
@@ -61,7 +64,7 @@ func PageMsg(status, tip, url string) {
     width: 100%%;
     height: 100%%;
     background-color: rgba(0, 0, 0, 0.36);
-    z-index: 999999;
+    z-index: 999999998;
     text-align: center;top:0"><span style="
     background-color: %s;
     padding: 20px 50px;

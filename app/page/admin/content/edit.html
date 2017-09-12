@@ -88,19 +88,21 @@
             });
         });
         var tpl = Request["tpl"];
-        $.ajax({
-            url: "/api/template/" + tpl,
-            type: 'GET',
-            dataType: "json",
-            success: function (d) {
-                if (d.ret == 200) {
-                    $("#title").val(d.data.title)
-                    editor.txt.html(d.data.content)
+        if (tpl) {
+            $.ajax({
+                url: "/api/template/" + tpl,
+                type: 'POST',
+                dataType: "json",
+                success: function (d) {
+                    if (d.ret == 200) {
+                        $("#title").val(d.data.title)
+                        editor.txt.html(d.data.content)
+                    }
+                },
+                error: function (d) {
                 }
-            },
-            error: function (d) {
-            }
-        });
+            });
+        }
     });
 </script>
 </body>

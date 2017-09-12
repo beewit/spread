@@ -13,6 +13,7 @@
     <link rel="icon" type="image/png" href="../assets/i/favicon.png">
     <link rel="apple-touch-icon-precomposed" href="../assets/i/app-icon72x72@2x.png">
     <meta name="apple-mobile-web-app-title" content="工蜂小智"/>
+    <link rel="stylesheet" href="/app/static/js/plugs/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="../assets/css/amazeui.min.css"/>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="../assets/css/app.css">
@@ -77,95 +78,17 @@
                                 <tr>
                                     <th class="table-title">帐号</th>
                                     <th class="table-type">头像</th>
+                                    <th class="table-title">昵称</th>
                                     <th class="table-author am-hide-sm-only">平台</th>
-                                    <th class="table-date am-hide-sm-only">最新登陆时间</th>
+                                    <th class="table-date am-hide-sm-only">更新时间</th>
                                     <th class="table-set">操作</th>
                                 </tr>
                                 </thead>
                                 <tbody id="view">
-                                <tr>
-                                    <td>承诺一时的华丽</td>
-                                    <td><a href="#">
-                                        <img src="/app/static/img/icon/sina.jpg">
-                                    </a></td>
-                                    <td>新浪微博</td>
-                                    <td class="am-hide-sm-only">2014年9月4日 7:28:47</td>
-                                    <td>
-                                        <div class="am-btn-toolbar">
-                                            <div class="am-btn-group am-btn-group-xs">
-                                                <button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"><span
-                                                        class="am-icon-trash-o"></span> 删除
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>承诺一时的华丽</td>
-                                    <td><a href="#">
-                                        <img src="/app/static/img/icon/toutiao.jpg">
-                                    </a></td>
-                                    <td>近日头条</td>
-                                    <td class="am-hide-sm-only">2014年9月4日 7:28:47</td>
-                                    <td>
-                                        <div class="am-btn-toolbar">
-                                            <div class="am-btn-group am-btn-group-xs">
-                                                <button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"><span
-                                                        class="am-icon-trash-o"></span> 删除
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>承诺一时的华丽</td>
-                                    <td><a href="#">
-                                        <img src="/app/static/img/icon/zhihu.jpg">
-                                    </a></td>
-                                    <td>知乎</td>
-                                    <td class="am-hide-sm-only">2014年9月4日 7:28:47</td>
-                                    <td>
-                                        <div class="am-btn-toolbar">
-                                            <div class="am-btn-group am-btn-group-xs">
-                                                <button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"><span
-                                                        class="am-icon-trash-o"></span> 删除
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>承诺一时的华丽</td>
-                                    <td><a href="#">
-                                        <img src="/app/static/img/icon/wechat.jpg">
-                                    </a></td>
-                                    <td>微信</td>
-                                    <td class="am-hide-sm-only">2014年9月4日 7:28:47</td>
-                                    <td>
-                                        <div class="am-btn-toolbar">
-                                            <div class="am-btn-group am-btn-group-xs">
-                                                <button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"><span
-                                                        class="am-icon-trash-o"></span> 删除
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
                                 </tbody>
                             </table>
                             <div class="am-cf">
-
-                                <div class="am-fr">
-                                    <ul class="am-pagination tpl-pagination">
-                                        <li class="am-disabled"><a href="#">«</a></li>
-                                        <li class="am-active"><a href="#">1</a></li>
-                                        <li><a href="#">2</a></li>
-                                        <li><a href="#">3</a></li>
-                                        <li><a href="#">4</a></li>
-                                        <li><a href="#">5</a></li>
-                                        <li><a href="#">»</a></li>
-                                    </ul>
+                                <div class="am-fr" id="page">
                                 </div>
                             </div>
                             <hr>
@@ -189,17 +112,21 @@
 <script id="list" type="text/html">
     {{#  layui.each(d, function(index, item){ }}
     <tr>
-        <td>承诺一时的华丽</td>
-        <td><a href="#">
-            <img src="/app/static/img/icon/wechat.jpg">
-        </a></td>
-        <td>微信</td>
-        <td class="am-hide-sm-only">2014年9月4日 7:28:47</td>
+        <td>{{ item.platform_account }}</td>
+        <td>
+            <a>
+                <img src="{{ item.photo }}">
+            </a>
+        </td>
+        <td>{{ item.nickname }}</td>
+        <td>{{ item.platform }}</td>
+        <td class="am-hide-sm-only">{{ item.ut_time }}</td>
         <td>
             <div class="am-btn-toolbar">
                 <div class="am-btn-group am-btn-group-xs">
-                    <button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"><span
-                            class="am-icon-trash-o"></span> 删除
+                    <button class="am-btn am-btn-default am-btn-xs am-text-success am-hide-sm-only" type="button"
+                            onclick="bindUnion('{{ item.platform }}')">
+                        <span class="am-icon-resistance"></span> 重新绑定
                     </button>
                 </div>
             </div>
@@ -212,9 +139,11 @@
 </script>
 <script>
     var laytpl;
+    var laypage;
     var getTpl = list.innerHTML, view = document.getElementById('view');
-    layui.use('laytpl', function () {
+    layui.use(['laytpl', 'laypage'], function () {
         laytpl = layui.laytpl;
+        laypage = layui.laypage;
         loadUnionList();
     });
 
@@ -223,10 +152,30 @@
             url: "/platform/union/list",
             success: function (d) {
                 if (d.ret == 200) {
-                    laytpl(getTpl).render(d.data, function (html) {
+                    laytpl(getTpl).render(d.data.Data, function (html) {
                         view.innerHTML = html;
                     });
+                    //总页数大于页码总数
+                    laypage.render({
+                        elem: 'page',
+                        count: d.data.Count,
+                        limit: d.data.PageSize,
+                        curr: d.data.pageIndex,
+                        jump: function (obj) {
+                            console.log(obj)
+                        }
+                    });
                 }
+            }
+        });
+    }
+
+    function bindUnion(platform) {
+        $.ajax({
+            url: "/platform/bind",
+            data: {type: platform},
+            success: function (d) {
+                player.msg(d.msg, {icon: 0, time: -1});
             }
         });
     }
