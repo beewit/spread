@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"github.com/beewit/beekit/utils/uhttp"
 	"strings"
+	"github.com/beewit/beekit/utils"
 )
 
 type Article struct {
@@ -82,6 +83,31 @@ func TestSplitStr(t *testing.T) {
 	} else {
 		t.Log(str)
 	}
+}
+
+func TestRules(t *testing.T) {
+	rp, err := ApiPost("http://127.0.0.1:8085/api/rules/list", map[string]string{"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.1SK0Uj1P_uu1YH-I3_p2JwSNlnb9jGjIjaYmWWLuGzA"})
+	if err != nil {
+		t.Error(err.Error())
+	}
+	str, err2 := json.Marshal(rp)
+	if err2 != nil {
+		t.Error(err2.Error())
+	}
+	println(string(str))
+}
+
+func ApiPost(url string, m map[string]string) (utils.ResultParam, error) {
+	b, _ := json.Marshal(m)
+	body, err := uhttp.Cmd(uhttp.Request{
+		Method: "POST",
+		URL:    url,
+		Body:   b,
+	})
+	if err != nil {
+		return utils.ResultParam{}, err
+	}
+	return utils.ToResultParam(body), nil
 }
 
 func checkErr(t *testing.T, err error) {

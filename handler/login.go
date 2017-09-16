@@ -33,6 +33,7 @@ func ReceiveToken(c echo.Context) error {
 		acc := SetClientToken(token)
 		if acc != nil {
 			global.Acc = acc
+			global.Acc.Token = token
 			return utils.Redirect(c, global.Host)
 		}
 	}

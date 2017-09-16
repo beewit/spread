@@ -29,10 +29,10 @@
             </div>
             <div class="tpl-block">
                 <ul class="am-nav am-nav-tabs">
-                    <li><a href="list.html">平台帐号绑定</a></li>
+                    <li><a data-href="list.html">平台帐号绑定</a></li>
                     <li class="am-active"><a href="member.html">我的帐号</a></li>
-                    <li><a href="info.html">资料修改</a></li>
-                    <li><a href="updatePwd.html">修改密码</a></li>
+                    <li><a data-href="info.html">资料修改</a></li>
+                    <li><a data-href="updatePwd.html">修改密码</a></li>
                 </ul>
                 <div class="am-g am-margin-top">
                     <div class="tpl-form-body tpl-form-line member-div">
@@ -66,8 +66,8 @@
                             </div>
                             <div class="account-overview-item last">
                                 <div class="val-line1" style="box-sizing: border-box; margin-top: 5px;">
-                                    <a class="btn" href="http://pay.tbqbz.com">开通会员</a>&nbsp;
-                                    <a class="btn btn-highlight" href="http://pay.tbqbz.com">续费会员</a>
+                                    <a class="btn payBtn" data-href="http://pay.tbqbz.com">开通会员</a>&nbsp;
+                                    <a class="btn btn-highlight payBtn" data-href="http://pay.tbqbz.com">续费会员</a>
                                 </div>
                             </div>
                         </div>
@@ -176,6 +176,27 @@
 <script src="../assets/js/jquery.min.js"></script>
 <script src="../assets/js/amazeui.min.js"></script>
 <script src="../assets/js/app.js"></script>
+<script src="/app/static/js/plugs/layui/layui.all.js"></script>
+<script src="../assets/js/common.ajax.js"></script>
+<script src="../assets/js/common.js"></script>
+<script>
+    $(function () {
+
+        getInfo()
+    });
+
+    function getInfo() {
+        $.ajax({
+            url: "/member/info",
+            success: function (d) {
+                if (d.ret == 200) {
+                    $(".payBtn").attr("href", "http://pay.tbqbz.com?token=" + d.data.account.Token + "&backUrl=" + encodeURIComponent(d.data.host +
+                        "&lastUrl=/app/page/admin/account/member.html"));
+                }
+            }
+        });
+    }
+</script>
 </body>
 
 </html>

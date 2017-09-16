@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"time"
 
+	"strings"
+
 	"github.com/beewit/beekit/conf"
 	"github.com/beewit/beekit/log"
 	"github.com/beewit/beekit/mysql"
 	"github.com/beewit/beekit/sqlite"
 	"github.com/beewit/beekit/utils"
 	"github.com/sclevine/agouti"
-	"strings"
 )
 
 var (
@@ -31,7 +32,7 @@ var (
 )
 
 const (
-	API_SERVICE_DOMAN = "http://127.0.0.1:8090" //"http://hive.tbqbz.com"
+	API_SERVICE_DOMAN = "http://hive.tbqbz.com" //"http://127.0.0.1:8085" //
 	API_SSO_DOMAN     = "http://sso.tbqbz.com"
 	PAGE_SIZE         = 10
 )

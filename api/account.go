@@ -16,5 +16,7 @@ func CheckClientLogin(token string) *global.Account {
 	if rp.Ret != 200 {
 		return nil
 	}
-	return global.ToInterfaceAccount(rp.Data)
+	acc := global.ToInterfaceAccount(rp.Data)
+	acc.Token = token
+	return acc
 }

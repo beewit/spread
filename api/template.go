@@ -2,39 +2,33 @@ package api
 
 import (
 	"github.com/beewit/beekit/utils"
-	"github.com/beewit/beekit/utils/uhttp"
-	"github.com/beewit/spread/global"
 	"github.com/labstack/echo"
+	"github.com/beewit/spread/global"
 )
 
 func GetTemplateByList(c echo.Context) error {
-	body, err := uhttp.Cmd(uhttp.Request{
-		Method: "POST",
-		URL:    global.API_SERVICE_DOMAN + "/api/template",
-	})
+	r, err := ApiPost("/api/template", nil)
 	if err != nil {
-		return utils.Error(c, "请求失败,"+err.Error(), nil)
+		global.Log.Error(err.Error())
+		return utils.ErrorNull(c, "请求失败,"+err.Error())
 	}
-	return utils.ResultApi(c, utils.ToResultParam(body))
+	return utils.ResultApi(c, r)
 }
 
-func UpdateTemplateRefterById(c echo.Context) error {
+func UpdateTemplateReferById(c echo.Context) error {
 	id := c.Param("id")
-	body, err := uhttp.Cmd(uhttp.Request{
-		Method: "POST",
-		URL:    global.API_SERVICE_DOMAN + "/api/template/update/refer/" + id,
-	})
+	r, err := ApiPost("/api/template/update/refer/"+id, nil)
 	if err != nil {
-		return utils.Error(c, "请求失败,"+err.Error(), nil)
+		return utils.ErrorNull(c, "请求失败,"+err.Error())
 	}
-	return utils.ResultApi(c, utils.ToResultParam(body))
+	return utils.ResultApi(c, r)
 }
 
 func GetTemplateById(c echo.Context) error {
 	id := c.Param("id")
-	body, err := uhttp.PostForm(global.API_SERVICE_DOMAN+"/api/template/"+id, nil)
+	r, err := ApiPost("/api/template/"+id, nil)
 	if err != nil {
-		return utils.Error(c, "请求失败,"+err.Error(), nil)
+		return utils.ErrorNull(c, "请求失败,"+err.Error())
 	}
-	return utils.ResultApi(c, utils.ToResultParam(body))
+	return utils.ResultApi(c, r)
 }

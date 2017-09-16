@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 
+	"runtime"
+
 	"github.com/beewit/spread/global"
 	"github.com/beewit/spread/router"
 	"github.com/sclevine/agouti"
-	"github.com/beewit/spread/api"
-	"runtime"
-	"github.com/beewit/spread/dao"
+	"github.com/beewit/spread/handler"
 )
 
 func main() {
@@ -18,7 +18,7 @@ func main() {
 }
 func start() {
 	load := global.Host
-	acc := CheckClientLogin()
+	acc := handler.CheckClientLogin()
 	if acc == nil {
 		load = global.API_SSO_DOMAN + "?backUrl=" + global.Host + "/ReceiveToken"
 	} else {
@@ -40,16 +40,4 @@ func start() {
 	go func() {
 		global.Page.Navigate(load)
 	}()
-}
-
-func CheckClientLogin() *global.Account {
-	token, err := dao.QueryLoginToken()
-	if err != nil {
-		global.Log.Error(err.Error())
-		panic(err)
-	}
-	if token == "" {
-		return nil
-	}
-	return api.CheckClientLogin(token)
 }

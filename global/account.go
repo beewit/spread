@@ -16,14 +16,15 @@ func (this JSONTime) MarshalJSON() ([]byte, error) {
 }
 
 type Account struct {
-	Id              int64 `json:"id"`
+	Id              int64  `json:"id"`
 	Gender          string `json:"gender"`
 	Mobile          string `json:"mobile"`
 	Photo           string `json:"photo"`
 	Nickname        string `json:"nickname"`
 	MemberTypeName  string `json:"member_type_name"`
 	MemberExpirTime string `json:"member_expir_time"`
-	MemberTypeId    int64 `json:"member_type_id"`
+	MemberTypeId    int64  `json:"member_type_id"`
+	Token           string
 }
 
 func ToByteAccount(b []byte) *Account {

@@ -17,14 +17,18 @@ layui.use('layer', function () {
     });
 });
 $(function () {
-    if (location.hostname != "localhost") {
+    $("body").delegate("[data-href]", "click", function () {
+        var href = $(this).attr("data-href");
+        if (!location.href.startsWith("http") && !location.href.startsWith("/")) {
+            href = location.origin + location.pathname.substring(0, location.pathname.lastIndexOf("/") + 1) + href;
+        }
+        location.href = LinkUrl.ChangeUrlParas(href, "v", version);
+    });
+    if (location.hostname != "localhost" && location.hostname != "127.0.0.1") {
         $(document).bind("contextmenu", function () {
             return false;
         });
-        $(document).bind("selectstart", function () {
-            return false;
-        });
-        $("body").attr("oncontextmenu", "return false").attr("onselectstart", "return false").attr("oncopy", "alert('不支持复制！');return false;");
+        $("body").attr("oncontextmenu", "return false");//.attr("onselectstart", "return false").attr("oncopy", "alert('不支持复制！');return false;");
     }
 });
 
