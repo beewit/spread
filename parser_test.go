@@ -60,13 +60,6 @@ func Parser(title, content string, t int) {
 	}
 }
 
-func TestPlatform(t *testing.T) {
-	m, err := api.GetPlatformList()
-	if err != nil {
-		t.Error(err)
-	}
-	t.Log(len(m))
-}
 
 func TestPlatformOne(t *testing.T) {
 	m, err := api.GetPlatformOne("新浪微博")

@@ -87,6 +87,16 @@ for (var i = 0; i < $dataSrc.length; i++) {
     $dataSrc[i].src = host + $dataSrc[i].getAttribute("data-src");
 }
 
+if (!local) {
+    var $dataHref = document.querySelectorAll('[data-href]');
+    for (var i = 0; i < $dataHref.length; i++) {
+        $dataHref[i].addEventListener('click', function (e) {
+            if (confirm("正在执行任务，是否确定终止任务！"))
+                location.href = host + "?lastUrl=" + this.getAttribute("data-href");
+        })
+    }
+}
+
 //$appitemHook
 var $appitemHook = document.getElementsByClassName('appitem-hook');
 for (var i = 0; i < $appitemHook.length; i++) {

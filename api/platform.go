@@ -1,39 +1,34 @@
 package api
 
 import (
-	"github.com/beewit/beekit/utils/uhttp"
 	"github.com/beewit/spread/global"
 	"github.com/beewit/beekit/utils"
+	"github.com/labstack/echo"
 	"github.com/beewit/beekit/utils/convert"
-	"net/url"
+	"fmt"
 )
 
-func GetPlatformList() ([]map[string]string, error) {
-	body, err := uhttp.PostForm(global.API_SERVICE_DOMAN+"/api/platform", nil)
+func GetPlatformList(c echo.Context) error {
+	r, err := ApiPost("/api/platform", nil)
 	if err != nil {
-		return nil, nil
+		global.Log.Error(err.Error())
+		return utils.ErrorNull(c, "请求失败,"+err.Error())
 	}
-	rp := utils.ToResultParam(body)
-	if rp.Ret == utils.SUCCESS_CODE {
-		m, err2 := convert.Obj2ListMapString(rp.Data)
-		return m, err2
-	} else {
-		return nil, nil
-	}
+	return utils.ResultApi(c, r)
 }
 
-func GetPlatformOne(t string) (map[string]string, error) {
-	v := url.Values{}
-	v.Add("type", t)
-	body, err := uhttp.PostForm(global.API_SERVICE_DOMAN+"/api/platform/one", v)
+func GetPlatformOne(t string) (map[string]interface{}, error) {
+	url := fmt.Sprintf("/api/platform/one?type=%s", t)
+	r, err := ApiPost(url, nil)
 	if err != nil {
-		return nil, nil
+		global.Log.Error(err.Error())
+		return nil, err
 	}
-	rp := utils.ToResultParam(body)
-	if rp.Ret == utils.SUCCESS_CODE {
-		m, err2 := convert.Obj2MapString(rp.Data)
-		return m, err2
-	} else {
-		return nil, nil
+
+	data, err2 := convert.Obj2Map(r.Data)
+	if err2 != nil {
+		global.Log.Error(err2.Error())
+		return nil, err2
 	}
+	return data, nil
 }

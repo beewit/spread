@@ -17,6 +17,8 @@ import (
 	"github.com/beewit/beekit/utils/convert"
 	"github.com/go-vgo/robotgo"
 	"golang.org/x/net/html/charset"
+	"github.com/beewit/beekit/utils"
+	"github.com/beewit/spread/global"
 )
 
 var (
@@ -24,6 +26,8 @@ var (
 	todo       = list.New()
 	gourpCount = 10
 	m          = map[string]interface{}{}
+
+	listUrls = list.New()
 )
 
 func TestCrawlerBBS(t *testing.T) {
@@ -131,7 +135,7 @@ func groupDay(url string) {
 		return
 	}
 	if html != "" {
-		num := getDayNum(html)
+		num, _ := getDayNum(html)
 		if num != "" {
 			m[url] = num
 			WriteAt("url:" + num)
@@ -142,6 +146,45 @@ func groupDay(url string) {
 	} else {
 		println("解析Html失败：" + url)
 	}
+}
+
+func groupDayNew(url string) (string, string, string) {
+	if url == "" {
+		return "", "", ""
+	}
+	resp, e := http.Get(url)
+	if e != nil {
+		println(e.Error)
+		return "", "", ""
+	}
+	var ir io.Reader
+	if strings.Contains(resp.Header.Get("Content-Type"), "utf-8") {
+		ir = resp.Body
+	} else {
+		var errIr error
+		ir, errIr = charset.NewReader(resp.Body, resp.Header.Get("Content-Type"))
+		if errIr != nil {
+			println(errIr.Error)
+			return "", "", ""
+		}
+	}
+
+	doc, err := goquery.NewDocumentFromReader(ir)
+	if err != nil {
+		println(err.Error())
+		return "", "", ""
+	}
+	html, err2 := doc.Html()
+	if err2 != nil {
+		println(err2.Error())
+		return "", "", ""
+	}
+	if html != "" {
+		t, y := getDayNum(html)
+		return t, y, doc.Find("title").Text()
+
+	}
+	return "", "", ""
 }
 
 func TestRegexp3(t *testing.T) {
@@ -194,7 +237,7 @@ func TestRegexp(t *testing.T) {
 	fmt.Println(strings.Replace(string(data), "今日:", "", -1))
 }
 
-func getDayNum(html string) string {
+func getDayNum(html string) (string, string) {
 	src := strings.TrimSpace(html)
 
 	//将HTML标签全转换成小写
@@ -223,20 +266,29 @@ func getDayNum(html string) string {
 	src = strings.Replace(src, "\r", "", -1)
 	src = strings.Replace(src, "	", "", -1)
 
-	fmt.Println(src)
-
 	fmt.Println("--------------------------------------------")
 
 	re = regexp.MustCompile("今日:(\\d+)")
+
+	re2 := regexp.MustCompile("昨日:(\\d+)")
 	fmt.Println("--------------------------------------------")
 	fmt.Println(re.FindString(src))
+	fmt.Println(re2.FindString(src))
 	fmt.Println("--------------------------------------------")
 	data := re.Find([]byte(src))
 	relust := string(data)
+
+	data2 := re2.Find([]byte(src))
+	relust2 := string(data2)
+
+	var today, yesterday string
 	if relust != "" {
-		return strings.Replace(string(data), "今日:", "", -1)
+		today = strings.Replace(string(data), "今日:", "", -1)
 	}
-	return ""
+	if relust2 != "" {
+		yesterday = strings.Replace(string(data2), "昨日:", "", -1)
+	}
+	return today, yesterday
 }
 
 func pageTodo(url string) {
@@ -407,4 +459,65 @@ func getSiteHref() {
 			time.Sleep(time.Second * 3)
 		}
 	}
+}
+
+func TestBBS(t *testing.T) {
+	dat, err := ioutil.ReadFile("siteDoMain.txt")
+	if err != nil {
+		println(dat)
+	}
+	str := string(dat)
+	strs := strings.Split(str, "\n")
+	for i := 0; i < len(strs); i++ {
+		listUrls.PushBack(strs[i])
+	}
+
+	for {
+		if listUrls.Len() > 0 {
+			c := gourpCount
+			if listUrls.Len() < gourpCount {
+				c = listUrls.Len()
+			}
+			for j := 0; j < c; j++ {
+				t := listUrls.Front()
+				listUrls.Remove(t)
+				if t.Value != nil {
+					//go func() {
+						today, yesterday, title := groupDayNew(convert.ToString(t.Value))
+						if today == "" && yesterday == "" && title == "" {
+
+						}else {
+							iw, _ := utils.NewIdWorker(1)
+							id, _ := iw.NextId()
+							m := make(map[string]interface{})
+							m["id"] = id
+							m["title"] = title
+							m["url"] = convert.ToString(t.Value)
+							if today != "" {
+								m["today"] = today
+							}
+							if yesterday != "" {
+								m["yesterday"] = yesterday
+							}
+							if today == "" && yesterday == "" {
+								m["state"] = 0
+							} else {
+								m["state"] = 1
+							}
+							x, err := global.SLDB.InsertMap("bbs", m)
+							if err != nil {
+								global.Log.Error(err.Error())
+							} else {
+								println("保存数据成功！", convert.ToString(x))
+							}
+						}
+					//}()
+				}
+			}
+		} else {
+			break
+		}
+		time.Sleep(time.Second * 3)
+	}
+	println("====================================={结束完成}=====================================")
 }

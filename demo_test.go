@@ -54,7 +54,7 @@ func TestCreateTable(t *testing.T) {
 		t.Error(b)
 	}
 
-	//str := `{"data":{"gender":null,"id":122068319091036160,"member_expir_time":null,"member_type_id":0,"member_type_name":null,"mobile":"18223277005","nickname":null,"photo":null},"msg":"有效token","ret":200}`
+	//str := `{"data":{"gender":null,"id":122068319091036160,"member_expir_time":null,"func_id":0,"func_name":null,"mobile":"18223277005","nickname":null,"photo":null},"msg":"有效token","ret":200}`
 	println("----- " + string(b[:]))
 
 	//rp := utils.ToResultParam(b)
@@ -76,8 +76,8 @@ func TestCreateTable(t *testing.T) {
 func TestSplitStr(t *testing.T) {
 	s := ".base>tr:eq(1) input@value"
 	str := strings.Split(s, ":")
-	global.Log.Warning("ONE:%s",str[0])
-	global.Log.Warning("TWO:%s",str[1])
+	global.Log.Warning("ONE:%s", str[0])
+	global.Log.Warning("TWO:%s", str[1])
 	if len(str) <= 1 {
 		t.Error(str)
 	} else {
@@ -142,4 +142,9 @@ func checkMaps(t *testing.T, m []map[string]interface{}) {
 	jsons, err := convert.ToArrayMapStr(m)
 	checkErr(t, err)
 	t.Log(jsons)
+}
+
+func TestJson(t *testing.T) {
+	s := "{\"title\":\"大众点评 - 房屋装修\",\"domain\":\"http://www.dianping.com\",\"loginUrl\":\"https://www.dianping.com/login?redir=http://www.dianping.com\",\"identity\":\"uamo\",\"writerUrl\":[\"http://s.dianping.com/jjzxblog/new\",\"http://s.dianping.com/jia/new\",\"http://s.dianping.com/meitu\"],\"sleep\":3,\"fill\":[{\"handle\":\"Js\",\"sleep\":2,\"js\":\"document.getElementById(\"groupNoteType\").selectedIndex=Math.ceil(Math.random()*(document.getElementById(\"groupNoteType\").getElementsByTagName(\"option\").length-3))\"},{\"handle\":\"Js\",\"sleep\":2,\"js\":\"$('#txtTitle').val(title)\",\"jsParam\":{\"title\":\"title/v\"}},{\"handle\":\"Js\",\"sleep\":1,\"js\":\"page.editor.setContent(content)\",\"jsParam\":{\"content\":\"content/v\"}},{\"handle\":\"Js\",\"sleep\":1,\"js\":\"document.getElementsByName('allowBindShop')[0].click()\"},{\"handle\":\"Js\",\"sleep\":1,\"js\":\"document.getElementById('btnAddNote').click()\"},{\"handle\":\"Text\",\"Selector\":\"selector\",\"SelectorName\":\".note-title\",\"sleep\":3,\"result\":\"title/v\"},{\"handle\":\"PageURL\",\"Selector\":\"PageURL\",\"sleep\":3,\"field\":\"result_url\"}]}"
+	println(s)
 }

@@ -1,11 +1,12 @@
 //全局版本变量
 var version = "20170831163240";
 var layer, player;
+var account = {};
 
 var win_name
 layui.use('layer', function () {
     layer = layui.layer;
-    player = layui.layer;// = window === window.top ? layer : (parent.window === parent.window.top) ? parent.layer :
+    player = layui.layer; // = window === window.top ? layer : (parent.window === parent.window.top) ? parent.layer :
     //(parent.parent.window === parent.parent.window.top ? parent.parent.layer : parent.parent.parent.layer);
     win_name = player.getFrameIndex(window.name);
     //页面中弹窗处理
@@ -28,9 +29,100 @@ $(function () {
         $(document).bind("contextmenu", function () {
             return false;
         });
-        $("body").attr("oncontextmenu", "return false");//.attr("onselectstart", "return false").attr("oncopy", "alert('不支持复制！');return false;");
+        $("body").attr("oncontextmenu", "return false"); //.attr("onselectstart", "return false").attr("oncopy", "alert('不支持复制！');return false;");
     }
 });
+
+function getAccount(func) {
+    var acc = window === window.top ? account : (parent.window === parent.window.top) ? parent.account : (parent.parent.window === parent.parent.window.top ? parent.parent.account : parent.parent.parent.account);
+    if (!acc || acc.Token == "" || acc.Token == null || acc.Token == undefined) {
+        getAccountAjax(function (a) {
+            acc = a;
+            func(acc)
+        })
+    } else {
+        func(acc)
+    }
+}
+
+function getAccountAjax(func, acc) {
+    $.ajax({
+        url: "/member/info",
+        success: function (d) {
+            if (d.ret == 200) {
+                func(d.data)
+            }
+        }
+    });
+}
+
+//时间是否在当前时间之后
+function AfterTime(expirationTime) {
+    if (expirationTime == null || expirationTime == undefined || expirationTime == "") {
+        return false
+    }
+    var date = new Date(expirationTime.replace(/-/g, '/'));
+    var et = Date.parse(date);
+    var now = Date.parse(new Date());
+    return et > now
+}
+
+function GetExpirationTime(expirationTime) {
+    if (expirationTime == null || expirationTime == undefined || expirationTime == "") {
+        return ""
+    }
+    var date = new Date(expirationTime);
+    return date.Format("yyyy-MM-dd")
+}
+
+function SplitCode(code) {
+    if (code == null || code == undefined || code == "") {
+        return ""
+    }
+    var codes = new Array();
+    var str = code.split(",")
+    for (var i = 0; i < str.length; i++) {
+        codes.push("<span>" + str[i] + "</span>")
+    }
+    return codes.join("")
+}
+
+//---------------------------------------------------
+// 日期格式化
+// 格式 YYYY/yyyy/YY/yy 表示年份
+// MM/M 月份
+// W/w 星期
+// dd/DD/d/D 日期
+// hh/HH/h/H 时间
+// mm/m 分钟
+// ss/SS/s/S 秒
+//---------------------------------------------------
+Date.prototype.Format = function (formatStr) {
+    var str = formatStr;
+    var Week = ['日', '一', '二', '三', '四', '五', '六'];
+
+    str = str.replace(/yyyy|YYYY/, this.getFullYear());
+    str = str.replace(/yy|YY/, (this.getYear() % 100) > 9 ? (this.getYear() % 100).toString() : '0' + (this.getYear() % 100));
+
+    str = str.replace(/MM/, this.getMonth() > 9 ? this.getMonth().toString() : '0' + this.getMonth());
+    str = str.replace(/M/g, this.getMonth());
+
+    str = str.replace(/w|W/g, Week[this.getDay()]);
+
+    str = str.replace(/dd|DD/, this.getDate() > 9 ? this.getDate().toString() : '0' + this.getDate());
+    str = str.replace(/d|D/g, this.getDate());
+
+    str = str.replace(/hh|HH/, this.getHours() > 9 ? this.getHours().toString() : '0' + this.getHours());
+    str = str.replace(/h|H/g, this.getHours());
+    str = str.replace(/mm/, this.getMinutes() > 9 ? this.getMinutes().toString() : '0' + this.getMinutes());
+    str = str.replace(/m/g, this.getMinutes());
+
+    str = str.replace(/ss|SS/, this.getSeconds() > 9 ? this.getSeconds().toString() : '0' + this.getSeconds());
+    str = str.replace(/s|S/g, this.getSeconds());
+
+    return str;
+}
+
 
 function openWin($obj, win_name) {
     var handle = $obj.attr("data-layer-handle");
@@ -67,7 +159,7 @@ function openWin($obj, win_name) {
     t = t || "5%";
     l = l || "";
     var shade = $obj.attr("data-layer-shade");
-    shade = shade != undefined ? [0.8, '#000000'] : false;
+    shade = shade != undefined ? [0.5, '#000000'] : false;
     var maxmin = $obj.attr("data-layer-maxmin");
     maxmin = maxmin == "false" ? false : true;
     var closeBtn = $obj.attr("data-layer-closeBtn");
@@ -80,7 +172,7 @@ function openWin($obj, win_name) {
             moveOut: true,
             resize: false,
             shade: shade,
-            shadeClose: false,//如果shade存在，shadeClose控制点击弹层外区域关闭。
+            shadeClose: false, //如果shade存在，shadeClose控制点击弹层外区域关闭。
             maxmin: maxmin, //开启最大化最小化按钮
             area: [w, h],
             offset: [t, l],
@@ -101,7 +193,8 @@ function openWin($obj, win_name) {
                 if (left + 40 > parent.document.body.clientWidth) {
                     $(window.parent.document).find(e.prevObject.selector).css("left", (parent.document.body.clientWidth - 40) + "px");
                 }
-            }, success: function (layero, index) {
+            },
+            success: function (layero, index) {
                 if (security) {
                     $(layero).find("iframe").attr("security", "restricted").attr("sandbox", "");
                 }
@@ -119,7 +212,7 @@ function closeRightMenu() {
 //关闭弹出
 function closeIframe() {
     var index = parent.layer.getFrameIndex(window.name);
-    player.close(index);
+    parent.layer.close(index);
 }
 
 //子弹窗调用父级弹窗的方法
@@ -197,8 +290,7 @@ var LinkUrl = {
                 if (arr[i].split('=')[0] == ref) {
                     setparam = value;
                     modify = "1";
-                }
-                else {
+                } else {
                     setparam = arr[i].split('=')[1];
                 }
                 returnurl = returnurl + arr[i].split('=')[0] + "=" + setparam + "&";
@@ -207,23 +299,20 @@ var LinkUrl = {
             if (modify == "0")
                 if (returnurl == str)
                     returnurl = returnurl + "&" + ref + "=" + value;
-        }
-        else {
+        } else {
             if (str.indexOf('=') != -1) {
                 arr = str.split('=');
                 if (arr[0] == ref) {
                     setparam = value;
                     modify = "1";
-                }
-                else {
+                } else {
                     setparam = arr[1];
                 }
                 returnurl = arr[0] + "=" + setparam;
                 if (modify == "0")
                     if (returnurl == str)
                         returnurl = returnurl + "&" + ref + "=" + value;
-            }
-            else
+            } else
                 returnurl = ref + "=" + value;
         }
         return url.substr(0, url.indexOf('?')) + "?" + returnurl;
@@ -232,8 +321,7 @@ var LinkUrl = {
         var str = "";
         if (url.indexOf('?') != -1) {
             str = url.substr(url.indexOf('?') + 1);
-        }
-        else {
+        } else {
             return url;
         }
         var arr = "";
@@ -247,13 +335,11 @@ var LinkUrl = {
                 }
             }
             return url.substr(0, url.indexOf('?')) + "?" + returnurl.substr(0, returnurl.length - 1);
-        }
-        else {
+        } else {
             arr = str.split('=');
             if (arr[0] == ref) {
                 return url.substr(0, url.indexOf('?'));
-            }
-            else {
+            } else {
                 return url;
             }
         }

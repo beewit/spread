@@ -21,9 +21,6 @@ type Account struct {
 	Mobile          string `json:"mobile"`
 	Photo           string `json:"photo"`
 	Nickname        string `json:"nickname"`
-	MemberTypeName  string `json:"member_type_name"`
-	MemberExpirTime string `json:"member_expir_time"`
-	MemberTypeId    int64  `json:"member_type_id"`
 	Token           string
 }
 

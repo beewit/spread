@@ -140,6 +140,7 @@
 <script>
     var laytpl;
     var laypage;
+    var pageIndex = 1;
     var getTpl = list.innerHTML, view = document.getElementById('view');
     layui.use(['laytpl', 'laypage'], function () {
         laytpl = layui.laytpl;
@@ -150,6 +151,7 @@
     function loadUnionList() {
         $.ajax({
             url: "/platform/union/list",
+            data: {pageIndex: pageIndex},
             success: function (d) {
                 if (d.ret == 200) {
                     laytpl(getTpl).render(d.data.Data, function (html) {
@@ -161,8 +163,11 @@
                         count: d.data.Count,
                         limit: d.data.PageSize,
                         curr: d.data.pageIndex,
-                        jump: function (obj) {
-                            console.log(obj)
+                        jump: function (obj, first) {
+                            if (!first) {
+                                pageIndex = obj.curr
+                                loadUnionList()
+                            }
                         }
                     });
                 }

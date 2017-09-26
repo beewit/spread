@@ -46,7 +46,7 @@
 
     function loadUnion() {
         $.ajax({
-            url: "/platform/list",
+            url: "/api/platform/list",
             success: function (d) {
                 if (d.ret == 200) {
                     laytpl(getTpl).render(d.data, function (html) {

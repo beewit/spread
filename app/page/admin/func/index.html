@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>绑定平台帐号</title>
+    <link rel="stylesheet" href="../assets/css/amazeui.min.css"/>
+    <link rel="stylesheet" href="/app/static/css/base.css">
+    <style>
+        .check-div li label {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .check-div li i.checked.active {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background: url("/app/page/admin/assets/img/icon/checked.png") no-repeat;
+            background-size: 100%;
+        }
+
+        .check-div li i.checked {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background: url("/app/page/admin/assets/img/icon/check.png") no-repeat;
+            background-size: 100%;
+        }
+
+        .footer-btn {
+            background-color: #efefef;
+            position: absolute;
+            bottom: 0;
+            text-align: center;
+            padding-top: 13px;
+            padding-bottom: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="am-padding">
+    <pre>
+        <span class="am-text-danger am-text-lg">温馨提示：点击可以选择需要分发的地方</span>
+    </pre>
+    <ul class="am-avg-sm-4 am-avg-md-5 am-avg-lg-6 am-thumbnails union-ul am-margin-top-lg check-div" id="view">
+    </ul>
+</div>
+
+<div class="footer-btn">
+    <input type="button" class="am-btn am-btn-success" disabled="disabled" value="确认发布" id="save">
+</div>
+
+<script id="list" type="text/html">
+    {{#  layui.each(d, function(index, item){ }}
+    <li data-id="{{ item.id }}" class="active">
+        <label style="margin: 0 auto">
+            <img class="am-thumbnail" src="{{ item.cover_img }}"/>
+            <i class="checked active"></i>
+        </label>
+        <span>{{ item.name }}</span>
+    </li>
+    {{#  }); }}
+    {{#  if(d == null){ }}
+    无数据
+    {{#  } }}
+</script>
+<script src="/app/page/admin/assets/js/jquery.min.js"></script>
+<script src="/app/static/js/plugs/layui/layui.all.js"></script>
+<script src="/app/page/admin/assets/js/common.ajax.js"></script>
+<script src="/app/page/admin/assets/js/common.js"></script>
+<script>
+    var laytpl;
+    var getTpl = list.innerHTML, view = document.getElementById('view');
+    layui.use('laytpl', function () {
+        laytpl = layui.laytpl;
+        loadUnion();
+    });
+
+    $(function () {
+        $("#view").delegate("li", "click", function () {
+            if ($(this).find(".checked").hasClass("active")) {
+                $(this).find(".checked").removeClass("active")
+                $(this).removeClass("active")
+            } else {
+                $(this).find(".checked").addClass("active")
+                $(this).addClass("active")
+            }
+            activeSave();
+        });
+
+        $("#save").click(function () {
+            parent.push(checkFunIds());
+            closeIframe()
+        });
+    });
+
+    function checkFunIds() {
+        var ids = new Array();
+        $.each($("#view li.active"), function (i, item) {
+            ids.push($(item).attr("data-id"))
+        });
+        return ids.join(",")
+    }
+
+    function activeSave() {
+        if ($("#view li.active").length > 0) {
+            $("#save").removeAttr("disabled")
+        } else {
+            $("#save").attr("disabled", "disabled")
+        }
+    }
+
+    function loadUnion() {
+        $.ajax({
+            url: "/api/account/func/list",
+            success: function (d) {
+                if (d.ret == 200) {
+                    laytpl(getTpl).render(d.data.Data, function (html) {
+                        view.innerHTML = html;
+                    });
+                    activeSave();
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

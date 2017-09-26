@@ -29,10 +29,12 @@ func handlerConfig(e *echo.Echo) {
 	e.POST("/api/template", api.GetTemplateByList, handler.Filter)
 	e.POST("/api/template/:id", api.GetTemplateById, handler.Filter)
 	e.POST("/api/template/update/refer/:id", api.UpdateTemplateReferById, handler.Filter)
+	e.POST("/api/platform/list", api.GetPlatformList, handler.Filter)
+	e.POST("/api/func/list", api.GetFuncByList, handler.Filter)
+	e.POST("/api/account/func/list", api.GetAccountFuncList, handler.Filter)
 
 	e.POST("/api/rules/list", api.GetRules, handler.Filter)
 
-	e.POST("/platform/list", handler.PlatformList, handler.Filter)
 	e.POST("/platform/bind", handler.PlatformUnionBind, handler.Filter)
 	e.POST("/platform/union/list", handler.UnionList, handler.Filter)
 

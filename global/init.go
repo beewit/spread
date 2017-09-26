@@ -52,21 +52,26 @@ func PageAlertMsg(tip, url string) {
 }
 
 func PageSuccessMsg(tip, url string) {
-	PageMsg("#19a010", tip, url)
+	PageJumpMsg("#19a010", tip, url)
 }
 
 func PageErrorMsg(tip, url string) {
-	PageMsg("#f33a3a", tip, url)
+	PageJumpMsg("#f33a3a", tip, url)
 }
 
-func PageMsg(status, tip, url string) {
-	tipDiv := fmt.Sprintf(`<div style="
+func PageMsg(tip string) {
+	PageJumpMsg("#ffb12c", tip, "")
+}
+
+func PageJumpMsg(status, tip, url string) {
+	tipDiv := fmt.Sprintf(`<div id="pageMsg" style="
     position: fixed;
     width: 100%%;
     height: 100%%;
     background-color: rgba(0, 0, 0, 0.36);
     z-index: 999999998;
-    text-align: center;top:0"><span style="
+    text-align: center;top:0;">
+	<span style="
     background-color: %s;
     padding: 20px 50px;
     color: #fff;
@@ -75,8 +80,24 @@ func PageMsg(status, tip, url string) {
     border-radius: 5px;
     margin-top: 20px;
     top: 20px;
-    font-weight: 900;">%s</span></div>`, status, tip)
-	js := fmt.Sprintf("var div = document.createElement('div');div.innerHTML=`%v`;document.body.appendChild(div);setTimeout(function () {     location.href='%v';    },1500)", tipDiv, url)
+    font-weight: 900;position: relative;"
+	onclick="var pageMsg= document.getElementById('pageMsg');pageMsg.parentNode.removeChild(pageMsg);">%s
+	<a style="position: absolute;
+    right: 4px;
+    border-radius: 50%%;
+    background-color: #fff;
+    color: #464545;
+    font-size: 12px;
+    height: 40px;
+    width: 40px;
+    line-height: 40px;
+    top: 8px;
+    cursor: pointer;">关闭</a></span></div>`, status, tip)
+	urls := ""
+	if url != "" {
+		urls = fmt.Sprintf("setTimeout(function () {     location.href='%v';    },1500)", url)
+	}
+	js := fmt.Sprintf("var div = document.createElement('div');div.innerHTML=`%v`;document.body.appendChild(div);%s", tipDiv, urls)
 	Page.RunScript(js, nil, nil)
 }
 

@@ -16,13 +16,11 @@
     <link rel="stylesheet" href="../assets/css/amazeui.min.css"/>
     <link rel="stylesheet" href="../assets/css/app.css">
     <link rel="stylesheet" href="/app/static/css/base.css">
-    <link href="/app/static/js/plugs/umeditor/themes/default/_css/umeditor.css" type="text/css" rel="stylesheet">
 
 </head>
 
 <body data-type="generalComponents" class=" edit-body-div">
 <div class="tpl-page-container tpl-page-header-fixed h-99">
-
     <div class="tpl-content-wrapper h-100">
         <div class="tpl-portlet-components  margin-auto">
             <div class="portlet-title">
@@ -55,7 +53,10 @@
 <div class="handle-div">
     <button type="button" class="am-btn am-btn-default am-btn-success">保存素材</button>
     <button type="button" class="am-btn am-btn-default am-btn-secondary">预览</button>
-    <button type="button" class="am-btn am-btn-default am-btn-warning" id="publish">一键发布</button>
+    <button type="button" class="am-btn am-btn-default am-btn-warning" data-layer="/app/page/admin/func/index.html"
+            data-layer-title="一键发布" data-layer-shade="#d2d2d2" data-layer-handle="checkContent">
+        一键发布
+    </button>
     <button type="button" class="am-btn am-btn-default am-btn-danger">关闭</button>
 </div>
 <script src="/app/page/admin/assets/js/jquery.min.js"></script>
@@ -69,24 +70,6 @@
     editor.create()
 
     $(function () {
-        $("#publish").click(function () {
-            var title = $("#title").val();
-            var content = editor.txt.html();
-
-            $.ajax({
-                url: "/push/push",
-                type: 'POST',
-                dataType: "json",
-                data: {
-                    title: title,
-                    content: content
-                },
-                success: function (e) {
-                },
-                error: function (e) {
-                }
-            });
-        });
         var tpl = Request["tpl"];
         if (tpl) {
             $.ajax({
@@ -104,6 +87,40 @@
             });
         }
     });
+
+    function checkContent() {
+        var title = $("#title").val();
+        var content = editor.txt.html();
+        if (title == "") {
+            player.msg("请输入标题", {icon: 0});
+            return false
+        }
+        if (content == "") {
+            player.msg("请输入内容", {icon: 0});
+            return false
+        }
+        return true
+    }
+
+    function push(funIds) {
+        var title = $("#title").val();
+        var content = editor.txt.html();
+
+        $.ajax({
+            url: "/push/push",
+            type: 'POST',
+            dataType: "json",
+            data: {
+                title: title,
+                content: content,
+                funIds: funIds
+            },
+            success: function (e) {
+            },
+            error: function (e) {
+            }
+        });
+    }
 </script>
 </body>
 

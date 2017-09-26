@@ -11,16 +11,17 @@ import (
 	"encoding/json"
 	"github.com/beewit/spread/parser"
 	"time"
+	"github.com/beewit/beekit/utils/convert"
 )
 
-func PlatformList(c echo.Context) error {
-	m, err := api.GetPlatformList()
-	if err != nil || m == nil {
-		global.Log.Error(err.Error())
-		return utils.Error(c, "获取平台信息失败", nil)
-	}
-	return utils.Success(c, "", m)
-}
+//func PlatformList(c echo.Context) error {
+//	m, err := api.GetPlatformList(c)
+//	if err != nil || m == nil {
+//		global.Log.Error(err.Error())
+//		return utils.Error(c, "获取平台信息失败", nil)
+//	}
+//	return utils.Success(c, "", m)
+//}
 
 func UnionList(c echo.Context) error {
 	pageIndex := utils.GetPageIndex(c.FormValue("pageIndex"))
@@ -40,77 +41,89 @@ func PlatformUnionBind(c echo.Context) error {
 	if t == "" {
 		return utils.Error(c, "请选择平台进行绑定", nil)
 	}
-	pv := global.Platform[t]
-	if pv < 0 {
-		return utils.Error(c, "请正确选择平台进行绑定", nil)
-	}
 	//获取远程服务中的平台信息进行帐号绑定操作
 	m, err := api.GetPlatformOne(t)
 	if err != nil || m == nil {
-		global.Log.Error(err.Error())
 		return utils.Error(c, "绑定信息失败，获取平台信息失败", nil)
 	}
 	go UnionBind(m)
 	return utils.Success(c, "正在前往绑定中...", "")
 }
 
-func UnionBind(m map[string]string) {
+func UnionBind(m map[string]interface{}) {
 	if global.Acc == nil || global.Acc.Id <= 0 {
 		global.PageAlertMsg("帐号未登陆，请登陆后操作", global.API_SSO_DOMAN+"?backUrl="+global.Host+"/ReceiveToken")
 		return
 	}
 	//进入登陆页面
-	lu := m["login_url"]
-	domain := m["site_url"]
-	platform := m["type"]
-	identity := m["identity"]
-	as := m["account_selector"]
-	ps := m["password_selector"]
+	platformId := convert.MustInt64(m["id"])
+	lu := convert.ToString(m["login_url"])
+	domain := convert.ToString(m["site_url"])
+	platform := convert.ToString(m["type"])
+	identity := convert.ToString(m["identity"])
+	as := convert.ToString(m["account_selector"])
+	ps := convert.ToString(m["password_selector"])
+	iframe := convert.ToString(m["iframe"])
 	global.Navigate(lu)
 	//检测登陆状态
-	flog, _ := checkLogin(domain, identity, platform, as, ps)
+	flog, platformAcc := checkLogin(domain, identity, platform, as, ps, iframe, platformId)
 	if flog {
-		infoUrl := m["info_url"]
-		ns := m["info_nickname_selector"]
-		ps := m["info_photo_selector"]
+		infoUrl := convert.ToString(m["info_url"])
+		ns := convert.ToString(m["info_nickname_selector"])
+		ps := convert.ToString(m["info_photo_selector"])
 		if infoUrl != "" && (ns != "" || ps != "") {
 			global.Navigate(infoUrl)
 			time.Sleep(2 * time.Second)
 			nickname := global.PageFindValue(ns)
 			photo := global.PageFindValue(ps)
 			if nickname != "" || photo != "" {
-				uFlog, _ := dao.UpdateUnionPhoto(nickname, photo, platform, global.Acc.Id)
+				uFlog, _ := dao.UpdateUnionPhoto(nickname, photo, platformAcc, platformId, global.Acc.Id)
 				global.Log.Warning("修改帐号昵称和帐号信息，状态：", uFlog)
 			}
 		}
-		global.PageSuccessMsg("绑定帐号成功", global.Host+"?lastUrl=/app/page/admin/content/list.html")
+		global.PageSuccessMsg("绑定帐号成功", global.Host+"?lastUrl=/app/page/admin/account/list.html")
 	} else {
-		global.PageErrorMsg("绑定帐号失败", global.Host+"?lastUrl=/app/page/admin/content/list.html")
+		global.PageErrorMsg("绑定帐号失败", global.Host+"?lastUrl=/app/page/admin/account/list.html")
 	}
 }
 
-func checkLogin(domain, identity, platform, as, ps string) (bool, string) {
+func checkLogin(domain, identity, platform, as, ps, iframeSeletor string, platformId int64) (bool, string) {
+	if iframeSeletor != "" {
+		time.Sleep(time.Second * 1)
+		html, _ := global.Page.HTML()
+		println(html)
+		iframe, err := global.Page.Find(iframeSeletor).Elements()
+		if err != nil {
+			println(err.Error())
+		}
+		if len(iframe) <= 0 {
+			return false, "切换iframe登陆失败"
+		}
+		err = global.Page.SwitchToRootFrameByName(iframe[0])
+		if err != nil {
+			println(err.Error())
+		}
+		defer global.Page.SwitchToParentFrame()
+	}
 	flog := false
 	result := ""
 	i := 0
+	var platformAcc, platformPwd string
 	for {
 		global.Log.Info("检测登陆状态")
 		//获取帐号密码
-		acc := global.PageFindValue(as)
-		pwd := global.PageFindValue(ps)
-		if acc != "" {
-			global.Log.Info("帐号：" + acc)
+		a := global.PageFindValue(as)
+		p := global.PageFindValue(ps)
+
+		if a != "" {
+			platformAcc = a
+			global.Log.Info("帐号：" + platformAcc)
 		}
-		if pwd != "" {
-			global.Log.Info("密码：" + pwd)
+		if p != "" {
+			platformPwd = p
+			global.Log.Info("密码：" + platformPwd)
 		}
-		if acc != "" || pwd != "" {
-			dbFlog, err := dao.SetUnion(platform, acc, pwd, global.Acc.Id)
-			if err != nil {
-				global.Log.Error("添加帐号绑定数据，异常：%v", err.Error())
-			}
-			global.Log.Warning("添加帐号绑定数据，状态：%v", dbFlog)
-		}
+
 		thisUrl, _ := global.Page.URL()
 		u, _ := url.Parse(domain)
 		if !strings.Contains(thisUrl, u.Host) {
@@ -123,12 +136,18 @@ func checkLogin(domain, identity, platform, as, ps string) (bool, string) {
 		flog = f
 
 		if flog {
+			if platformAcc != "" || platformPwd != "" {
+				dbFlog, err := dao.SetUnion(platform, platformAcc, platformPwd, platformId, global.Acc.Id)
+				if err != nil {
+					global.Log.Error("添加帐号绑定数据，异常：%v", err.Error())
+				}
+				global.Log.Warning("添加帐号绑定数据，状态：%v", dbFlog)
+			}
 			cookieJson, _ := json.Marshal(c)
 
 			global.Log.Info(string(cookieJson[:]))
-			dao.SetUnionCookies(domain, string(cookieJson), global.Acc.Id)
+			dao.SetUnionCookies(domain, string(cookieJson), platformId, global.Acc.Id, platformAcc)
 			result = "登陆成功"
-			global.Log.Info(result)
 			break
 		}
 		i++
@@ -137,5 +156,8 @@ func checkLogin(domain, identity, platform, as, ps string) (bool, string) {
 			break
 		}
 	}
-	return flog, result
+	if result != "" {
+		global.Log.Info(result)
+	}
+	return flog, platformAcc
 }

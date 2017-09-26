@@ -22,11 +22,15 @@
         width: 60px;
         height: 100%;
         z-index: 9999999991;
-        filter: progid:DXImageTransform.Microsoft.Shadow(color='#969696', Direction=135, Strength=5); /*for ie6,7,8*/
+        filter: progid:DXImageTransform.Microsoft.Shadow(color='#969696', Direction=135, Strength=5);
+        /*for ie6,7,8*/
         background-color: #ccc;
-        -moz-box-shadow: 2px 2px 5px #969696; /*firefox*/
-        -webkit-box-shadow: 2px 2px 5px #969696; /*webkit*/
-        box-shadow: 2px 2px 5px #969696; /*opera或ie9*/
+        -moz-box-shadow: 2px 2px 5px #969696;
+        /*firefox*/
+        -webkit-box-shadow: 2px 2px 5px #969696;
+        /*webkit*/
+        box-shadow: 2px 2px 5px #969696;
+        /*opera或ie9*/
     }
 
     .slidetoolbarv2 {
@@ -65,7 +69,8 @@
         box-shadow: 1px 1px 10px #ffb9b9;
     }
 
-    .slidetoolbarv2 .flipping:hover .content, .slidetoolbarv2 .content {
+    .slidetoolbarv2 .flipping:hover .content,
+    .slidetoolbarv2 .content {
         display: none;
     }
 
@@ -81,7 +86,9 @@
         width: 32px;
     }
 
-    .slidetoolbarv2 .flipping .icon, .slidetoolbarv2 .flipping:hover .icon, .slidetoolbarv2 .icon {
+    .slidetoolbarv2 .flipping .icon,
+    .slidetoolbarv2 .flipping:hover .icon,
+    .slidetoolbarv2 .icon {
         position: relative;
         display: block;
         padding: 1px 0;
@@ -99,7 +106,8 @@
         font-size: 14px;
     }
 
-    .slidetoolbarv2 .link, .slidetoolbarv2 .desc {
+    .slidetoolbarv2 .link,
+    .slidetoolbarv2 .desc {
         display: block;
         overflow: hidden;
         padding-left: 10px;
@@ -227,7 +235,6 @@
     .tagging-danger {
         background-color: #ed6b75 !important;
     }
-
     /* 定义keyframe动画，命名为blink */
 
     @keyframes blink {
@@ -245,7 +252,6 @@
             opacity: 0;
         }
     }
-
     /* 添加兼容性前缀 */
 
     @-webkit-keyframes blink {
@@ -307,8 +313,8 @@
             opacity: 0;
         }
     }
-
     /* 定义blink类*/
+
     .blink {
         animation: blink .75s linear infinite;
         /* 其它浏览器兼容性前缀 */
@@ -377,42 +383,43 @@
                     <a class="icon icon-hook">
                         <img class="icon-img" data-src="/app/static/img/icon/edit.png">编辑器</a>
                 </div>
-                <div class="appitem appitem-hook" data-href="/app/page/admin/content/list.html">
-                    <div class="content content-hook">
-                        <a class="g-fr" title="单图文适用于所有平台">
-                            <img class="img" src="http://sc1.hao123img.com/res/r/image/2017-08-17/ed157c320aa30d594cb94dc2c35c585e.jpg"></a>
-                        <a class="link">单图文适用于所有平台</a>
-                        <a class="desc">千挑万选精美图文</a>
-                    </div>
-                    <a class="icon icon-hook">
-                        <img class="icon-img" data-src="/app/static/img/icon/content.png">内容模板
-                    </a>
-                </div>
-                <div class="appitem appitem-hook" data-href="/app/page/admin/article/index.html">
-                    <div class="content content-hook">
-                        <a class="g-fr" title="工蜂小智精选文章">
-                            <img class="img" src="http://sc0.hao123img.com/res/r/image/2017-08-16/470825601353ac729648d5a86ea28c45.jpg">
-                        </a>
-                        <a class="link">工蜂小智精选文章</a>
-                        <a class="desc">亿万数据尽在工蜂数据</a></div>
-                    <a class="icon icon-hook">
-                        <img class="icon-img"
-                             data-src="/app/static/img/icon/article.png">文章库</a>
-                </div>
-                <div class="appitem appitem-hook" data-href="/app/page/admin/form-news.html">
-                    <div class="content content-hook">
-                        <a class="g-fr" title="消息通知">
-                            <img class="img" src="http://s0.hao123img.com/res/r/image/2017-03-13/2708666b8eed77d16a4ab4bc4870719b.png"></a>
-                        <a class="link">消息通知</a>
-                        <a class="desc">数据分发/抓取完成/系统消息</a>
-                    </div>
-                    <a class="icon icon-hook">
-                        <img class="icon-img" data-src="/app/static/img/icon/news.png">消息
-                        <i class="tagging tagging-danger blink">
-                            12
-                        </i>
-                    </a>
-                </div>
+                <!--<div class="appitem appitem-hook" data-href="/app/page/admin/content/list.html">
+                   <div class="content content-hook">
+                       <a class="g-fr" title="单图文适用于所有平台">
+                           <img class="img" src="http://sc1.hao123img.com/res/r/image/2017-08-17/ed157c320aa30d594cb94dc2c35c585e.jpg"></a>
+                       <a class="link">单图文适用于所有平台</a>
+                       <a class="desc">千挑万选精美图文</a>
+                   </div>
+                   <a class="icon icon-hook">
+                       <img class="icon-img" data-src="/app/static/img/icon/content.png">内容模板
+                   </a>
+               </div>
+               <div class="appitem appitem-hook" data-href="/app/page/admin/article/index.html">
+                   <div class="content content-hook">
+                       <a class="g-fr" title="工蜂小智精选文章">
+                           <img class="img" src="http://sc0.hao123img.com/res/r/image/2017-08-16/470825601353ac729648d5a86ea28c45.jpg">
+                       </a>
+                       <a class="link">工蜂小智精选文章</a>
+                       <a class="desc">亿万数据尽在工蜂数据</a></div>
+                   <a class="icon icon-hook">
+                       <img class="icon-img"
+                            data-src="/app/static/img/icon/article.png">文章库</a>
+               </div>
+               <div class="appitem appitem-hook" data-href="/app/page/admin/form-news.html">
+                   <div class="content content-hook">
+                       <a class="g-fr" title="消息通知">
+                           <img class="img" src="http://s0.hao123img.com/res/r/image/2017-03-13/2708666b8eed77d16a4ab4bc4870719b.png"></a>
+                       <a class="link">消息通知</a>
+                       <a class="desc">数据分发/抓取完成/系统消息</a>
+                   </div>
+                   <a class="icon icon-hook">
+                       <img class="icon-img" data-src="/app/static/img/icon/news.png">消息
+                       <i class="tagging tagging-danger blink">
+                           12
+                       </i>
+                   </a>
+               </div>
+               -->
                 <div class="appitem appitem-hook" data-href="/app/page/admin/account/list.html">
                     <div class="content content-hook">
                         <a class="g-fr" title="平台帐号绑定">
@@ -443,7 +450,7 @@
     </div>
     <div class="hive-load" style="z-index: 999999997;">
         <div class="hive-load-tip">
-                <span>
+            <span>
                     <img data-src="/app/static/img/icon/ball-triangle.svg">
                     <p>
                         小智正在工作中<br>请不要随意操作哦
@@ -454,6 +461,7 @@
 </div>
 
 <script>
+    var account = {};
     if (location.href.indexOf("127.0.0.1") <= -1 || location.href.indexOf("localhost") <= -1) {
         loadScript("/app/static/js/inject.js");
     }
@@ -461,7 +469,7 @@
     function loadScript(url, callback) {
         var script = document.createElement("script");
         script.type = "text/javascript";
-        if (typeof(callback) != "undefined") {
+        if (typeof (callback) != "undefined") {
             if (script.readyState) {
                 script.onreadystatechange = function () {
                     if (script.readyState == "loaded" || script.readyState == "complete") {

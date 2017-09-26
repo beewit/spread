@@ -6,9 +6,9 @@ import (
 	"runtime"
 
 	"github.com/beewit/spread/global"
+	"github.com/beewit/spread/handler"
 	"github.com/beewit/spread/router"
 	"github.com/sclevine/agouti"
-	"github.com/beewit/spread/handler"
 )
 
 func main() {

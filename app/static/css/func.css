@@ -1,0 +1,255 @@
+.func {
+    overflow: hidden
+}
+
+.func li {
+    margin-bottom: 1.5rem;
+    padding: .5rem 1.5rem;
+    float: left;
+    width: 33.3333333%
+}
+
+@media only screen and (max-width: 1600px) {
+    .func li {
+        width: 50% !important
+    }
+}
+
+@media only screen and (max-width: 800px) {
+    .func li {
+        width: 100% !important
+    }
+}
+
+.func .func-item:hover {
+    box-shadow: 0 24px 30px -12px rgba(0, 0, 0, .2);
+    -webkit-transform: translate(-1px, -4px);
+    transform: translate(-1px, -4px);
+    z-index: 10;
+    border: 1px solid #d6d6d6;
+    background-color: #f8fcff;
+}
+
+.func section {
+    display: block;
+    overflow: hidden;
+}
+
+.func .func-item {
+    position: relative;
+    height: 168px;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+    -webkit-transition: all .2s;
+    transition: all .2s;
+    cursor: pointer;
+    background: url(/app/page/admin/assets/img/func/no.png) no-repeat #FFF;
+    background-size: 90px;
+    background-position: right bottom;
+}
+
+.func .func-item.yes {
+    background-image: url(/app/page/admin/assets/img/func/yes.png)
+}
+
+.func .func-item.no {
+    background-image: url(/app/page/admin/assets/img/func/no.png)
+}
+
+.func .func-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.func .func-header {
+    padding: 16px 12px;
+}
+
+.func .func-icon {
+    float: left;
+    width: 64px;
+    height: 64px;
+    vertical-align: text-top;
+    border-radius: 50%;
+}
+
+.func .func-header-corp .price {
+    margin: 4px 0;
+}
+
+.func-price {
+    font-size: 1.8rem;
+    color: red;
+}
+
+.hot {
+    background: url(/app/page/admin/assets/img/postion/hot2.png) no-repeat;
+    background-position: left top;
+    background-size: 50px;
+}
+
+.new {
+    background: url(/app/page/admin/assets/img/postion/new.png) no-repeat;
+    background-position: left top;
+    background-size: 50px;
+}
+
+.func .func-header-corp {
+    padding-left: 70px;
+    margin-right: 80px;
+}
+
+.func .func-header-corp a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    color: #2E3133;
+    font-size: 1.7rem;
+    line-height: 18px;
+    font-weight: 600;
+}
+
+.func .func-header-corp .desc {
+    display: block;
+    max-height: 36px;
+    overflow: hidden;
+    color: #47525D;
+    font-size: 1.4rem;
+    line-height: 18px;
+    height: 70px;
+}
+
+.func .func-handle {
+    position: absolute;
+    top: 16px;
+    right: 12px;
+}
+
+.func .func-handle span {
+    height: 30px;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: none;
+    outline: 0;
+    margin-bottom: 5px;
+    display: block;
+    width: 80px;
+    font-size: 1.5rem;
+    border-radius: 4px;
+    line-height: 30px;
+    background-color: #00BD52;
+    color: #fff;
+    border: 1px solid rgba(0, 0, 0, .1);
+    -webkit-transition: all .3s ease-in;
+    transition: all .3s ease-in;
+}
+
+.func .func-handle span.addCart {
+    background-color: #F59A2B
+}
+
+.func .func-item:hover .func-handle span {
+    background-color: #26d270;
+}
+
+.func .func-item:hover .func-handle span.addCart {
+    background-color: #FCAE56;
+}
+
+.func .func-item:hover .func-handle span.disabled,
+.func .func-item .func-handle span.disabled {
+    background-color: #e6e6e6;
+    color: #a2a2a2;
+}
+
+.func-item.yes {
+    cursor: default;
+}
+
+.func-item.yes .addCart,
+.func-item.yes .openFunc {
+    display: none;
+}
+
+
+.func .func-item .func-handle .time {
+    background: none;
+    color: #808080;
+    line-height: 20px;
+    text-align: left;
+    border: none;
+    display: none;
+}
+
+.func-item.yes .func-handle .time {
+    display: block;
+}
+
+.func .func-item:hover .func-handle .time {
+    background: none
+}
+
+.func .func-tag {
+    font-size: 0;
+    padding-left: 12px;
+    position: absolute;
+    bottom: 1.5rem;
+}
+
+.func .func-tag span {
+    display: inline-block;
+    padding: 0 12px;
+    line-height: 24px;
+    font-size: 1.2rem;
+    color: #7D8994;
+    margin-right: 4px;
+    background: #F1F1F1;
+    border-radius: 12px;
+}
+
+.func-type {
+    width: 100%;
+    height: 40px;
+    border-bottom: 2px solid #c5c5c5;
+}
+
+.func-type span,
+.func-type a {
+    float: left;
+    line-height: 36px;
+    color: #616161;
+    font-size: 18px;
+}
+
+.func-type a {
+    padding: 0 10px
+}
+
+.func-type a.active {
+    border-bottom: 4px solid #000;
+    color: #000;
+}
+
+.func-type a:hover {
+    color: #000;
+}
+
+.func-nav {
+    position: relative
+}
+
+.func-batch {
+    position: absolute;
+    right: 20px;
+    top: 0;
+}
+
+.func-batch span {
+    font-size: 1.4rem;
+    color: #757575
+}

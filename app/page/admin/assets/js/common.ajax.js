@@ -17,7 +17,6 @@
             success: function (data, textStatus) {
             },
             beforeSend: function (XMLHttpRequest) {
-                //XMLHttpRequest.setRequestHeader('Authorization', "Bearer " + opt.token);
             },
             complete: function (XMLHttpRequest, textStatus) {
 
@@ -31,7 +30,6 @@
         }
         var loadi;
         var _opt = $.extend(opt, {
-            //headers: {'Authorization': "Bearer " + opt.token},
             beforeSend: function () {
                 loadi = player.msg('正在加载..', {icon: 6, time: -1});
             },
