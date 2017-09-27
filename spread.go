@@ -33,7 +33,7 @@ func start() {
 		"--webkit-text-size-adjust"}))
 	global.Driver.Start()
 	var err error
-	global.Page, err = global.Driver.NewPage()
+	global.Page.Page, err = global.Driver.NewPage()
 	if err != nil {
 		fmt.Println("Failed to open page.")
 	}

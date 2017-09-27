@@ -11,7 +11,7 @@ import (
 	"github.com/beewit/beekit/mysql"
 	"github.com/beewit/beekit/sqlite"
 	"github.com/beewit/beekit/utils"
-	"github.com/sclevine/agouti"
+	"github.com/sclevine/agouti" 
 )
 
 var (
@@ -19,7 +19,6 @@ var (
 	DB       = mysql.DB
 	SLDB     = sqlite.DB
 	Driver   *agouti.WebDriver
-	Page     *agouti.Page
 	HiveHtml = utils.Read("app/page/index.html")
 	HiveJs   = utils.Read("app/static/js/inject.js")
 	Log      = log.Logger
@@ -29,6 +28,8 @@ var (
 	Navigate = PageNavigate
 	Acc      *Account
 	Platform = map[string]int{"新浪微博": 1, "简书": 2, "知乎": 3}
+
+	Page = new(utils.AgoutiPage)
 )
 
 const (
@@ -36,6 +37,7 @@ const (
 	API_SSO_DOMAN     = "http://sso.tbqbz.com"
 	PAGE_SIZE         = 10
 )
+
 
 func injection() {
 	time.Sleep(300 * time.Millisecond)
