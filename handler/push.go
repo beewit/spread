@@ -24,23 +24,6 @@ func Push(c echo.Context) error {
 	}
 	m, err := convert.Obj2ListMap(rp.Data)
 	go func() {
-		//println("开始执行简书分发")
-		////   utils.JsonPath("parser", "./jianshu.json")
-		//rule := utils.Read("./parser/jianshu.json")
-		//flog, result, err2 := PushComm(title, content, rule)
-		//println("简书分发", flog, result, err2)
-		//
-		//println("开始执行新浪分发")
-		////utils.JsonPath("parser", "./sina.json")
-		//rule = utils.Read("./parser/sina.json")
-		//flog, result, err2 = PushComm(title, content, rule)
-		//println("微博分发", flog, result, err2)
-		//
-		//println("开始执行知乎分发")
-		////utils.JsonPath("parser", "./zhihu.json")
-		//rule = utils.Read("./parser/zhihu.json")
-		//flog, result, err2 = PushComm(title, content, rule)
-		//println("知乎分发", flog, result, err2)
 		var names []string
 		done := 0
 		if m != nil && len(m) > 0 {

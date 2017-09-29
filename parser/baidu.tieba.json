@@ -1,0 +1,78 @@
+{
+  "title": "百度贴吧 - 装修吧",
+  "domain": "https://www.baidu.com",
+  "loginUrl": "https://tieba.baidu.com/index.html",
+  "identity": "BDUSS",
+  "writerUrl": [
+    "http://tieba.baidu.com/f?kw=%E8%A3%85%E4%BF%AE#sub"
+  ],
+  "sleep": 2,
+  "timeOut": -3,
+  "login": [
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".u_login",
+      "sleep": 2
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "#TANGRAM__PSP_10__userName",
+      "Param": "loginName",
+      "sleep": 2
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "#TANGRAM__PSP_10__password",
+      "Param": "loginPwd",
+      "sleep": 2
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": "#TANGRAM__PSP_10__submit",
+      "sleep": 1
+    }
+  ],
+  "fill": [
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": ".j_title",
+      "Param": "title",
+      "sleep": 1
+    },
+    {
+      "handle": "Js",
+      "sleep": 1,
+      "js": "document.getElementById('ueditor_replace').innerHTML=content",
+      "jsParam": {
+        "content": "content/v"
+      }
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".j_submit",
+      "sleep": 2
+    },
+    {
+      "handle": "Text",
+      "Selector": "selector",
+      "SelectorName": "#thread_list",
+      "sleep": 3,
+      "result": "title/v",
+      "status": "Complete"
+    },
+    {
+      "handle": "Attr",
+      "attr": "href",
+      "Selector": "selector",
+      "SelectorName": "a[title='title/v']",
+      "sleep": 1,
+      "field": "result_url"
+    }
+  ]
+}

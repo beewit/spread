@@ -9,8 +9,6 @@ import (
 	"github.com/beewit/spread/global"
 	"github.com/beewit/spread/parser"
 	"github.com/labstack/echo"
-	"net/url"
-	"strings"
 	"time"
 )
 
@@ -79,7 +77,7 @@ func UnionBind(m map[string]interface{}) {
 			photo := global.PageFindValue(ps)
 			if nickname != "" || photo != "" {
 				uFlog, _ := dao.UpdateUnionPhoto(nickname, photo, platformAcc, platformId, global.Acc.Id)
-				global.Log.Warning("修改帐号昵称和帐号信息，状态：", uFlog)
+				global.Log.Warning("修改帐号昵称和帐号信息，状态：%v", uFlog)
 			}
 		}
 		global.PageSuccessMsg("绑定帐号成功", global.Host+"?lastUrl=/app/page/admin/account/list.html")
@@ -125,9 +123,7 @@ func checkLogin(domain, identity, platform, as, ps, iframeSeletor string, platfo
 			global.Log.Info("密码：" + platformPwd)
 		}
 
-		thisUrl, _ := global.Page.URL()
-		u, _ := url.Parse(domain)
-		if !strings.Contains(thisUrl, u.Host) {
+		if parser.CheckStopAtSite(domain) {
 			result = "已经不在本网站了，结束检测登陆状态"
 			global.Log.Info(result)
 			break

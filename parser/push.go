@@ -157,10 +157,10 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 				}
 				global.Log.Info("自动登陆中...")
 				for i := 0; i < len(pj.Login); i++ {
-					if checkStopAtSite(pj.Domain) {
+					if CheckStopAtSite(pj.Domain) {
 						return false, false, "已经不在任务网站了，结束任务执行", nil
 					}
-					rFlog, result, _, _, err :=	handleSelection(&pj.Login[i], paramMap)
+					rFlog, result, _, _, err := handleSelection(&pj.Login[i], paramMap)
 
 					if err != nil {
 						global.Log.Error(err.Error())
@@ -198,7 +198,10 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 	if !flog {
 		return false, false, pj.Title + "登陆失败", nil
 	}
-	global.Navigate(pj.WriterUrl[rand.Intn(len(pj.WriterUrl))])
+	time.Sleep(time.Second)
+	sendUrl := pj.WriterUrl[rand.Intn(len(pj.WriterUrl))]
+	global.Log.Warning("正在进入发送URL地址：v%", sendUrl)
+	global.Navigate(sendUrl)
 	if pj.Sleep > 0 {
 		time.Sleep(time.Duration(pj.Sleep) * time.Second)
 	}
@@ -209,9 +212,9 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 		iframe, ic, err := switchIframe(pj.Fill[i].SwitchIframe)
 		if err != nil {
 			global.Log.Error(err.Error())
-			return false, false, "切换Iframe失败", nil
+			return false, false, "切换Iframe失败" + global.PageUrl(), nil
 		}
-		if checkStopAtSite(pj.Domain) {
+		if CheckStopAtSite(pj.Domain) {
 			return false, false, "已经不在任务网站了，结束任务执行", nil
 		}
 		rFlog, result, m, status, err := handleSelection(&pj.Fill[i], paramMap)
@@ -243,11 +246,18 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 	} else {
 		//执行失败数据
 	}
-	global.Log.Warning("直接最终结果：%s", completFlog)
+	global.Log.Warning("直接最终结果：%v", completFlog)
 	return true, completFlog, "全部执行完成", nil
 }
 
 func handleSelection(p *PushFillJson, paramMap map[string]string) (bool, string, map[string]string, string, error) {
+	if paramMap != nil && p.SelectorName != "" {
+		for k, v := range paramMap {
+			if strings.Contains(p.SelectorName, k+"/v") {
+				p.SelectorName = strings.Replace(p.SelectorName, k+"/v", v, -1)
+			}
+		}
+	}
 	resultMap := map[string]string{}
 	var result string
 	var err error
@@ -349,7 +359,7 @@ func checkLogin(platformId int64, domain, identity, platformAcc string) (bool, s
 	i := 0
 	for {
 		global.Log.Info("检测登陆状态")
-		if checkStopAtSite(domain) {
+		if CheckStopAtSite(domain) {
 			result = "已经不在本网站了，结束检测登陆状态"
 			global.Log.Info(result)
 			break
@@ -377,7 +387,7 @@ func checkLogin(platformId int64, domain, identity, platformAcc string) (bool, s
 	return flog, result
 }
 
-func checkStopAtSite(domain string) bool {
+func CheckStopAtSite(domain string) bool {
 	thisUrl, _ := global.Page.URL()
 	u, _ := url.Parse(domain)
 	domainName := utils.Substr(u.Host, strings.LastIndex(utils.Substr(u.Host, 0, strings.LastIndex(u.Host, ".")), "."), len(u.Host))
