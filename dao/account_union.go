@@ -1,9 +1,9 @@
 package dao
 
 import (
-	"time"
-	"github.com/beewit/spread/global"
 	"github.com/beewit/beekit/utils"
+	"github.com/beewit/spread/global"
+	"time"
 )
 
 func SetUnion(platform, platformAcc, platformPwd string, platformId, accId int64) (bool, error) {

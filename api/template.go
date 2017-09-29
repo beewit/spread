@@ -2,8 +2,8 @@ package api
 
 import (
 	"github.com/beewit/beekit/utils"
-	"github.com/labstack/echo"
 	"github.com/beewit/spread/global"
+	"github.com/labstack/echo"
 )
 
 func GetTemplateByList(c echo.Context) error {

@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"github.com/beewit/spread/global"
-	"github.com/beewit/beekit/utils"
-	"github.com/labstack/echo"
-	"github.com/beewit/spread/api"
 	"github.com/beewit/beekit/log"
+	"github.com/beewit/beekit/utils"
+	"github.com/beewit/spread/api"
 	"github.com/beewit/spread/dao"
+	"github.com/beewit/spread/global"
+	"github.com/labstack/echo"
 )
 
 func SetClientToken(token string) *global.Account {

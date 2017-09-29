@@ -1,11 +1,11 @@
 package api
 
 import (
-	"github.com/labstack/echo"
-	"github.com/beewit/spread/global"
+	"fmt"
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/beekit/utils/convert"
-	"fmt"
+	"github.com/beewit/spread/global"
+	"github.com/labstack/echo"
 )
 
 func GetFuncByList(c echo.Context) error {

@@ -8,11 +8,12 @@ import (
 
 	"net/url"
 
+	"errors"
+	"github.com/beewit/spread/dao"
 	"github.com/beewit/spread/global"
 	"github.com/sclevine/agouti"
-	"github.com/beewit/spread/dao"
 	"math/rand"
-	"errors"
+	"github.com/beewit/beekit/utils"
 )
 
 type PushJson struct {
@@ -25,6 +26,7 @@ type PushJson struct {
 	Fill         []PushFillJson    `json:"fill"`
 	Login        []PushFillJson    `json:"login"`
 	SwitchIframe map[string]string `json:"switchIframe"`
+	TimeOut      int               `json:"timeOut"`
 }
 
 type PushFillJson struct {
@@ -40,6 +42,7 @@ type PushFillJson struct {
 	Result       string                 `json:"result"`
 	Field        string                 `json:"field"`
 	Status       string                 `json:"status"`
+	SwitchIframe string                 `json:"switchIframe"`
 }
 
 const (
@@ -90,59 +93,87 @@ func getSwitchIframe(m map[string]string, key string) string {
 	return ""
 }
 
-func switchIframe(m map[string]string, key string) (bool, error) {
-	iframeSelector := getSwitchIframe(m, key)
-	if iframeSelector != "" {
-		time.Sleep(time.Second * 1)
-		html, _ := global.Page.HTML()
-		println(html)
-		iframe, err := global.Page.Find(iframeSelector).Elements()
-		if err != nil {
-			global.Log.Error(err.Error())
-			return false, err
+func switchIframe(iframeList string) (bool, int, error) {
+	if iframeList != "" {
+		var iframes []string
+		if iframeList != "" {
+			iframes = strings.Split(iframeList, "|")
 		}
-		if len(iframe) <= 0 {
-			return false, errors.New("未查找到iframe，Selector：" + iframeSelector)
+		if len(iframes) > 0 {
+			for i := 0; i < len(iframes); i++ {
+				iframeSelector := iframes[i]
+				if iframeSelector != "" {
+					time.Sleep(time.Second * 1)
+					iframe, err := global.Page.Find(iframeSelector).Elements()
+					if err != nil {
+						global.Log.Error(err.Error())
+						return false, 0, err
+					}
+					if len(iframe) <= 0 {
+						return false, 0, errors.New("未查找到iframe，Selector：" + iframeSelector)
+					}
+					err = global.Page.SwitchToRootFrameByName(iframe[0])
+					if err != nil {
+						global.Log.Error(err.Error())
+						return false, 0, err
+					}
+					return true, len(iframes), nil
+				}
+
+			}
 		}
-		err = global.Page.SwitchToRootFrameByName(iframe[0])
-		if err != nil {
-			global.Log.Error(err.Error())
-			return false, err
-		}
-		return true, nil
 	}
-	return false, nil
+	return false, 0, nil
 }
 
-func RunPush(rule string, paramMap map[string]string, platformAcc string, platformId int64) (bool, string, error) {
+func RunPush(rule string, paramMap map[string]string, platformAcc string, platformId int64, switchAccount bool) (bool, bool, string, error) {
 	pj, err := getPushJson(rule)
 	if err != nil {
-		return false, pj.Title + "解析配置规则失败", err
+		return false, false, pj.Title + "解析配置规则失败", err
 	}
 	if len(pj.Fill) <= 0 {
-		return false, pj.Title + "无发布规则配置", nil
+		return false, false, pj.Title + "无发布规则配置", nil
 	}
 	var flog bool
 	if pj.Login != nil && len(pj.Login) > 0 {
 		global.Navigate(pj.LoginUrl)
+		if switchAccount {
+			DeleteCookie()
+		}
 		_, flog = CheckIdentity(pj.Identity)
-		if !flog {
-			flog, _ = setCookieLogin(platformId, pj.Domain, platformAcc)
-			if !flog {
-				iframe, err := switchIframe(pj.SwitchIframe, "login")
+		if !flog || switchAccount {
+			flog, _ = setCookieLogin(platformId, pj.Domain, platformAcc, time.Duration(pj.TimeOut))
+			_, flog2 := CheckIdentity(pj.Identity)
+			if !flog || !flog2 || switchAccount {
+				if pj.LoginUrl != global.PageUrl() {
+					global.Navigate(pj.LoginUrl)
+					time.Sleep(time.Second)
+				}
+				iframe, ic, err := switchIframe(getSwitchIframe(pj.SwitchIframe, "login"))
 				if err != nil {
-					return false, "切换Iframe失败", nil
+					global.Log.Error(err.Error())
+					url, _ := global.Page.URL()
+					return false, false, "切换Iframe失败，PageURL：" + url, nil
 				}
 				global.Log.Info("自动登陆中...")
 				for i := 0; i < len(pj.Login); i++ {
 					if checkStopAtSite(pj.Domain) {
-						return false, "已经不在任务网站了，结束任务执行", nil
+						return false, false, "已经不在任务网站了，结束任务执行", nil
 					}
-					handleSelection(&pj.Login[i], paramMap)
+					rFlog, result, _, _, err :=	handleSelection(&pj.Login[i], paramMap)
+
+					if err != nil {
+						global.Log.Error(err.Error())
+					}
+					rule, _ := json.Marshal(pj.Login[i])
+					global.Log.Warning("《登陆》执行任务：%s", string(rule))
+					global.Log.Warning("《登陆》执行结果：%v，返回之：result：%s", rFlog, result)
 				}
 				flog, _ = checkLogin(platformId, pj.Domain, pj.Identity, platformAcc)
 				if iframe {
-					global.Page.SwitchToParentFrame()
+					for i := 0; i < ic; i++ {
+						global.Page.SwitchToParentFrame()
+					}
 				}
 			}
 		}
@@ -150,8 +181,10 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 		global.Navigate(pj.Domain)
 		_, flog = CheckIdentity(pj.Identity)
 		if !flog {
-			flog, _ = setCookieLogin(platformId, pj.Domain, platformAcc)
-			if !flog {
+			flog, _ = setCookieLogin(platformId, pj.Domain, platformAcc, time.Duration(pj.TimeOut))
+			_, flog2 := CheckIdentity(pj.Identity)
+			if !flog || !flog2 {
+				//等待登陆方式
 				global.Navigate(pj.LoginUrl)
 			} else {
 				//设置Cookie
@@ -163,7 +196,7 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 		}
 	}
 	if !flog {
-		return false, pj.Title + "登陆失败", nil
+		return false, false, pj.Title + "登陆失败", nil
 	}
 	global.Navigate(pj.WriterUrl[rand.Intn(len(pj.WriterUrl))])
 	if pj.Sleep > 0 {
@@ -173,8 +206,13 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 
 	completFlog := false
 	for i := 0; i < len(pj.Fill); i++ {
+		iframe, ic, err := switchIframe(pj.Fill[i].SwitchIframe)
+		if err != nil {
+			global.Log.Error(err.Error())
+			return false, false, "切换Iframe失败", nil
+		}
 		if checkStopAtSite(pj.Domain) {
-			return false, "已经不在任务网站了，结束任务执行", nil
+			return false, false, "已经不在任务网站了，结束任务执行", nil
 		}
 		rFlog, result, m, status, err := handleSelection(&pj.Fill[i], paramMap)
 		if err != nil {
@@ -189,9 +227,14 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 				}
 			}
 		}
-		if result != "" {
-			global.Log.Warning("执行结果：%v，返回之：result：", rFlog, result)
+		if iframe {
+			for i := 0; i < ic; i++ {
+				global.Page.SwitchToParentFrame()
+			}
 		}
+		rule, _ := json.Marshal(pj.Fill[i])
+		global.Log.Warning("执行任务：%s", string(rule))
+		global.Log.Warning("执行结果：%v，返回之：result：%s", rFlog, result)
 	}
 	if completFlog {
 		//执行成功数据
@@ -200,8 +243,8 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 	} else {
 		//执行失败数据
 	}
-	global.Log.Warning("直接最终结果：", completFlog)
-	return true, "全部执行完成", nil
+	global.Log.Warning("直接最终结果：%s", completFlog)
+	return true, completFlog, "全部执行完成", nil
 }
 
 func handleSelection(p *PushFillJson, paramMap map[string]string) (bool, string, map[string]string, string, error) {
@@ -245,7 +288,7 @@ func handleSelection(p *PushFillJson, paramMap map[string]string) (bool, string,
 				global.Log.Info("JsParam", key, p.JsParam[key])
 			}
 		}
-		global.Log.Info("执行JS：", p.Js)
+		global.Log.Info("执行JS：%s", p.Js)
 		err = global.Page.RunScript(p.Js, p.JsParam, &result)
 		break
 	case PageURL:
@@ -337,11 +380,12 @@ func checkLogin(platformId int64, domain, identity, platformAcc string) (bool, s
 func checkStopAtSite(domain string) bool {
 	thisUrl, _ := global.Page.URL()
 	u, _ := url.Parse(domain)
-	return !strings.Contains(thisUrl, strings.Replace(u.Host, "www.", ".", 1))
+	domainName := utils.Substr(u.Host, strings.LastIndex(utils.Substr(u.Host, 0, strings.LastIndex(u.Host, ".")), "."), len(u.Host))
+	return !strings.Contains(thisUrl, domainName)
 }
 
-func setCookieLogin(platformId int64, doMan, platformAcc string) (bool, error) {
-	cookieRd, err := dao.GetUnionCookies(platformId, global.Acc.Id, platformAcc) //global.RD.GetString(doMan)
+func setCookieLogin(platformId int64, doMan, platformAcc string, timeOut time.Duration) (bool, error) {
+	cookieRd, err := dao.GetUnionCookies(platformId, global.Acc.Id, platformAcc, timeOut) //global.RD.GetString(doMan)
 	if err != nil {
 		return false, err
 	}
@@ -359,7 +403,22 @@ func setCookieLogin(platformId int64, doMan, platformAcc string) (bool, error) {
 		cc := cks[i]
 		global.Page.SetCookie(cc)
 	}
-	return true, nil
+	if timeOut == -3 {
+		return false, nil
+	} else {
+		return true, nil
+	}
+}
+
+func DeleteCookie() bool {
+	c, err := global.Page.GetCookies()
+	if err != nil {
+		return false
+	}
+	for _, apiCookie := range c {
+		global.Page.DeleteCookie(apiCookie.Name)
+	}
+	return true
 }
 
 func CheckIdentity(identity string) ([]*http.Cookie, bool) {
@@ -389,6 +448,7 @@ func main() {
 		"已发布",
 		"",
 		"",
+		"",
 	}
 
 	var pfs []PushFillJson
@@ -407,6 +467,7 @@ func main() {
 		"已发布",
 		"",
 		"",
+		"",
 	}
 	pfs = append(pfs, *pf)
 	st := PushJson{
@@ -419,6 +480,7 @@ func main() {
 		pfs,
 		nil,
 		nil,
+		0,
 	}
 
 	b, err := json.Marshal(st)

@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"github.com/labstack/echo"
-	"github.com/beewit/spread/global"
 	"github.com/beewit/beekit/utils"
+	"github.com/beewit/spread/global"
+	"github.com/labstack/echo"
 )
 
 func GetMemberInfo(c echo.Context) error {

@@ -1,0 +1,93 @@
+{
+  "title": "淘宝论坛 - 服饰",
+  "domain": "https://index.bbs.taobao.com",
+  "loginUrl": "https://login.taobao.com/member/login.jhtml?f=top&redirectURL=https%3A%2F%2Findex.bbs.taobao.com%2Fhome.html",
+  "identity": "cookie17",
+  "writerUrl": [
+    "https://nvzhuang.bbs.taobao.com/list.html",
+    "https://nanzhuang.bbs.taobao.com/list.html",
+    "https://peijian.bbs.taobao.com/list.html"
+  ],
+  "sleep": 3,
+  "timeOut": -2,
+  "login": [
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".quick-form .forget-pwd",
+      "sleep": 1
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "#TPL_username_1",
+      "Param": "loginName",
+      "sleep": 1
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "#TPL_password_1",
+      "Param": "loginPwd",
+      "sleep": 1
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": "#J_SubmitStatic",
+      "sleep": 3
+    }
+  ],
+  "fill": [
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": "#J_addpost",
+      "sleep": 1
+    },
+    {
+      "switchIframe": ".bbs-post iframe",
+      "handle": "Js",
+      "sleep": 1,
+      "js": "document.getElementsByName('topicId')[0].selectedIndex=Math.ceil(Math.random()*(document.getElementsByName('topicId')[0].getElementsByTagName('option').length-3))"
+    },
+    {
+      "switchIframe": ".bbs-post iframe",
+      "handle": "Js",
+      "sleep": 1,
+      "js": "document.getElementsByName('title')[0].value=title",
+      "jsParam": {
+        "title": "title/v"
+      }
+    },
+    {
+      "switchIframe": ".bbs-post iframe",
+      "handle": "Js",
+      "sleep": 1,
+      "js": "tinyMCE.activeEditor.setContent(content)",
+      "jsParam": {
+        "content": "content/v"
+      }
+    },
+    {
+      "switchIframe": ".bbs-post iframe",
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": "#J_submit",
+      "sleep": 1
+    },
+    {
+      "handle": "Text",
+      "Selector": "selector",
+      "SelectorName": ".header .h3",
+      "sleep": 3,
+      "result": "title/v",
+      "status": "Complete"
+    },
+    {
+      "handle": "PageURL",
+      "sleep": 3,
+      "field": "result_url"
+    }
+  ]
+}

@@ -11,7 +11,7 @@ import (
 	"github.com/beewit/beekit/mysql"
 	"github.com/beewit/beekit/sqlite"
 	"github.com/beewit/beekit/utils"
-	"github.com/sclevine/agouti" 
+	"github.com/sclevine/agouti"
 )
 
 var (
@@ -29,7 +29,7 @@ var (
 	Acc      *Account
 	Platform = map[string]int{"新浪微博": 1, "简书": 2, "知乎": 3}
 
-	Page = new(utils.AgoutiPage)
+	Page = *new(utils.AgoutiPage)
 )
 
 const (
@@ -37,7 +37,6 @@ const (
 	API_SSO_DOMAN     = "http://sso.tbqbz.com"
 	PAGE_SIZE         = 10
 )
-
 
 func injection() {
 	time.Sleep(300 * time.Millisecond)
@@ -132,4 +131,9 @@ func PageFindAttr(selector, attr string) string {
 		return val
 	}
 	return ""
+}
+
+func PageUrl() string {
+	url, _ := Page.URL()
+	return url
 }

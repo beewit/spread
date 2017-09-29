@@ -5,6 +5,7 @@
   "writerUrl": "https://weibo.com/ttarticle/p/editor",
   "identity": "SSOLoginState",
   "sleep": 5,
+  "timeOut": 10,
   "login": [
     {
       "handle": "Fill",
@@ -42,9 +43,9 @@
       }
     },
     {
-      "handle":"Js",
-      "sleep":5,
-      "js":"document.getElementById('editor').innerHTML=content",
+      "handle": "Js",
+      "sleep": 5,
+      "js": "document.getElementById('editor').innerHTML=content",
       "jsParam": {
         "content": "content/v"
       }

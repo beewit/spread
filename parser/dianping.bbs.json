@@ -1,0 +1,95 @@
+{
+  "title": "大众点评 - 房屋装修",
+  "domain": "http://www.dianping.com",
+  "loginUrl": "https://www.dianping.com/login",
+  "identity": "ua",
+  "writerUrl": [
+    "http://s.dianping.com/jjzxblog/new",
+    "http://s.dianping.com/jia/new",
+    "http://s.dianping.com/meitu/new"
+  ],
+  "sleep": 3,
+  "switchIframe": {
+    "login": ".login-wrap iframe"
+  },
+  "login": [
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".bottom-password-login",
+      "sleep": 1
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": "#tab-account",
+      "sleep": 1
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "#account-textbox",
+      "Param": "loginName",
+      "sleep": 1
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": "#password-textbox",
+      "Param": "loginPwd",
+      "sleep": 1
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": "#login-button-account",
+      "sleep": 3
+    }
+  ],
+  "fill": [
+    {
+      "handle": "Js",
+      "sleep": 2,
+      "js": "document.getElementById('groupNoteType').selectedIndex=Math.ceil(Math.random()*(document.getElementById('groupNoteType').getElementsByTagName('option').length-3))"
+    },
+    {
+      "handle": "Js",
+      "sleep": 2,
+      "js": "document.getElementById('txtTitle').value=title",
+      "jsParam": {
+        "title": "title/v"
+      }
+    },
+    {
+      "handle": "Js",
+      "sleep": 1,
+      "js": "page.editor.setContent(content)",
+      "jsParam": {
+        "content": "content/v"
+      }
+    },
+    {
+      "handle": "Js",
+      "sleep": 60,
+      "js": "document.getElementsByName('allowBindShop')[0].click()"
+    },
+    {
+      "handle": "Js",
+      "sleep": 1,
+      "js": "document.getElementById('btnAddNote').click()"
+    },
+    {
+      "handle": "Text",
+      "Selector": "selector",
+      "SelectorName": ".note-title",
+      "sleep": 3,
+      "result": "title/v",
+      "status": "Complete"
+    },
+    {
+      "handle": "PageURL",
+      "sleep": 3,
+      "field": "result_url"
+    }
+  ]
+}

@@ -2,9 +2,9 @@ package global
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/beewit/beekit/utils/convert"
 	"time"
-	"fmt"
 )
 
 type JSONTime time.Time
@@ -16,12 +16,12 @@ func (this JSONTime) MarshalJSON() ([]byte, error) {
 }
 
 type Account struct {
-	Id              int64  `json:"id"`
-	Gender          string `json:"gender"`
-	Mobile          string `json:"mobile"`
-	Photo           string `json:"photo"`
-	Nickname        string `json:"nickname"`
-	Token           string
+	Id       int64  `json:"id"`
+	Gender   string `json:"gender"`
+	Mobile   string `json:"mobile"`
+	Photo    string `json:"photo"`
+	Nickname string `json:"nickname"`
+	Token    string
 }
 
 func ToByteAccount(b []byte) *Account {

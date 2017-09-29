@@ -1,14 +1,15 @@
 package dao
 
 import (
-	"time"
-	"github.com/beewit/spread/global"
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/beekit/utils/convert"
+	"github.com/beewit/spread/global"
+	"time"
+	"fmt"
 )
 
-func GetUnionCookies(platformId, accId int64, platformAcc string) (string, error) {
-	m, err := GetUnionCookie(platformId, accId, platformAcc)
+func GetUnionCookies(platformId, accId int64, platformAcc string, timeOut time.Duration) (string, error) {
+	m, err := GetUnionCookie(platformId, accId, platformAcc, timeOut)
 	if err != nil {
 		return "", err
 	}
@@ -21,7 +22,7 @@ func SetUnionCookies(domain, cookies string, platformId, accId int64, platformAc
 	}
 	iw, _ := utils.NewIdWorker(1)
 	id, _ := iw.NextId()
-	m, err := GetUnionCookie(platformId, accId, platformAcc)
+	m, err := GetUnionCookie(platformId, accId, platformAcc, -1)
 	if err != nil {
 		return false, err
 	}
@@ -44,11 +45,20 @@ func SetUnionCookies(domain, cookies string, platformId, accId int64, platformAc
 	return x > 0, err
 }
 
-func GetUnionCookie(platformId, accId int64, platformAcc string) (map[string]interface{}, error) {
+func GetUnionCookie(platformId, accId int64, platformAcc string, timeOut time.Duration) (map[string]interface{}, error) {
 	if global.Acc == nil {
 		return nil, nil
 	}
-	sql := `SELECT cookies FROM account_union_cookie WHERE platform_id=? AND account_id=? AND platform_account=? ORDER BY ut_time DESC LIMIT 1`
+	var timeWhere string
+
+	if timeOut == -2 {
+		return nil, nil
+	}
+	if timeOut != -1 && timeOut != -3 {
+		nt := utils.FormatTime(time.Now().Add(-(time.Minute * timeOut)))
+		timeWhere = fmt.Sprintf(" AND ut_time<'%s'", nt)
+	}
+	sql := fmt.Sprintf(`SELECT cookies FROM account_union_cookie WHERE platform_id=? AND account_id=? AND platform_account=? %s ORDER BY	ut_time DESC LIMIT 1`, timeWhere)
 	m, err := global.SLDB.Query(sql, platformId, accId, platformAcc)
 	if err != nil {
 		return nil, err

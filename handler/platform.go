@@ -1,17 +1,17 @@
 package handler
 
 import (
-	"github.com/labstack/echo"
-	"github.com/beewit/spread/global"
+	"encoding/json"
 	"github.com/beewit/beekit/utils"
+	"github.com/beewit/beekit/utils/convert"
 	"github.com/beewit/spread/api"
+	"github.com/beewit/spread/dao"
+	"github.com/beewit/spread/global"
+	"github.com/beewit/spread/parser"
+	"github.com/labstack/echo"
 	"net/url"
 	"strings"
-	"github.com/beewit/spread/dao"
-	"encoding/json"
-	"github.com/beewit/spread/parser"
 	"time"
-	"github.com/beewit/beekit/utils/convert"
 )
 
 //func PlatformList(c echo.Context) error {
@@ -65,6 +65,7 @@ func UnionBind(m map[string]interface{}) {
 	ps := convert.ToString(m["password_selector"])
 	iframe := convert.ToString(m["iframe"])
 	global.Navigate(lu)
+	parser.DeleteCookie()
 	//检测登陆状态
 	flog, platformAcc := checkLogin(domain, identity, platform, as, ps, iframe, platformId)
 	if flog {
@@ -136,7 +137,7 @@ func checkLogin(domain, identity, platform, as, ps, iframeSeletor string, platfo
 		flog = f
 
 		if flog {
-			if platformAcc != "" || platformPwd != "" {
+			if platformAcc != "" && platformPwd != "" {
 				dbFlog, err := dao.SetUnion(platform, platformAcc, platformPwd, platformId, global.Acc.Id)
 				if err != nil {
 					global.Log.Error("添加帐号绑定数据，异常：%v", err.Error())

@@ -1,0 +1,103 @@
+{
+  "title": "猫扑 - 大杂烩",
+  "domain": "http://www.mop.com/",
+  "loginUrl": "http://www.mop.com/login.html",
+  "identity": "logined",
+  "writerUrl": [
+    "http://dzh.mop.com/dzhpost.html"
+  ],
+  "sleep": 2,
+  "timeOut": 120,
+  "login": [
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": ".login-by-pw .input-account input",
+      "Param": "loginName",
+      "sleep": 1
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": ".login-by-pw .input-password input",
+      "Param": "loginPwd",
+      "sleep": 60
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".login-by-pw .keep-password",
+      "sleep": 1
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".login-by-pw .btn-submit",
+      "sleep": 2
+    }
+  ],
+  "fill": [
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": ".dzh-post-title input",
+      "Param": "title",
+      "sleep": 1
+    },
+    {
+      "handle": "Js",
+      "sleep": 1,
+      "js": "KindEditor.html('#editor-dzh',content)",
+      "jsParam": {
+        "content": "content/v"
+      }
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".post-select-main span",
+      "sleep": 1
+    },
+    {
+      "handle": "Js",
+      "sleep": 1,
+      "js": "document.getElementsByClassName('post-select-main')[0].getElementsByTagName('li')[Math.ceil(Math.random()*(document.getElementsByClassName('post-select-main')[0].getElementsByTagName('li').length-1))].click()"
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".post-select-sub span",
+      "sleep": 1
+    },
+    {
+      "handle": "Js",
+      "sleep": 1,
+      "js": "document.getElementsByClassName('post-select-sub')[0].getElementsByTagName('li')[Math.ceil(Math.random()*(document.getElementsByClassName('post-select-sub')[0].getElementsByTagName('li').length-1))].click()"
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".post-submit",
+      "sleep": 1
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".popup-btns",
+      "sleep": 1
+    },
+    {
+      "handle": "Text",
+      "Selector": "selector",
+      "SelectorName": ".post-header",
+      "sleep": 3,
+      "result": "title/v",
+      "status": "Complete"
+    },
+    {
+      "handle": "PageURL",
+      "sleep": 3,
+      "field": "result_url"
+    }
+  ]
+}

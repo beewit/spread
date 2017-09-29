@@ -1,15 +1,17 @@
 package main
 
 import (
-	"testing"
+	"fmt"
 	"github.com/beewit/beekit/utils"
+	"github.com/beewit/beekit/utils/uhttp"
+	"github.com/beewit/spread/api"
+	"github.com/beewit/spread/global"
 	"github.com/beewit/spread/handler"
 	"github.com/sclevine/agouti"
-	"fmt"
-	"github.com/beewit/spread/global"
-	"github.com/beewit/spread/api"
-	"github.com/beewit/beekit/utils/uhttp"
+	"testing"
 	"time"
+	"net/url"
+	"strings"
 )
 
 func TestParser(t *testing.T) {
@@ -27,7 +29,7 @@ func Parser(title, content string, t int) {
 		"--webkit-text-size-adjust"}))
 	global.Driver.Start()
 	var err error
-	global.Page, err = global.Driver.NewPage()
+	global.Page.Page, err = global.Driver.NewPage()
 	if err != nil {
 		fmt.Println("Failed to open page.")
 	}
@@ -36,21 +38,21 @@ func Parser(title, content string, t int) {
 		println("开始执行简书分发")
 		//   utils.JsonPath("parser", "./jianshu.json")
 		rule = utils.Read("./parser/jianshu.json")
-		flog, result, err2 = handler.PushComm(title, content, rule)
+		flog, _, result, err2 = handler.PushComm(title, content, rule)
 		println("简书分发", flog, result, err2)
 		break
 	case 2:
 		println("开始执行知乎分发")
 		//utils.JsonPath("parser", "./zhihu.json")
 		rule = utils.Read("./parser/zhihu.json")
-		flog, result, err2 = handler.PushComm(title, content, rule)
+		flog, _, result, err2 = handler.PushComm(title, content, rule)
 		println("知乎分发", flog, result, err2)
 		break
 	case 3:
 		println("开始执行新浪分发")
 		//utils.JsonPath("parser", "./sina.json")
 		rule = utils.Read("./parser/sina.json")
-		flog, result, err2 = handler.PushComm(title, content, rule)
+		flog, _, result, err2 = handler.PushComm(title, content, rule)
 		println("微博分发", flog, result, err2)
 		break
 	case 4:
@@ -59,7 +61,6 @@ func Parser(title, content string, t int) {
 		break
 	}
 }
-
 
 func TestPlatformOne(t *testing.T) {
 	m, err := api.GetPlatformOne("新浪微博")
@@ -88,7 +89,7 @@ func TestFindText(t *testing.T) {
 		"--webkit-text-size-adjust"}))
 	global.Driver.Start()
 	var err error
-	global.Page, err = global.Driver.NewPage()
+	global.Page.Page, err = global.Driver.NewPage()
 	if err != nil {
 		fmt.Println("Failed to open page.")
 	}
@@ -112,9 +113,15 @@ func TestMsg(t *testing.T) {
 		"--webkit-text-size-adjust"}))
 	global.Driver.Start()
 	var err error
-	global.Page, err = global.Driver.NewPage()
+	global.Page.Page, err = global.Driver.NewPage()
 	if err != nil {
 		fmt.Println("Failed to open page.")
 	}
 	global.Navigate("https://www.baidu.com/")
+}
+
+func TestUrl(t *testing.T) {
+	u, _ := url.Parse("https://nanxie.bbs.taobao.com/search.html?keyword=25%E5%A4%A7%E8%AE%BE%E8%AE%A1%E5%B8%88%E9%A3%8E%E6%A0%BC%E7%94%B7%E8%A3%85%E5%93%81%E7%89%8C%E7%9B%98%E7%82%B9+%E4%BB%96%E4%BB%AC%E6%89%8D%E6%98%AF%E6%9C%AA%E6%9D%A5%EF%BC%81")
+	s := utils.Substr(u.Host, strings.LastIndex(utils.Substr(u.Host, 0, strings.LastIndex(u.Host, ".")), "."), len(u.Host))
+	println(s)
 }

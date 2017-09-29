@@ -14,11 +14,11 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/beewit/beekit/utils"
 	"github.com/beewit/beekit/utils/convert"
+	"github.com/beewit/spread/global"
 	"github.com/go-vgo/robotgo"
 	"golang.org/x/net/html/charset"
-	"github.com/beewit/beekit/utils"
-	"github.com/beewit/spread/global"
 )
 
 var (
@@ -483,34 +483,34 @@ func TestBBS(t *testing.T) {
 				listUrls.Remove(t)
 				if t.Value != nil {
 					//go func() {
-						today, yesterday, title := groupDayNew(convert.ToString(t.Value))
-						if today == "" && yesterday == "" && title == "" {
+					today, yesterday, title := groupDayNew(convert.ToString(t.Value))
+					if today == "" && yesterday == "" && title == "" {
 
-						}else {
-							iw, _ := utils.NewIdWorker(1)
-							id, _ := iw.NextId()
-							m := make(map[string]interface{})
-							m["id"] = id
-							m["title"] = title
-							m["url"] = convert.ToString(t.Value)
-							if today != "" {
-								m["today"] = today
-							}
-							if yesterday != "" {
-								m["yesterday"] = yesterday
-							}
-							if today == "" && yesterday == "" {
-								m["state"] = 0
-							} else {
-								m["state"] = 1
-							}
-							x, err := global.SLDB.InsertMap("bbs", m)
-							if err != nil {
-								global.Log.Error(err.Error())
-							} else {
-								println("保存数据成功！", convert.ToString(x))
-							}
+					} else {
+						iw, _ := utils.NewIdWorker(1)
+						id, _ := iw.NextId()
+						m := make(map[string]interface{})
+						m["id"] = id
+						m["title"] = title
+						m["url"] = convert.ToString(t.Value)
+						if today != "" {
+							m["today"] = today
 						}
+						if yesterday != "" {
+							m["yesterday"] = yesterday
+						}
+						if today == "" && yesterday == "" {
+							m["state"] = 0
+						} else {
+							m["state"] = 1
+						}
+						x, err := global.SLDB.InsertMap("bbs", m)
+						if err != nil {
+							global.Log.Error(err.Error())
+						} else {
+							println("保存数据成功！", convert.ToString(x))
+						}
+					}
 					//}()
 				}
 			}

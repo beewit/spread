@@ -1,9 +1,9 @@
 package main
 
 import (
-	"testing"
 	"github.com/beewit/spread/dao"
 	"github.com/beewit/spread/global"
+	"testing"
 )
 
 func TestUnionCookies(t *testing.T) {
