@@ -128,6 +128,16 @@
                             onclick="bindUnion('{{ item.platform }}')">
                         <span class="am-icon-resistance"></span> 重新绑定
                     </button>
+                    <button class="am-btn am-btn-default am-btn-xs am-btn-primary am-hide-sm-only" style="background-color: #0c80ba;"
+                            type="button"
+                            onclick="loginUnion('{{ item.platform_account }}','{{ item.platform_id }}')">
+                        <span class="am-icon-user"></span> 模拟登陆
+                    </button>
+                    <button class="am-btn am-btn-default am-btn-xs am-btn-danger am-hide-sm-only" style="background-color: #d93c37;"
+                            type="button"
+                            onclick="bindUnion('{{ item.platform }}')">
+                        <span class="am-icon-remove"></span> 删除
+                    </button>
                 </div>
             </div>
         </td>
@@ -179,6 +189,16 @@
         $.ajax({
             url: "/platform/bind",
             data: {type: platform},
+            success: function (d) {
+                player.msg(d.msg, {icon: 0, time: -1});
+            }
+        });
+    }
+
+    function loginUnion(platformAcc, platformId) {
+        $.ajax({
+            url: "/platform/union/login",
+            data: {platformAcc: platformAcc, platformId: platformId},
             success: function (d) {
                 player.msg(d.msg, {icon: 0, time: -1});
             }

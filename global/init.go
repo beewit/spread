@@ -12,6 +12,8 @@ import (
 	"github.com/beewit/beekit/sqlite"
 	"github.com/beewit/beekit/utils"
 	"github.com/sclevine/agouti"
+	"encoding/json"
+	"github.com/beewit/pay/global"
 )
 
 var (
@@ -96,6 +98,9 @@ func PageJumpMsg(status, tip, url string) {
     cursor: pointer;">关闭</a></span></div>`, status, tip)
 	urls := ""
 	if url != "" {
+		if strings.Index(url, "http") == -1 {
+			url = global.Host + "?lastUrl=" + url
+		}
 		urls = fmt.Sprintf("setTimeout(function () {     location.href='%v';    },1500)", url)
 	}
 	js := fmt.Sprintf("var div = document.createElement('div');div.innerHTML=`%v`;document.body.appendChild(div);%s", tipDiv, urls)
@@ -136,4 +141,67 @@ func PageFindAttr(selector, attr string) string {
 func PageUrl() string {
 	url, _ := Page.URL()
 	return url
+}
+
+func PageLocalStorage() (string, error) {
+	var result string
+	err := Page.RunScript("return JSON.stringify(localStorage);", nil, &result)
+	return result, err
+}
+
+func PageAddLocalStorage(ls string) bool {
+	if ls == "" {
+		return false
+	}
+	m := map[string]string{}
+	err := json.Unmarshal([]byte(ls), &m)
+	if err != nil {
+		global.Log.Error("json转换失败：" + ls)
+		return false
+	}
+	for k, v := range m {
+		arguments := map[string]interface{}{"key": k, "value": v}
+		err = Page.RunScript("localStorage.setItem(key,value)", arguments, nil)
+		if err != nil {
+			global.Log.Error("<<<<<<<<<<< localStorage.setItem('%s','%s')失败", k, v)
+		} else {
+			global.Log.Info("<<<<<<<<<<< localStorage.setItem('%s','%s')成功", k, v)
+		}
+	}
+	return true
+}
+
+func PageSessionStorageByKey(key string) (string, error) {
+	var result string
+	arguments := map[string]interface{}{"key": key}
+	err := Page.RunScript("return sessionStorage.getItem(key);", arguments, &result)
+	return result, err
+}
+
+func PageSessionStorage() (string, error) {
+	var result string
+	err := Page.RunScript("return JSON.stringify(sessionStorage);", nil, &result)
+	return result, err
+}
+
+func PageAddSessionStorage(ss string) bool {
+	if ss == "" {
+		return false
+	}
+	m := map[string]string{}
+	err := json.Unmarshal([]byte(ss), &m)
+	if err != nil {
+		global.Log.Error("json转换失败：" + ss)
+		return false
+	}
+	for k, v := range m {
+		arguments := map[string]interface{}{"key": k, "value": v}
+		err = Page.RunScript("sessionStorage.setItem(key,value)", arguments, nil)
+		if err != nil {
+			global.Log.Error("<<<<<<<<<<< sessionStorage.setItem('%s','%s')失败", k, v)
+		} else {
+			global.Log.Info("<<<<<<<<<<< sessionStorage.setItem('%s','%s')成功", k, v)
+		}
+	}
+	return true
 }

@@ -37,6 +37,9 @@ func handlerConfig(e *echo.Echo) {
 
 	e.POST("/platform/bind", handler.PlatformUnionBind, handler.Filter)
 	e.POST("/platform/union/list", handler.UnionList, handler.Filter)
+	e.POST("/platform/union/login", handler.UnionLogin, handler.Filter)
+
+
 
 	e.POST("/member/info", handler.GetMemberInfo, handler.Filter)
 	e.GET("/ReceiveToken", handler.ReceiveToken)

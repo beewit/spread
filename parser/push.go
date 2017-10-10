@@ -75,7 +75,7 @@ const (
 	Complete_Status  = "Complete"
 )
 
-func getPushJson(rule string) (*PushJson, error) {
+func GetPushJson(rule string) (*PushJson, error) {
 	var pj PushJson
 	err := json.Unmarshal([]byte(rule), &pj)
 	if err != nil {
@@ -86,14 +86,14 @@ func getPushJson(rule string) (*PushJson, error) {
 	}
 }
 
-func getSwitchIframe(m map[string]string, key string) string {
+func GetSwitchIframe(m map[string]string, key string) string {
 	if m != nil {
 		return m[key]
 	}
 	return ""
 }
 
-func switchIframe(iframeList string) (bool, int, error) {
+func SwitchIframe(iframeList string) (bool, int, error) {
 	if iframeList != "" {
 		var iframes []string
 		if iframeList != "" {
@@ -127,7 +127,7 @@ func switchIframe(iframeList string) (bool, int, error) {
 }
 
 func RunPush(rule string, paramMap map[string]string, platformAcc string, platformId int64, switchAccount bool) (bool, bool, string, error) {
-	pj, err := getPushJson(rule)
+	pj, err := GetPushJson(rule)
 	if err != nil {
 		return false, false, pj.Title + "解析配置规则失败", err
 	}
@@ -142,14 +142,14 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 		}
 		_, flog = CheckIdentity(pj.Identity)
 		if !flog || switchAccount {
-			flog, _ = setCookieLogin(platformId, pj.Domain, platformAcc, time.Duration(pj.TimeOut))
+			flog, _ = SetCookieLogin(platformId, pj.Domain, platformAcc, time.Duration(pj.TimeOut))
 			_, flog2 := CheckIdentity(pj.Identity)
 			if !flog || !flog2 || switchAccount {
 				if pj.LoginUrl != global.PageUrl() {
 					global.Navigate(pj.LoginUrl)
 					time.Sleep(time.Second)
 				}
-				iframe, ic, err := switchIframe(getSwitchIframe(pj.SwitchIframe, "login"))
+				iframe, ic, err := SwitchIframe(GetSwitchIframe(pj.SwitchIframe, "login"))
 				if err != nil {
 					global.Log.Error(err.Error())
 					url, _ := global.Page.URL()
@@ -160,7 +160,7 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 					if CheckStopAtSite(pj.Domain) {
 						return false, false, "已经不在任务网站了，结束任务执行", nil
 					}
-					rFlog, result, _, _, err := handleSelection(&pj.Login[i], paramMap)
+					rFlog, result, _, _, err := HandleSelection(&pj.Login[i], paramMap)
 
 					if err != nil {
 						global.Log.Error(err.Error())
@@ -169,7 +169,7 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 					global.Log.Warning("《登陆》执行任务：%s", string(rule))
 					global.Log.Warning("《登陆》执行结果：%v，返回之：result：%s", rFlog, result)
 				}
-				flog, _ = checkLogin(platformId, pj.Domain, pj.Identity, platformAcc)
+				flog, _ = CheckLogin(platformId, pj.Domain, pj.Identity, platformAcc)
 				if iframe {
 					for i := 0; i < ic; i++ {
 						global.Page.SwitchToParentFrame()
@@ -181,7 +181,7 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 		global.Navigate(pj.Domain)
 		_, flog = CheckIdentity(pj.Identity)
 		if !flog {
-			flog, _ = setCookieLogin(platformId, pj.Domain, platformAcc, time.Duration(pj.TimeOut))
+			flog, _ = SetCookieLogin(platformId, pj.Domain, platformAcc, time.Duration(pj.TimeOut))
 			_, flog2 := CheckIdentity(pj.Identity)
 			if !flog || !flog2 {
 				//等待登陆方式
@@ -190,7 +190,7 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 				//设置Cookie
 				global.Log.Info("设置Cookie成功")
 			}
-			flog, _ = checkLogin(platformId, pj.Domain, pj.Identity, platformAcc)
+			flog, _ = CheckLogin(platformId, pj.Domain, pj.Identity, platformAcc)
 		} else {
 			global.Log.Info("已经是登陆状态")
 		}
@@ -209,7 +209,7 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 
 	completFlog := false
 	for i := 0; i < len(pj.Fill); i++ {
-		iframe, ic, err := switchIframe(pj.Fill[i].SwitchIframe)
+		iframe, ic, err := SwitchIframe(pj.Fill[i].SwitchIframe)
 		if err != nil {
 			global.Log.Error(err.Error())
 			return false, false, "切换Iframe失败" + global.PageUrl(), nil
@@ -217,7 +217,7 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 		if CheckStopAtSite(pj.Domain) {
 			return false, false, "已经不在任务网站了，结束任务执行", nil
 		}
-		rFlog, result, m, status, err := handleSelection(&pj.Fill[i], paramMap)
+		rFlog, result, m, status, err := HandleSelection(&pj.Fill[i], paramMap)
 		if err != nil {
 			global.Log.Error(err.Error())
 		} else {
@@ -250,7 +250,7 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 	return true, completFlog, "全部执行完成", nil
 }
 
-func handleSelection(p *PushFillJson, paramMap map[string]string) (bool, string, map[string]string, string, error) {
+func HandleSelection(p *PushFillJson, paramMap map[string]string) (bool, string, map[string]string, string, error) {
 	if paramMap != nil && p.SelectorName != "" {
 		for k, v := range paramMap {
 			if strings.Contains(p.SelectorName, k+"/v") {
@@ -353,7 +353,7 @@ func findSelection(selector string, selectorName string) *agouti.Selection {
 	}
 }
 
-func checkLogin(platformId int64, domain, identity, platformAcc string) (bool, string) {
+func CheckLogin(platformId int64, domain, identity, platformAcc string) (bool, string) {
 	flog := false
 	result := ""
 	i := 0
@@ -369,11 +369,17 @@ func checkLogin(platformId int64, domain, identity, platformAcc string) (bool, s
 		flog = f
 
 		if flog {
+
 			cookieJson, _ := json.Marshal(c)
 
 			global.Log.Info(string(cookieJson[:]))
-			//global.RD.SetString(domain, cookieJson)
-			dao.SetUnionCookies(domain, string(cookieJson), platformId, global.Acc.Id, platformAcc)
+
+			localStorage, err := global.PageLocalStorage()
+			if err != nil {
+				global.Log.Error("PageLocalStorage：" + err.Error())
+			}
+			session := "" //global.Page.Session()
+			dao.SetUnionCookies(domain, string(cookieJson), localStorage, session, platformId, global.Acc.Id, platformAcc)
 			result = "设置Cookie成功"
 			global.Log.Info(result)
 			break
@@ -394,8 +400,9 @@ func CheckStopAtSite(domain string) bool {
 	return !strings.Contains(thisUrl, domainName)
 }
 
-func setCookieLogin(platformId int64, doMan, platformAcc string, timeOut time.Duration) (bool, error) {
-	cookieRd, err := dao.GetUnionCookies(platformId, global.Acc.Id, platformAcc, timeOut) //global.RD.GetString(doMan)
+func SetCookieLogin(platformId int64, doMan, platformAcc string, timeOut time.Duration) (bool, error) {
+	cookieRd, localStorage, sessions, err := dao.GetUnionCookies(platformId, global.Acc.Id, platformAcc, timeOut) //global.RD.GetString
+	// (doMan)
 	if err != nil {
 		return false, err
 	}
@@ -413,6 +420,11 @@ func setCookieLogin(platformId int64, doMan, platformAcc string, timeOut time.Du
 		cc := cks[i]
 		global.Page.SetCookie(cc)
 	}
+
+	global.PageAddLocalStorage(localStorage)
+
+	global.PageAddSessionStorage(sessions)
+
 	if timeOut == -3 {
 		return false, nil
 	} else {
@@ -421,12 +433,16 @@ func setCookieLogin(platformId int64, doMan, platformAcc string, timeOut time.Du
 }
 
 func DeleteCookie() bool {
-	c, err := global.Page.GetCookies()
+	err := global.Page.ClearCookies()
 	if err != nil {
 		return false
 	}
-	for _, apiCookie := range c {
-		global.Page.DeleteCookie(apiCookie.Name)
+	if err := global.Page.RunScript("localStorage.clear();", nil, nil); err != nil {
+		return false
+	}
+
+	if err := global.Page.RunScript("sessionStorage.clear();", nil, nil); err != nil {
+		return false
 	}
 	return true
 }
@@ -437,8 +453,17 @@ func CheckIdentity(identity string) ([]*http.Cookie, bool) {
 		return nil, false
 	}
 	for _, apiCookie := range c {
-		if apiCookie.Name == identity && apiCookie.Value != "" {
-			return c, true
+		if strings.Contains(identity, "@") {
+			idents := strings.Split(identity, "@")
+			if len(idents) > 1 {
+				if apiCookie.Name == idents[0] && apiCookie.Value == idents[1] {
+					return c, true
+				}
+			}
+		} else {
+			if apiCookie.Name == identity && apiCookie.Value != "" {
+				return c, true
+			}
 		}
 	}
 	return nil, false

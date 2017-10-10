@@ -55,3 +55,8 @@ func GetFuncAllByIdsAndAccId(funcIds, accId string) (utils.ResultParam, error) {
 	url := fmt.Sprintf("/api/func/account/list?funcIds=%s&accId=%s", funcIds, accId)
 	return ApiPost(url, nil)
 }
+
+func GetFuncByPlatformIdsAndAccId(platformIds, accId string) (utils.ResultParam, error) {
+	url := fmt.Sprintf("/api/func/account/list?platformIds=%s&accId=%s", platformIds, accId)
+	return ApiPost(url, nil)
+}

@@ -1,0 +1,89 @@
+{
+  "title": "今日头条",
+  "domain": "https://www.toutiao.com",
+  "loginUrl": "https://sso.toutiao.com/login/",
+  "identity": "sid_tt",
+  "writerUrl": [
+    "https://www.toutiao.com/"
+  ],
+  "sleep": 2,
+  "timeOut": 120,
+  "login": [
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".mail-login",
+      "sleep": 1
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": ".baseLogin #account",
+      "Param": "loginName",
+      "sleep": 1
+    },
+    {
+      "handle": "Fill",
+      "Selector": "selector",
+      "SelectorName": ".baseLogin #password",
+      "Param": "loginPwd",
+      "sleep": 30
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".baseLogin input[name=submitBtn]",
+      "sleep": 2
+    }
+  ],
+  "fill": [
+    {
+      "handle": "Js",
+      "sleep": 2,
+      "js": "document.getElementsByClassName('user-name')[0].removeAttribute('target')"
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".user-name",
+      "sleep": 2
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".btn-publish ",
+      "sleep": 2
+    },
+    {
+      "handle": "Js",
+      "sleep": 2,
+      "js": "document.getElementsByClassName('title-input')[0].value=title+'\\r\\n'+content",
+      "jsParam": {
+        "title": "title/v",
+        "content": "title/v"
+      }
+    },
+    {
+      "handle": "Click",
+      "Selector": "selector",
+      "SelectorName": ".upload-publish",
+      "sleep": 1
+    },
+    {
+      "handle": "Text",
+      "Selector": "selector",
+      "SelectorName": ".ugc-content:eq(0)",
+      "sleep": 3,
+      "result": "title/v",
+      "status": "Complete"
+    },
+    {
+      "handle": "Attr",
+      "attr": "href",
+      "Selector": "selector",
+      "SelectorName": "document.getElementsByClassName('ugc-content')[0].getElementsByTagName('a')",
+      "sleep": 1,
+      "field": "result_url"
+    }
+  ]
+}

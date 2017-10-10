@@ -10,8 +10,8 @@ import (
 	"github.com/sclevine/agouti"
 	"testing"
 	"time"
-	"net/url"
-	"strings"
+	"encoding/json"
+	"github.com/beewit/beekit/utils/convert"
 )
 
 func TestParser(t *testing.T) {
@@ -117,11 +117,59 @@ func TestMsg(t *testing.T) {
 	if err != nil {
 		fmt.Println("Failed to open page.")
 	}
-	global.Navigate("https://www.baidu.com/")
+	global.Navigate("https://www.dianping.com/")
+	time.Sleep(time.Second * 60)
+	doc, err := global.PageLocalStorage()
+	if err != nil {
+		println(err.Error())
+	}
+	println("PageLocalStorage：" + doc)
+
+	c, err := global.Page.GetCookies()
+	if err != nil {
+		println(err.Error())
+	}
+	cookieJson, _ := json.Marshal(c)
+	println("Cookies：" + string(cookieJson))
+
+	sess := global.Page.Session()
+
+	j, _ := json.Marshal(sess)
+	println("Session：" + string(j))
+
+	sess2, _ := global.PageSessionStorage()
+	println("Session2：" + sess2)
 }
 
-func TestUrl(t *testing.T) {
-	u, _ := url.Parse("https://nanxie.bbs.taobao.com/search.html?keyword=25%E5%A4%A7%E8%AE%BE%E8%AE%A1%E5%B8%88%E9%A3%8E%E6%A0%BC%E7%94%B7%E8%A3%85%E5%93%81%E7%89%8C%E7%9B%98%E7%82%B9+%E4%BB%96%E4%BB%AC%E6%89%8D%E6%98%AF%E6%9C%AA%E6%9D%A5%EF%BC%81")
-	s := utils.Substr(u.Host, strings.LastIndex(utils.Substr(u.Host, 0, strings.LastIndex(u.Host, ".")), "."), len(u.Host))
-	println(s)
+func TestUploadFile(t *testing.T) {
+	global.Driver = agouti.ChromeDriver(agouti.ChromeOptions("args", []string{
+		"--start-maximized",
+		"--disable-infobars",
+		"--app=http://www.jq22.com/demo/svgloader-150105194218/",
+		"--webkit-text-size-adjust"}))
+	global.Driver.Start()
+	var err error
+	global.Page.Page, err = global.Driver.NewPage()
+	if err != nil {
+		fmt.Println("Failed to open page.")
+	}
+	global.Navigate("https://www.weibo.com/")
+	platformId := "16"
+	platformAcc := "18983393519"
+
+	rp, err := api.GetFuncByPlatformIdsAndAccId(platformId, convert.ToString(122068319091036160))
+	if err != nil {
+		global.Log.Error(err.Error())
+	}
+	m, err := convert.Obj2ListMap(rp.Data)
+
+	if err == nil && m != nil && len(m) > 0 {
+		go handler.UnionLoginComm(m, platformAcc)
+	}
+}
+
+func TestUploadPath(t *testing.T) {
+
+	filePath:=utils.CurrentDirectory()+"/app/static/img/hive-logo.png"
+	println(filePath)
 }

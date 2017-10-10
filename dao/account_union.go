@@ -65,6 +65,22 @@ func GetUnionList(platformId, accId int64) ([]map[string]interface{}, error) {
 	return m, nil
 }
 
+func GetUnionListByPlatformAcc(platformId, accId int64, platformAcc string) (map[string]interface{}, error) {
+	if global.Acc == nil {
+		return nil, nil
+	}
+	sql := `SELECT * FROM account_union WHERE account_id=? AND platform_id=? AND platform_account=? AND status=1 ORDER BY ut_time DESC
+	LIMIT 1`
+	m, err := global.SLDB.Query(sql, accId, platformId, platformAcc)
+	if err != nil {
+		return nil, err
+	}
+	if len(m) <= 0 {
+		return nil, nil
+	}
+	return m[0], nil
+}
+
 func GetUnionListPage(accId int64, pageIndex, pageSize int) (*utils.PageData, error) {
 	if global.Acc == nil {
 		return nil, nil

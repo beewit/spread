@@ -12,15 +12,6 @@ import (
 	"time"
 )
 
-//func PlatformList(c echo.Context) error {
-//	m, err := api.GetPlatformList(c)
-//	if err != nil || m == nil {
-//		global.Log.Error(err.Error())
-//		return utils.Error(c, "获取平台信息失败", nil)
-//	}
-//	return utils.Success(c, "", m)
-//}
-
 func UnionList(c echo.Context) error {
 	pageIndex := utils.GetPageIndex(c.FormValue("pageIndex"))
 	page, err := dao.GetUnionListPage(global.Acc.Id, pageIndex, global.PAGE_SIZE)
@@ -65,7 +56,7 @@ func UnionBind(m map[string]interface{}) {
 	global.Navigate(lu)
 	parser.DeleteCookie()
 	//检测登陆状态
-	flog, platformAcc := checkLogin(domain, identity, platform, as, ps, iframe, platformId)
+	flog, platformAcc := CheckLogin(domain, identity, platform, as, ps, iframe, platformId)
 	if flog {
 		infoUrl := convert.ToString(m["info_url"])
 		ns := convert.ToString(m["info_nickname_selector"])
@@ -86,7 +77,7 @@ func UnionBind(m map[string]interface{}) {
 	}
 }
 
-func checkLogin(domain, identity, platform, as, ps, iframeSeletor string, platformId int64) (bool, string) {
+func CheckLogin(domain, identity, platform, as, ps, iframeSeletor string, platformId int64) (bool, string) {
 	if iframeSeletor != "" {
 		time.Sleep(time.Second * 1)
 		html, _ := global.Page.HTML()
@@ -143,7 +134,13 @@ func checkLogin(domain, identity, platform, as, ps, iframeSeletor string, platfo
 			cookieJson, _ := json.Marshal(c)
 
 			global.Log.Info(string(cookieJson[:]))
-			dao.SetUnionCookies(domain, string(cookieJson), platformId, global.Acc.Id, platformAcc)
+
+			localStorage, err := global.PageLocalStorage()
+			if err != nil {
+				global.Log.Error("PageLocalStorage：" + err.Error())
+			}
+			session := "" //global.Page.Session()
+			dao.SetUnionCookies(domain, string(cookieJson), localStorage, session, platformId, global.Acc.Id, platformAcc)
 			result = "登陆成功"
 			break
 		}
@@ -157,4 +154,100 @@ func checkLogin(domain, identity, platform, as, ps, iframeSeletor string, platfo
 		global.Log.Info(result)
 	}
 	return flog, platformAcc
+}
+
+func UnionLogin(c echo.Context) error {
+	platformId := c.FormValue("platformId")
+	platformAcc := c.FormValue("platformAcc")
+
+	rp, err := api.GetFuncByPlatformIdsAndAccId(platformId, convert.ToString(global.Acc.Id))
+	if err != nil {
+		global.Log.Error(err.Error())
+		return utils.ErrorNull(c, "获取网站信息失败，err："+err.Error())
+	}
+	m, err := convert.Obj2ListMap(rp.Data)
+
+	if err == nil && m != nil && len(m) > 0 {
+		go UnionLoginComm(m, platformAcc)
+		return utils.SuccessNullMsg(c, "正在前往中..")
+	} else {
+		return utils.ErrorNull(c, "获取网站信息失败..")
+	}
+}
+
+func UnionLoginComm(m []map[string]interface{}, platformAcc string) {
+	flog := false
+	for j := 0; j < len(m); j++ {
+		platformName := convert.ToString(m[j]["platform_name"])
+		platformId := convert.MustInt64(m[j]["platform_id"])
+
+		list, err := dao.GetUnionListByPlatformAcc(platformId, global.Acc.Id, platformAcc)
+		if err != nil {
+			global.PageMsg("[" + platformName + "]查找平台绑定帐号失败")
+			continue
+		}
+		if list == nil || len(list) <= 0 {
+			global.PageMsg("[" + platformName + "]未绑定平台帐号，请进入《帐号》->《平台帐号绑定》->《新增平台帐号》 ->点击要绑定的平台帐号")
+			continue
+		}
+		platformAcc := convert.ToString(list["platform_account"])
+		platformPwd := convert.ToString(list["platform_password"])
+		rule := convert.ToString(m[j]["rule"])
+		paramMap := map[string]string{
+			"loginName": convert.ToString(platformAcc),
+			"loginPwd":  convert.ToString(platformPwd),
+		}
+		pj, err := parser.GetPushJson(rule)
+		global.Navigate(pj.LoginUrl)
+		_, flog = parser.CheckIdentity(pj.Identity)
+		if !flog {
+			flog, _ = parser.SetCookieLogin(platformId, pj.Domain, platformAcc, time.Duration(pj.TimeOut))
+			_, flog2 := parser.CheckIdentity(pj.Identity)
+			if !flog || !flog2 {
+				if pj.LoginUrl != global.PageUrl() {
+					global.Navigate(pj.LoginUrl)
+					time.Sleep(time.Second)
+				}
+				iframe, ic, err := parser.SwitchIframe(parser.GetSwitchIframe(pj.SwitchIframe, "login"))
+				if err != nil {
+					global.Log.Error(err.Error())
+					url, _ := global.Page.URL()
+					global.Log.Error("切换Iframe失败，PageURL：" + url)
+				}
+				global.Log.Info("自动登陆中...")
+				for i := 0; i < len(pj.Login); i++ {
+					if parser.CheckStopAtSite(pj.Domain) {
+						global.Log.Error("已经不在任务网站了，结束任务执行")
+					}
+					rFlog, result, _, _, err := parser.HandleSelection(&pj.Login[i], paramMap)
+
+					if err != nil {
+						global.Log.Error(err.Error())
+					}
+					rule, _ := json.Marshal(pj.Login[i])
+					global.Log.Warning("《登陆》执行任务：%s", string(rule))
+					global.Log.Warning("《登陆》执行结果：%v，返回之：result：%s", rFlog, result)
+				}
+				flog, _ = parser.CheckLogin(platformId, pj.Domain, pj.Identity, platformAcc)
+				if iframe {
+					for i := 0; i < ic; i++ {
+						global.Page.SwitchToParentFrame()
+					}
+				}
+			}
+		}
+	}
+	//if flog {
+	//	global.PageSuccessMsg("登陆成功", "/app/page/admin/index.html")
+	//} else {
+	//	global.PageMsg("登陆失败，请手动登陆！")
+	//}
+	global.Navigate("https://www.toutiao.com/c/user/65722630674/?tab=weitoutiao")
+	global.Page.Find(".btn-publish").Click()
+	filePath := "/app/static/img/hive-logo.png"
+	println(filePath)
+	err := global.Page.FindByID("fileElem").UploadFile(filePath)
+	if err != nil {
+		println(err.Error())
+	}
 }
