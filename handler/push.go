@@ -93,8 +93,8 @@ func PushComm(title string, content string, rule string) (bool, bool, string, er
 	//println("Title：", title, "，Content:", content, "，规则：", rule)
 
 	paramMap := map[string]string{
-		"loginName": "18223277005",
-		"loginPwd":  "13696433488wb",
+		"loginName": "登陆帐号",
+		"loginPwd":  "登陆密码",
 		"title":     title,
 		"content":   content}
 	return parser.RunPush(rule, paramMap, "", 1, false)

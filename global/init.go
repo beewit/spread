@@ -8,17 +8,14 @@ import (
 
 	"github.com/beewit/beekit/conf"
 	"github.com/beewit/beekit/log"
-	"github.com/beewit/beekit/mysql"
 	"github.com/beewit/beekit/sqlite"
 	"github.com/beewit/beekit/utils"
 	"github.com/sclevine/agouti"
 	"encoding/json"
-	"github.com/beewit/pay/global"
 )
 
 var (
 	CFG      = conf.New("config.json")
-	DB       = mysql.DB
 	SLDB     = sqlite.DB
 	Driver   *agouti.WebDriver
 	HiveHtml = utils.Read("app/page/index.html")
@@ -99,7 +96,7 @@ func PageJumpMsg(status, tip, url string) {
 	urls := ""
 	if url != "" {
 		if strings.Index(url, "http") == -1 {
-			url = global.Host + "?lastUrl=" + url
+			url = Host + "?lastUrl=" + url
 		}
 		urls = fmt.Sprintf("setTimeout(function () {     location.href='%v';    },1500)", url)
 	}
@@ -156,16 +153,16 @@ func PageAddLocalStorage(ls string) bool {
 	m := map[string]string{}
 	err := json.Unmarshal([]byte(ls), &m)
 	if err != nil {
-		global.Log.Error("json转换失败：" + ls)
+		Log.Error("json转换失败：" + ls)
 		return false
 	}
 	for k, v := range m {
 		arguments := map[string]interface{}{"key": k, "value": v}
 		err = Page.RunScript("localStorage.setItem(key,value)", arguments, nil)
 		if err != nil {
-			global.Log.Error("<<<<<<<<<<< localStorage.setItem('%s','%s')失败", k, v)
+			Log.Error("<<<<<<<<<<< localStorage.setItem('%s','%s')失败", k, v)
 		} else {
-			global.Log.Info("<<<<<<<<<<< localStorage.setItem('%s','%s')成功", k, v)
+			Log.Info("<<<<<<<<<<< localStorage.setItem('%s','%s')成功", k, v)
 		}
 	}
 	return true
@@ -191,16 +188,16 @@ func PageAddSessionStorage(ss string) bool {
 	m := map[string]string{}
 	err := json.Unmarshal([]byte(ss), &m)
 	if err != nil {
-		global.Log.Error("json转换失败：" + ss)
+		Log.Error("json转换失败：" + ss)
 		return false
 	}
 	for k, v := range m {
 		arguments := map[string]interface{}{"key": k, "value": v}
 		err = Page.RunScript("sessionStorage.setItem(key,value)", arguments, nil)
 		if err != nil {
-			global.Log.Error("<<<<<<<<<<< sessionStorage.setItem('%s','%s')失败", k, v)
+			Log.Error("<<<<<<<<<<< sessionStorage.setItem('%s','%s')失败", k, v)
 		} else {
-			global.Log.Info("<<<<<<<<<<< sessionStorage.setItem('%s','%s')成功", k, v)
+			Log.Info("<<<<<<<<<<< sessionStorage.setItem('%s','%s')成功", k, v)
 		}
 	}
 	return true
