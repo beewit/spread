@@ -68,7 +68,6 @@
 // }, time)
 //
 //
-
 var time = 300;
 var host = "";
 var local = false;
@@ -77,6 +76,23 @@ if (location.href.indexOf("127.0.0.1") > -1 || location.href.indexOf('localhost'
 } else {
     host = "http://127.0.0.1:8080";
 }
+
+
+if (document.getElementsByTagName("title").length > 0) {
+    document.getElementsByTagName("title")[0].innerHTML = "工蜂小智";
+} else {
+    var title = document.createElement("title");
+    title.innerHTML = "工蜂小智";
+    document.head.appendChild(title);
+}
+if (document.querySelectorAll("[href='" + host + "assets/i/favicon.png']").length <= 0) {
+    var link = document.createElement("link");
+    link.setAttribute("type", "image/png");
+    link.setAttribute("rel", "icon");
+    link.setAttribute("href", host + 'assets/i/favicon.png');
+    document.head.appendChild(link);
+}
+
 $hiveIframe = document.getElementById("hive-iframe");
 $hiveIframe.style.width = '0px';
 
