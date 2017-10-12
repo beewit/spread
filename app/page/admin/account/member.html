@@ -12,6 +12,7 @@
     <link rel="icon" type="image/png" href="../assets/i/favicon.png">
     <link rel="apple-touch-icon-precomposed" href="../assets/i/favicon.png">
     <meta name="apple-mobile-web-app-" content="工蜂小智"/>
+    <link rel="stylesheet" href="/app/static/js/plugs/layui/css/layui.css" media="all">
     <link rel="stylesheet" href="../assets/css/amazeui.min.css"/>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="../assets/css/app.css">
@@ -31,7 +32,7 @@
                 <ul class="am-nav am-nav-tabs">
                     <li><a data-href="list.html">平台帐号绑定</a></li>
                     <li class="am-active"><a href="member.html">我的帐号</a></li>
-                    <li><a data-href="info.html">资料修改</a></li>
+                    <!--<li><a data-href="info.html">资料修改</a></li>-->
                     <li><a data-href="updatePwd.html">修改密码</a></li>
                 </ul>
                 <div class="am-g am-margin-top">
@@ -44,8 +45,8 @@
                                 <div class="item-label">
                                     手机帐号
                                 </div>
-                                <div class="val">
-                                    1822***7005
+                                <div class="val" id="mobile">
+                                    --
                                 </div>
                             </div>
                             <div class="account-overview-item">
@@ -53,21 +54,29 @@
                                     会员类型
                                 </div>
                                 <div class="val val2">
-                                    普通
+                                    个人
                                 </div>
                             </div>
                             <div class="account-overview-item">
                                 <div class="item-label">
-                                    到期时间
+                                    微信
                                 </div>
-                                <div class="val">
-                                    2017-09-12
+                                <div class="val val2">
+                                    未绑定
+                                </div>
+                            </div>
+                            <div class="account-overview-item">
+                                <div class="item-label">
+                                    微博
+                                </div>
+                                <div class="val val2">
+                                    未绑定
                                 </div>
                             </div>
                             <div class="account-overview-item last">
                                 <div class="val-line1" style="box-sizing: border-box; margin-top: 5px;">
-                                    <a class="btn payBtn" data-href="http://pay.tbqbz.com">开通会员</a>&nbsp;
-                                    <a class="btn btn-highlight payBtn" data-href="http://pay.tbqbz.com">续费会员</a>
+                                    <a class="btn payBtn" data-href="http://pay.tbqbz.com">绑定微信</a>&nbsp;
+                                    <!--<a class="btn btn-highlight payBtn" data-href="http://pay.tbqbz.com">解除绑定</a>-->
                                 </div>
                             </div>
                         </div>
@@ -110,59 +119,25 @@
                         <div class="account-section-title am-margin-bottom">
                             最近账单
                         </div>
-                        <div class="table-no-result">
-                            账单记录为空
-                        </div>
+
                         <table class="am-table am-table-striped am-table-hover table-main">
                             <thead>
                             <tr>
                                 <th class="table-id">订单号</th>
+                                <th class="table-type">类型</th>
+                                <th class="table-title">支付方式</th>
                                 <th class="table-title">支付金额（元）</th>
-                                <th class="table-type">备注</th>
-                                <th class="table-type">状态</th>
-                                <th class="table-author am-hide-sm-only">下单时间</th>
-                                <th class="table-date am-hide-sm-only">支付时间</th>
+                                <th class="table-type">支付时间</th>
+                                <th class="table-type">支付状态</th>
                             </tr>
                             </thead>
-                            <tbody>
-                            <tr>
-                                <td>1489456654897894564</td>
-                                <td>89</td>
-                                <td>会员充值</td>
-                                <td class="am-hide-sm-only"><span class="am-text-success">已支付</span></td>
-                                <td class="am-hide-sm-only">2014年9月4日 7:28:47</td>
-                                <td class="am-hide-sm-only">2014年9月4日 7:28:47</td>
-                            </tr>
-                            <tr>
-                                <td>1489456654897894564</td>
-                                <td>89</td>
-                                <td>会员充值</td>
-                                <td class="am-hide-sm-only"><span class="am-text-success">已支付</span></td>
-                                <td class="am-hide-sm-only">2014年9月4日 7:28:47</td>
-                                <td class="am-hide-sm-only">2014年9月4日 7:28:47</td>
-                            </tr>
-                            <tr>
-                                <td>1489456654897894564</td>
-                                <td>89</td>
-                                <td>会员充值</td>
-                                <td class="am-hide-sm-only"><span class="am-text-success">已支付</span></td>
-                                <td class="am-hide-sm-only">2014年9月4日 7:28:47</td>
-                                <td class="am-hide-sm-only">2014年9月4日 7:28:47</td>
-                            </tr>
+                            <tbody id="view">
+
                             </tbody>
                         </table>
                     </div>
                     <div class="am-cf">
-                        <div class="am-fr">
-                            <ul class="am-pagination tpl-pagination">
-                                <li class="am-disabled"><a href="#">«</a></li>
-                                <li class="am-active"><a href="#">1</a></li>
-                                <li><a href="#">2</a></li>
-                                <li><a href="#">3</a></li>
-                                <li><a href="#">4</a></li>
-                                <li><a href="#">5</a></li>
-                                <li><a href="#">»</a></li>
-                            </ul>
+                        <div class="am-fr" id="page">
                         </div>
                     </div>
                 </div>
@@ -179,9 +154,25 @@
 <script src="/app/static/js/plugs/layui/layui.all.js"></script>
 <script src="../assets/js/common.ajax.js"></script>
 <script src="../assets/js/common.js"></script>
+<script id="list" type="text/html">
+    {{#  layui.each(d, function(index, item){ }}
+    <tr>
+        <td>{{ item.id }}</td>
+        <td>{{ item.type }}</td>
+        <td>{{ item.pay_type }}</td>
+        <td>{{ item.pay_price }}</td>
+        <td>{{ item.pay_time }}</td>
+        <td>{{ item.ct_time }}</td>
+    </tr>
+    {{#  }); }}
+    {{#  if(d == null){ }}
+    <div class="table-no-result">
+        账单记录为空
+    </div>
+    {{#  } }}
+</script>
 <script>
     $(function () {
-
         getInfo()
     });
 
@@ -192,6 +183,46 @@
                 if (d.ret == 200) {
                     $(".payBtn").attr("href", "http://pay.tbqbz.com?token=" + d.data.account.Token + "&backUrl=" + encodeURIComponent(d.data.host +
                         "&lastUrl=/app/page/admin/account/member.html"));
+                    $("#mobile").html(d.data.account.mobile)
+                }
+            }
+        });
+    }
+</script>
+
+<script>
+    var laytpl;
+    var laypage;
+    var pageIndex = 1;
+    var getTpl = list.innerHTML, view = document.getElementById('view');
+    layui.use(['laytpl', 'laypage'], function () {
+        laytpl = layui.laytpl;
+        laypage = layui.laypage;
+        loadOrderList();
+    });
+
+    function loadOrderList() {
+        $.ajax({
+            url: "/api/order/pay/list",
+            data: {pageIndex: pageIndex},
+            success: function (d) {
+                if (d.ret == 200) {
+                    laytpl(getTpl).render(d.data.Data, function (html) {
+                        view.innerHTML = html;
+                    });
+                    //总页数大于页码总数
+                    laypage.render({
+                        elem: 'page',
+                        count: d.data.Count,
+                        limit: d.data.PageSize,
+                        curr: d.data.pageIndex,
+                        jump: function (obj, first) {
+                            if (!first) {
+                                pageIndex = obj.curr
+                                loadOrderList()
+                            }
+                        }
+                    });
                 }
             }
         });

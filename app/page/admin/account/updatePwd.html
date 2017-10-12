@@ -16,6 +16,11 @@
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="../assets/css/app.css">
     <link rel="stylesheet" href="/app/static/css/base.css">
+    <style>
+        small {
+            color: #ffad6d
+        }
+    </style>
 </head>
 
 <body data-type="generalComponents">
@@ -31,36 +36,39 @@
                 <ul class="am-nav am-nav-tabs">
                     <li><a data-href="list.html">平台帐号绑定</a></li>
                     <li><a data-href="member.html">我的帐号</a></li>
-                    <li><a data-href="info.html">资料修改</a></li>
+                    <!--<li><a data-href="info.html">资料修改</a></li>-->
                     <li class="am-active"><a href="updatePwd.html">修改密码</a></li>
                 </ul>
                 <div class="am-g am-margin-top">
                     <div class="tpl-form-body tpl-form-line">
                         <form class="am-form tpl-form-line-form am-u-lg-6 margin-auto">
                             <div class="am-form-group ">
-                                <label for="user-name" class="am-u-sm-3 am-form-label">原密码 <span
+                                <label for="pwd" class="am-u-sm-3 am-form-label">原密码 <span
                                         class="tpl-form-line-small-"></span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" class="tpl-form-input" id="user-name" placeholder="请输入原密码">
+                                    <input type="password" class="tpl-form-input" id="pwd" placeholder="请输入原密码">
+                                    <small></small>
                                 </div>
                             </div>
                             <div class="am-form-group">
-                                <label for="user-name" class="am-u-sm-3 am-form-label">新密码 <span
+                                <label for="pwdNew" class="am-u-sm-3 am-form-label">新密码 <span
                                         class="tpl-form-line-small-"></span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" class="tpl-form-input" id="user-name" placeholder="请输入新密码">
+                                    <input type="password" class="tpl-form-input" id="pwdNew" placeholder="请输入新密码">
+                                    <small></small>
                                 </div>
                             </div>
                             <div class="am-form-group">
-                                <label for="user-name" class="am-u-sm-3 am-form-label">确认密码 <span
+                                <label for="pwdNew2" class="am-u-sm-3 am-form-label">确认密码 <span
                                         class="tpl-form-line-small-"></span></label>
                                 <div class="am-u-sm-9">
-                                    <input type="text" class="tpl-form-input" id="user-name" placeholder="请输入确认密码">
+                                    <input type="password" class="tpl-form-input" id="pwdNew2" placeholder="请输入确认密码">
+                                    <small></small>
                                 </div>
                             </div>
                             <div class="am-form-group">
                                 <div class="am-u-sm-9 am-u-sm-push-3">
-                                    <button type="button" class="am-btn am-btn-primary tpl-btn-bg-color-success ">提交</button>
+                                    <button type="button" class="am-btn am-btn-primary tpl-btn-bg-color-success " id="updatePwd">提交</button>
                                 </div>
                             </div>
                         </form>
@@ -79,6 +87,59 @@
 <script src="/app/static/js/plugs/layui/layui.all.js"></script>
 <script src="../assets/js/common.ajax.js"></script>
 <script src="../assets/js/common.js"></script>
+<script>
+    $(function () {
+        $("#updatePwd").click(function () {
+            var $pwd = $("#pwd"), $pwdNew = $("#pwdNew"), $pwdNew2 = $("#pwdNew2");
+            var pwd = $pwd.val(), pwdNew = $pwdNew.val(), pwdNew2 = $pwdNew2.val();
+            var reg = /^[0-9A-Z_-]*$/i
+            if (pwd == "") {
+                $pwd.parent().find("small").html("原密码不能为空")
+                return
+            }
+            if (!reg.test(pwd) && pwdNew2.length >= 6 && pwdNew2 <= 20) {
+                $pwd.parent().find("small").html("密码6-20位仅包含英文、数字、下划线")
+                return
+            }
+            $pwd.parent().find("small").html("")
+            if (pwdNew == "") {
+                $pwdNew.parent().find("small").html("新密码不能为空")
+                return
+            }
+            if (!reg.test(pwdNew) && pwdNew2.length >= 6 && pwdNew2 <= 20) {
+                $pwdNew.parent().find("small").html("密码6-20位仅包含英文、数字、下划线")
+                return
+            }
+            $pwdNew.parent().find("small").html("")
+            if (pwdNew2 == "") {
+                $pwdNew2.parent().find("small").html("确认密码不能为空")
+                return
+            }
+            if (!reg.test(pwdNew2) && pwdNew2.length >= 6 && pwdNew2 <= 20) {
+                $pwdNew2.parent().find("small").html("密码6-20位仅包含英文、数字、下划线")
+                return
+            }
+            $pwdNew2.parent().find("small").html("")
+            if (pwdNew != pwdNew2) {
+                $pwdNew2.parent().find("small").html("两次密码输入不一致")
+                return
+            }
+            $.ajax({
+                url: "/api/account/updatePwd",
+                data: {pwd: pwd, pwdNew: pwdNew2},
+                success: function (d) {
+                    if (d.ret == 200) {
+                        layer.msg("修改密码成功，请重新登陆！", {icon: 1}, function () {
+                            parent.location.href = "/signOut"
+                        })
+                    } else {
+                        layer.msg(d.msg, {icon: 0})
+                    }
+                }
+            });
+        });
+    });
+</script>
 </body>
 
 </html>

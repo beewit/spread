@@ -29,6 +29,14 @@ func InsertToken(token string, acc *global.Account) (bool, error) {
 	}
 	return x > 0, err
 }
+func DeleteToken(acc *global.Account) (bool, error) {
+	sql := `DELETE FROM account_token WHERE account_id=?;`
+	x, err := global.SLDB.Delete(sql, acc.Id)
+	if err != nil {
+		return false, err
+	}
+	return x > 0, err
+}
 
 func QueryTableExists(table string) (bool, error) {
 	sql := "`SELECT count(*) as num FROM sqlite_master WHERE type='table' AND name=?;`"
