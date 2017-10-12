@@ -5,7 +5,10 @@
 *.dylib
 !chromedriver.exe
 ChromeUserData/*
-site*.txt
+site.txt
+sitedetail.txt
+siteDoMain.txt
+siteOld.txt
 
 # Test binary, build with `go test -c`
 *.test
