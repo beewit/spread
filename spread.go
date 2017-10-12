@@ -25,6 +25,7 @@ func start() {
 		global.Acc = acc
 	}
 	global.Driver = agouti.ChromeDriver(agouti.ChromeOptions("args", []string{
+		"--user-data-dir=ChromeUserData",
 		"--gpu-process",
 		"--start-maximized",
 		"--disable-infobars",
