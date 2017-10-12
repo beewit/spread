@@ -3,7 +3,8 @@
 *.dll
 *.so
 *.dylib
-chromedriver
+!chromedriver.exe
+ChromeUserData/*
 
 # Test binary, build with `go test -c`
 *.test
@@ -16,6 +17,8 @@ chromedriver
 .idea/
 *.log
 spread
+spread.exe
+spread_go.exe
 sso
 hive
 www
