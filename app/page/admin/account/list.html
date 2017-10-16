@@ -41,34 +41,35 @@
                         <div class="am-btn-toolbar">
                             <div class="am-btn-group am-btn-group-xs">
                                 <button type="button" class="am-btn am-btn-default am-btn-success"
-                                        data-layer="platform.html" data-layer-w="50%" data-layer-h="70%" data-layer-title="新增平台帐号">
+                                        data-layer="platform.html" data-layer-w="50%" data-layer-h="70%"
+                                        data-layer-title="新增平台帐号">
                                     <span class="am-icon-plus"></span> 新增平台帐号
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="am-u-sm-12 am-u-md-3">
-                        <div class="am-form-group">
-                            <select data-am-selected="{btnSize: 'sm'}">
-                                <option value="option1">所有平台</option>
-                                <option value="option2">知乎</option>
-                                <option value="option3">简书</option>
-                                <option value="option3">新浪</option>
-                                <option value="option3">微信</option>
-                                <option value="option3">微博</option>
-                                <option value="option3">头条</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="am-u-sm-12 am-u-md-3">
-                        <div class="am-input-group am-input-group-sm">
-                            <input type="text" class="am-form-field">
-                            <span class="am-input-group-btn">
-                                <button class="am-btn  am-btn-default am-btn-success tpl-am-btn-success am-icon-search"
-                                        type="button"></button>
-                            </span>
-                        </div>
-                    </div>
+                    <!--<div class="am-u-sm-12 am-u-md-3">-->
+                    <!--<div class="am-form-group">-->
+                    <!--<select data-am-selected="{btnSize: 'sm'}">-->
+                    <!--<option value="option1">所有平台</option>-->
+                    <!--<option value="option2">知乎</option>-->
+                    <!--<option value="option3">简书</option>-->
+                    <!--<option value="option3">新浪</option>-->
+                    <!--<option value="option3">微信</option>-->
+                    <!--<option value="option3">微博</option>-->
+                    <!--<option value="option3">头条</option>-->
+                    <!--</select>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="am-u-sm-12 am-u-md-3">-->
+                    <!--<div class="am-input-group am-input-group-sm">-->
+                    <!--<input type="text" class="am-form-field">-->
+                    <!--<span class="am-input-group-btn">-->
+                    <!--<button class="am-btn  am-btn-default am-btn-success tpl-am-btn-success am-icon-search"-->
+                    <!--type="button"></button>-->
+                    <!--</span>-->
+                    <!--</div>-->
+                    <!--</div>-->
                 </div>
                 <div class="am-g">
                     <div class="am-u-sm-12">
@@ -115,7 +116,9 @@
         <td>{{ item.platform_account }}</td>
         <td>
             <a>
-                <img src="{{ item.photo }}">
+                {{# if(item.photo != null && item.photo!=""){ }}
+                <img src="{{ item.photo }}" style="height: 50px;">
+                {{# } }}
             </a>
         </td>
         <td>{{ item.nickname }}</td>
@@ -128,14 +131,16 @@
                             onclick="bindUnion('{{ item.platform }}')">
                         <span class="am-icon-resistance"></span> 重新绑定
                     </button>
-                    <button class="am-btn am-btn-default am-btn-xs am-btn-primary am-hide-sm-only" style="background-color: #0c80ba;"
+                    <button class="am-btn am-btn-default am-btn-xs am-btn-primary am-hide-sm-only"
+                            style="background-color: #0c80ba;"
                             type="button"
                             onclick="loginUnion('{{ item.platform_account }}','{{ item.platform_id }}')">
                         <span class="am-icon-user"></span> 模拟登陆
                     </button>
-                    <button class="am-btn am-btn-default am-btn-xs am-btn-danger am-hide-sm-only" style="background-color: #d93c37;"
+                    <button class="am-btn am-btn-default am-btn-xs am-btn-danger am-hide-sm-only"
+                            style="background-color: #d93c37;"
                             type="button"
-                            onclick="bindUnion('{{ item.platform }}')">
+                            onclick="deleteUnion('{{ item.id }}')">
                         <span class="am-icon-remove"></span> 删除
                     </button>
                 </div>
@@ -201,6 +206,16 @@
             data: {platformAcc: platformAcc, platformId: platformId},
             success: function (d) {
                 player.msg(d.msg, {icon: 0, time: -1});
+            }
+        });
+    }
+
+    function deleteUnion(id) {
+        $.ajax({
+            url: "/platform/union/delete",
+            data: {id: id},
+            success: function (d) {
+                location.href = location.href;
             }
         });
     }

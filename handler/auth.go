@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/spread/api"
+	//	"github.com/beewit/spread/dao"
 	"github.com/beewit/spread/dao"
 	"github.com/beewit/spread/global"
 	"github.com/labstack/echo"
@@ -12,7 +13,6 @@ func CheckClientLogin() *global.Account {
 	token, err := dao.QueryLoginToken()
 	if err != nil {
 		global.Log.Error(err.Error())
-		panic(err)
 	}
 	if token == "" {
 		return nil

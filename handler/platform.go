@@ -39,6 +39,23 @@ func PlatformUnionBind(c echo.Context) error {
 	return utils.Success(c, "正在前往绑定中...", "")
 }
 
+func UnionDelete(c echo.Context) error {
+	id := c.FormValue("id")
+	if id != "" && utils.IsValidNumber(id) {
+		flog, err := dao.DeleteUnionById(convert.MustInt64(id), global.Acc.Id)
+
+		if flog {
+			return utils.SuccessNull(c, "删除成功")
+		}
+		if err != nil {
+			global.Log.Error(err.Error())
+		}
+		return utils.ErrorNull(c, "删除失败")
+	} else {
+		return utils.ErrorNull(c, "参数错误")
+	}
+}
+
 func UnionBind(m map[string]interface{}) {
 	if global.Acc == nil || global.Acc.Id <= 0 {
 		global.PageAlertMsg("帐号未登陆，请登陆后操作", global.API_SSO_DOMAN+"?backUrl="+global.Host+"/ReceiveToken")
@@ -53,8 +70,14 @@ func UnionBind(m map[string]interface{}) {
 	as := convert.ToString(m["account_selector"])
 	ps := convert.ToString(m["password_selector"])
 	iframe := convert.ToString(m["iframe"])
+	js := convert.ToString(m["js"])
 	global.Navigate(lu)
+	time.Sleep(time.Second * 2)
 	parser.DeleteCookie()
+	if js != "" {
+		global.Page.RunScript(js, nil, nil)
+		global.Log.Info("Login Start JS：", js)
+	}
 	//检测登陆状态
 	flog, platformAcc := CheckLogin(domain, identity, platform, as, ps, iframe, platformId)
 	if flog {

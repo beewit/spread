@@ -110,3 +110,14 @@ func UpdateUnionPhoto(nickname, photo, platformAcc string, platformId, accId int
 	}
 	return x > 0, err
 }
+
+func DeleteUnionById(id, accId int64) (bool, error) {
+	sql := `DELETE FROM account_union_cookie WHERE platform_account IN
+	(SELECT platform_account  FROM account_union  WHERE  account_id = ? AND id = ?) AND account_id = 5882608802350080;
+	DELETE FROM account_union WHERE id=? AND account_id=?`
+	x, err := global.SLDB.Delete(sql, accId, id, id, accId)
+	if err != nil {
+		return false, err
+	}
+	return x > 0, err
+}

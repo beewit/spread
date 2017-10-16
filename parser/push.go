@@ -9,11 +9,11 @@ import (
 	"net/url"
 
 	"errors"
+	"github.com/beewit/beekit/utils"
 	"github.com/beewit/spread/dao"
 	"github.com/beewit/spread/global"
 	"github.com/sclevine/agouti"
 	"math/rand"
-	"github.com/beewit/beekit/utils"
 )
 
 type PushJson struct {
@@ -57,6 +57,7 @@ const (
 	Text        = "Text"
 	PageURL     = "PageURL"
 	Attr        = "Attr"
+	Value       = "Value"
 )
 
 const (
@@ -79,7 +80,8 @@ func GetPushJson(rule string) (*PushJson, error) {
 	var pj PushJson
 	err := json.Unmarshal([]byte(rule), &pj)
 	if err != nil {
-		panic(err)
+		global.Log.Error("规则：%s", rule)
+		global.Log.Error("规则解析错误：%s", err.Error()) 
 		return &PushJson{}, err
 	} else {
 		return &pj, nil
@@ -126,13 +128,14 @@ func SwitchIframe(iframeList string) (bool, int, error) {
 	return false, 0, nil
 }
 
-func RunPush(rule string, paramMap map[string]string, platformAcc string, platformId int64, switchAccount bool) (bool, bool, string, error) {
+func RunPush(rule string, paramMap map[string]string, platformAcc string, platformId int64, switchAccount bool) (bool, bool, string, map[string]interface{}, error) {
+	resultMap := map[string]interface{}{}
 	pj, err := GetPushJson(rule)
 	if err != nil {
-		return false, false, pj.Title + "解析配置规则失败", err
+		return false, false, pj.Title + "解析配置规则失败", nil, err
 	}
 	if len(pj.Fill) <= 0 {
-		return false, false, pj.Title + "无发布规则配置", nil
+		return false, false, pj.Title + "无发布规则配置", nil, nil
 	}
 	var flog bool
 	if pj.Login != nil && len(pj.Login) > 0 {
@@ -153,12 +156,12 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 				if err != nil {
 					global.Log.Error(err.Error())
 					url, _ := global.Page.URL()
-					return false, false, "切换Iframe失败，PageURL：" + url, nil
+					return false, false, "切换Iframe失败，PageURL：" + url, nil, nil
 				}
 				global.Log.Info("自动登陆中...")
 				for i := 0; i < len(pj.Login); i++ {
 					if CheckStopAtSite(pj.Domain) {
-						return false, false, "已经不在任务网站了，结束任务执行", nil
+						return false, false, "已经不在任务网站了，结束任务执行", nil, nil
 					}
 					rFlog, result, _, _, err := HandleSelection(&pj.Login[i], paramMap)
 
@@ -196,7 +199,7 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 		}
 	}
 	if !flog {
-		return false, false, pj.Title + "登陆失败", nil
+		return false, false, pj.Title + "登陆失败", nil, nil
 	}
 	time.Sleep(time.Second)
 	sendUrl := pj.WriterUrl[rand.Intn(len(pj.WriterUrl))]
@@ -205,17 +208,16 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 	if pj.Sleep > 0 {
 		time.Sleep(time.Duration(pj.Sleep) * time.Second)
 	}
-	resultMap := map[string]string{}
 
 	completFlog := false
 	for i := 0; i < len(pj.Fill); i++ {
 		iframe, ic, err := SwitchIframe(pj.Fill[i].SwitchIframe)
 		if err != nil {
 			global.Log.Error(err.Error())
-			return false, false, "切换Iframe失败" + global.PageUrl(), nil
+			return false, false, "切换Iframe失败" + global.PageUrl(), nil, nil
 		}
 		if CheckStopAtSite(pj.Domain) {
-			return false, false, "已经不在任务网站了，结束任务执行", nil
+			return false, false, "已经不在任务网站了，结束任务执行", nil, nil
 		}
 		rFlog, result, m, status, err := HandleSelection(&pj.Fill[i], paramMap)
 		if err != nil {
@@ -239,15 +241,9 @@ func RunPush(rule string, paramMap map[string]string, platformAcc string, platfo
 		global.Log.Warning("执行任务：%s", string(rule))
 		global.Log.Warning("执行结果：%v，返回之：result：%s", rFlog, result)
 	}
-	if completFlog {
-		//执行成功数据
-		if resultMap != nil {
-		}
-	} else {
-		//执行失败数据
-	}
+
 	global.Log.Warning("直接最终结果：%v", completFlog)
-	return true, completFlog, "全部执行完成", nil
+	return true, completFlog, "全部执行完成", resultMap, nil
 }
 
 func HandleSelection(p *PushFillJson, paramMap map[string]string) (bool, string, map[string]string, string, error) {
@@ -307,6 +303,9 @@ func HandleSelection(p *PushFillJson, paramMap map[string]string) (bool, string,
 	case Attr:
 		result, err = findSelection(p.Selector, p.SelectorName).Attribute(p.Attr)
 		break
+	case Value:
+		result = p.Result
+		break
 	}
 	if p.Sleep > 0 {
 		time.Sleep(time.Duration(p.Sleep) * time.Second)
@@ -328,7 +327,9 @@ func HandleSelection(p *PushFillJson, paramMap map[string]string) (bool, string,
 			resultMap[p.Field] = result
 		}
 	}
-
+	if err != nil {
+		global.Log.Error(err.Error())
+	}
 	return err == nil, result, resultMap, p.Status, nil
 }
 
@@ -397,6 +398,7 @@ func CheckStopAtSite(domain string) bool {
 	thisUrl, _ := global.Page.URL()
 	u, _ := url.Parse(domain)
 	domainName := utils.Substr(u.Host, strings.LastIndex(utils.Substr(u.Host, 0, strings.LastIndex(u.Host, ".")), "."), len(u.Host))
+	global.Log.Info("原网站：%s,现网站：%s", thisUrl, domainName)
 	return !strings.Contains(thisUrl, domainName)
 }
 

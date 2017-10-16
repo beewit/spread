@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/beekit/utils/convert"
 	"github.com/beewit/spread/api"
@@ -10,7 +11,6 @@ import (
 	"github.com/labstack/echo"
 	"strings"
 	"time"
-	"fmt"
 )
 
 func Push(c echo.Context) error {
@@ -59,16 +59,59 @@ func Push(c echo.Context) error {
 					}
 					oldPlatformAcc[platformId] = platformAcc
 
-					flog, completFlog, result, err := parser.RunPush(rule, paramMap, platformAcc, platformId, switchAccount)
+					flog, completFlog, result, resultMap, err := parser.RunPush(rule, paramMap, platformAcc, platformId, switchAccount)
+					var logs string
 					if err != nil {
-						global.Log.Error(platformName, " - > 发送失败")
-						global.Log.Error("《%s》 - > 异常：%v，result:%s", platformName, err.Error(), result)
+						logs = fmt.Sprintf("《%s》 - > 异常：%v，result:%s", platformName, err.Error(), result)
+						global.Log.Error(logs)
 					} else {
-						global.Log.Error("《%s》 - > 状态：%v，result:%s", platformName, flog, result)
+						logs = fmt.Sprintf("《%s》 - > 状态：%v，result:%s", platformName, flog, result)
+						global.Log.Error(logs)
 					}
 					if completFlog {
 						done++
 						global.PageSuccessMsg(platformName+" - > 发送结果成功", "")
+
+						if completFlog {
+							//执行成功数据
+							if resultMap != nil {
+								global.Log.Info("成功后的日志记录")
+								resultMap["status"] = 1
+							}
+						} else {
+							//执行失败数据
+							global.Log.Info("失败后的日志记录")
+						}
+						if resultMap == nil {
+							resultMap = map[string]interface{}{}
+							resultMap["status"] = 0
+						}
+						iw, _ := utils.NewIdWorker(1)
+						id, _ := iw.NextId()
+						resultMap["id"] = id
+						resultMap["type"] = 0
+						resultMap["func_id"] = m[j]["id"]
+						resultMap["func_name"] = m[j]["name"]
+						resultMap["platform_id"] = platformId
+						resultMap["platform_name"] = platformName
+						resultMap["ct_time"] = utils.CurrentTime()
+						resultMap["title"] = title
+						resultMap["content"] = content
+						resultMap["logs"] = logs
+						resultMap["account_union_id"] = list[i]["id"]
+						resultMap["account_id"] = global.Acc.Id
+						flog, err := dao.SetFuncLogs(resultMap)
+						if err != nil {
+							logs = fmt.Sprintf("《%s》 - > 保存日志异常：%v ", platformName, err.Error())
+							global.Log.Error(logs)
+						} else {
+							if flog {
+								logs = fmt.Sprintf("《%s》 - > 保存日志成功", platformName)
+							} else {
+								logs = fmt.Sprintf("《%s》 - > 保存日志失败", platformName)
+							}
+							global.Log.Info(logs)
+						}
 					} else {
 						global.PageErrorMsg(platformName+" - > 发送结果失败", "")
 					}
@@ -89,7 +132,7 @@ func Push(c echo.Context) error {
 	return utils.Success(c, "正在发布中", "")
 }
 
-func PushComm(title string, content string, rule string) (bool, bool, string, error) {
+func PushComm(title string, content string, rule string) (bool, bool, string, map[string]interface{}, error) {
 	//println("Title：", title, "，Content:", content, "，规则：", rule)
 
 	paramMap := map[string]string{

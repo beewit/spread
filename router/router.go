@@ -7,23 +7,28 @@ import (
 	"fmt"
 
 	"github.com/beewit/spread/api"
+	"github.com/beewit/spread/static"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
 
-func Router() {
-	e := echo.New()
+var e *echo.Echo
 
-	e.Static("/app", "app")
+func Router() {
+	e = echo.New()
+
+	//e.Static("/app", "app")
+	e.GET("/*", echo.WrapHandler(static.Handler))
 	e.File("/", "app/page/index.html")
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
-	handlerConfig(e)
+	handlerConfig()
+	global.Log.Info("启动路由服务")
 	go e.Logger.Fatal(e.Start(fmt.Sprintf(":%v", global.Port)))
-
+	//go e.Start(fmt.Sprintf(":%v", global.Port))
 }
 
-func handlerConfig(e *echo.Echo) {
+func handlerConfig() {
 	e.POST("/push/push", handler.Push, handler.Filter)
 
 	e.POST("/api/template", api.GetTemplateByList, handler.Filter)
@@ -40,8 +45,13 @@ func handlerConfig(e *echo.Echo) {
 	e.POST("/platform/bind", handler.PlatformUnionBind, handler.Filter)
 	e.POST("/platform/union/list", handler.UnionList, handler.Filter)
 	e.POST("/platform/union/login", handler.UnionLogin, handler.Filter)
+	e.POST("/platform/union/delete", handler.UnionDelete, handler.Filter)
 
 	e.POST("/member/info", handler.GetMemberInfo, handler.Filter)
 	e.GET("/ReceiveToken", handler.ReceiveToken)
 	e.GET("/signOut", handler.SignOut)
+}
+
+func Stop() {
+	e.Close()
 }
