@@ -48,6 +48,7 @@ func handlerConfig() {
 	e.POST("/platform/union/delete", handler.UnionDelete, handler.Filter)
 
 	e.POST("/member/info", handler.GetMemberInfo, handler.Filter)
+	e.POST("/member/bindWechat", handler.CreateWechatQrCode, handler.Filter)
 	e.GET("/ReceiveToken", handler.ReceiveToken)
 	e.GET("/signOut", handler.SignOut)
 }

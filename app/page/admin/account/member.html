@@ -61,7 +61,7 @@
                                 <div class="item-label">
                                     微信
                                 </div>
-                                <div class="val val2">
+                                <div class="val val2" id="wechat">
                                     未绑定
                                 </div>
                             </div>
@@ -75,7 +75,7 @@
                             </div>
                             <div class="account-overview-item last">
                                 <div class="val-line1" style="box-sizing: border-box; margin-top: 5px;">
-                                    <a class="btn payBtn" data-href="http://m.tbqbz.com/account/wechatBind">绑定微信</a>&nbsp;
+                                    <a class="btn bindBtn" onclick="bindWechat(this)">绑定微信</a>&nbsp;
                                     <!--<a class="btn btn-highlight payBtn" data-href="http://pay.tbqbz.com">解除绑定</a>-->
                                 </div>
                             </div>
@@ -184,7 +184,43 @@
                     $(".payBtn").attr("href", "http://pay.tbqbz.com?token=" + d.data.account.Token + "&backUrl=" + encodeURIComponent(d.data.host +
                         "&lastUrl=/app/page/admin/account/member.html"));
                     $("#mobile").html(d.data.account.mobile)
+                    if (d.data.account.nickname != null && d.data.account.nickname != "") {
+                        $("#wechat").html("<div><img src='" + d.data.account.photo + "' " +
+                            "style='width: 50px;height: 50px;border-radius: 50%;'/></div><div>" + d.data.account.nickname + "</div>");
+                    }
                 }
+            }
+        });
+    }
+
+    function bindWechat(obj) {
+        var qrCode = $(obj).attr("data-qrCode");
+        if (qrCode == "" || qrCode == undefined) {
+            $.ajax({
+                url: "/member/bindWechat",
+                success: function (d) {
+                    if (d.ret == 200) {
+                        openQrCode(d.data);
+                    }
+                }
+            });
+        } else {
+            openQrCode(qrCode);
+        }
+    }
+
+    function openQrCode(qrcode) {
+        layer.open({
+            type: 1,
+            title: false,//不显示标题栏   ,
+            closeBtn: false,
+            shade: 0.8,
+            id: 'LAY_layuipro',
+            btn: ['刷新当前页面', '取消绑定'],
+            moveType: 1,//拖拽模式，0或者1  ,
+            content: '<div style="padding: 50px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;padding-bottom: 10px;"><img src="' + qrcode + '" style="display:black;"><div style="text-align:center"><img src="/Content/Img/WeChatPay.png" style=" width: 100px;"/></div></div>'
+            , yes: function () {
+                location.href = location.href;
             }
         });
     }
