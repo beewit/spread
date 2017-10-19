@@ -9,6 +9,7 @@ site.txt
 sitedetail.txt
 siteDoMain.txt
 siteOld.txt
+debug
 
 # Test binary, build with `go test -c`
 *.test
@@ -20,6 +21,7 @@ siteOld.txt
 .glide/
 .idea/
 *.log
+*.txt
 spread
 spread.exe
 spread_go.exe
