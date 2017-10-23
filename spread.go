@@ -145,7 +145,7 @@ func Start() error {
 		"--gpu-process",
 		"--start-maximized",
 		"--disable-infobars",
-		"--app=http://sso.tbqbz.com/",
+		"--app=" + global.LoadPage,
 		"--webkit-text-size-adjust"}))
 	global.Driver.Start()
 	var err error

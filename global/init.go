@@ -27,8 +27,8 @@ var (
 	Navigate = PageNavigate
 	Acc      *Account
 	Platform = map[string]int{"新浪微博": 1, "简书": 2, "知乎": 3}
-
-	Page = *new(utils.AgoutiPage)
+	LoadPage = "http://www.tbqbz.com/page/load.html"
+	Page     = *new(utils.AgoutiPage)
 )
 
 const (

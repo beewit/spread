@@ -31,7 +31,9 @@
         var loadi;
         var _opt = $.extend(opt, {
             beforeSend: function () {
-                loadi = player.msg('正在加载..', {icon: 6, time: -1});
+                if (opt.load_tip) {
+                    loadi = player.msg('正在加载..', {icon: 6, time: -1});
+                }
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
                 if (opt.err_tip) {

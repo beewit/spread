@@ -90,6 +90,9 @@
                         <button type="button" class="am-btn am-btn-sm am-btn-success" id="StartAddWechatGroup"><span
                                 class="am-icon-plus"></span> 启动一键加群
                         </button>
+                        <button type="button" class="am-btn am-btn-sm am-btn-secondary" onclick="sendWechatMsg()">
+                            <span class="am-icon-location-arrow"></span> 群发微信
+                        </button>
                     </div>
                 </div>
             </div>
@@ -136,7 +139,7 @@
         <td>{{ item.area }}</td>
         <td>{{ item.code }}</td>
         <td>{{ item.owner_wechat }}</td>
-        <td>{{ item.ut_time }}</td>
+        <td>{{ item.re_time }}</td>
         <td>{{ item.hot }}</td>
     </tr>
     {{#  }); }}
@@ -170,11 +173,19 @@
             loadList()
         });
         $("#StartAddWechatGroup").click(function () {
-            layer.confirm('请确定是否开启微信电脑版客户端？', {
+            layer.confirm('请确定是否已开启微信电脑版客户端？', {
                 btn: ['确定', '取消'] //按钮
             }, function () {
+                var type = $("#type").val(), area = $("#area").val();
+                if (type != "") {
+                    type = type.trim()
+                }
+                if (area != "") {
+                    area = area.trim()
+                }
                 $.ajax({
-                    url: "/wechat/group/start",
+                    url: "/wechat/group/start/add",
+                    data: {type: type, area: area},
                     success: function (d) {
                         layer.msg(d.msg, {icon: 1})
                     }
@@ -193,7 +204,7 @@
         }
         $.ajax({
             url: "/api/wechat/group/list",
-            data: {type: type, area: area},
+            data: {type: type, area: area, pageIndex: pageIndex},
             success: function (d) {
                 if (d.ret == 200) {
                     laytpl(getTpl).render(d.data.Data, function (html) {
@@ -204,7 +215,7 @@
                         elem: 'page',
                         count: d.data.Count,
                         limit: d.data.PageSize,
-                        curr: d.data.pageIndex,
+                        curr: d.data.PageIndex,
                         jump: function (obj, first) {
                             if (!first) {
                                 pageIndex = obj.curr
@@ -237,9 +248,63 @@
             option += '<option value="">' + def + '</option>'
         }
         $.each(data, function (index, key) {
-            option += '<option value="' + eval("data[index]." + val) + '" ' + (val == checkKey ? "selected" : "") + '>' + eval("data[index]." + text) + '</option>'
+            option += '<option value="' + eval("data[index]." + val) + '" ' + (val == checkKey ? "selected" : "") + '>'
+                + eval("data[index]." + text) + '</option>'
         });
         $sel.html(option)
+    }
+
+
+    function sendWechatMsg() {
+        layer.prompt({title: '请输入微信群发消息内容', formType: 2}, function (text, index) {
+            layer.close(index);
+            if (text == "") {
+                layer.msg('请输入发送内容');
+                return
+            }
+            $.ajax({
+                url: "/wechat/group/start/send",
+                data: {msg: text},
+                success: function (d) {
+                    openQrCode(d.data)
+                }
+            });
+        });
+    }
+
+    var sendStatus = 0;
+
+    function getWechatStatus() {
+        $.ajax({
+            load_tip: false,
+            url: "/wechat/group/get/sendStatus",
+            success: function (d) {
+                sendStatus = d.data.sendStatus
+                if (sendStatus != 2) {
+                    $("#sendStatusMsg").html("【" + d.data.sendStatus + "】" + d.data.sendStatusMsg);
+                    setTimeout(function () {
+                        getWechatStatus()
+                    }, 300)
+                }
+            }
+        });
+    }
+
+    function openQrCode(qrcode) {
+        layer.open({
+            type: 1,
+            title: "请用手机微信扫一扫二维码",
+            offset: '100px',
+            closeBtn: false,
+            shade: 0.8,
+            id: 'LAY_layuipro',
+            btn: ['取消发送'],
+            moveType: 1,//拖拽模式，0或者1  ,
+            content: '<div style="padding: 50px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;padding-bottom: 10px;">' +
+            '<img src="' + qrcode + '" style="display:black;"><div style="text-align:center">' +
+            '<pre id="sendStatusMsg">扫码登录</pre></div></div>'
+        });
+        getWechatStatus()
     }
 </script>
 </body>

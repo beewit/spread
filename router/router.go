@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/beewit/spread/api"
-	//"github.com/beewit/spread/static"
+	"github.com/beewit/spread/static"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -17,8 +17,8 @@ var e *echo.Echo
 func Router() {
 	e = echo.New()
 
-	e.Static("/app", "app")
-	//e.GET("/*", echo.WrapHandler(static.Handler))
+	//e.Static("/app", "app")
+	e.GET("/*", echo.WrapHandler(static.Handler))
 	e.File("/", "app/page/index.html")
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
@@ -51,7 +51,9 @@ func handlerConfig() {
 	e.POST("/member/info", handler.GetMemberInfo, handler.Filter)
 	e.POST("/member/bindWechat", handler.CreateWechatQrCode, handler.Filter)
 
-	e.POST("/wechat/group/start", handler.StartAddWechatGroup, handler.Filter)
+	e.POST("/wechat/group/start/add", handler.StartAddWechatGroup, handler.Filter)
+	e.POST("/wechat/group/start/send", handler.SendWechatMsg, handler.Filter)
+	e.POST("/wechat/group/get/sendStatus", handler.GetSendWechatMsgStatus, handler.Filter)
 
 	e.GET("/ReceiveToken", handler.ReceiveToken)
 	e.GET("/signOut", handler.SignOut)
