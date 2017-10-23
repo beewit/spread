@@ -131,6 +131,7 @@ func checkError(err error) {
 
 func Start() error {
 	go router.Router()
+	utils.CloseChrome()
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	load := global.Host
 	acc := handler.CheckClientLogin()

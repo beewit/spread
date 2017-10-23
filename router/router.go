@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/beewit/spread/api"
-	"github.com/beewit/spread/static"
+	//"github.com/beewit/spread/static"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -17,8 +17,8 @@ var e *echo.Echo
 func Router() {
 	e = echo.New()
 
-	//e.Static("/app", "app")
-	e.GET("/*", echo.WrapHandler(static.Handler))
+	e.Static("/app", "app")
+	//e.GET("/*", echo.WrapHandler(static.Handler))
 	e.File("/", "app/page/index.html")
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
@@ -38,9 +38,10 @@ func handlerConfig() {
 	e.POST("/api/func/list", api.GetFuncByList, handler.Filter)
 	e.POST("/api/account/func/list", api.GetAccountFuncList, handler.Filter)
 	e.POST("/api/account/updatePwd", api.UpdatePwd, handler.Filter)
-
 	e.POST("/api/rules/list", api.GetRules, handler.Filter)
 	e.POST("/api/order/pay/list", api.GetOrderByList, handler.Filter)
+	e.POST("/api/wechat/group/list", api.GetWechatGroupList, handler.Filter)
+	e.POST("/api/wechat/group/class", api.GetWechatGroupClass, handler.Filter)
 
 	e.POST("/platform/bind", handler.PlatformUnionBind, handler.Filter)
 	e.POST("/platform/union/list", handler.UnionList, handler.Filter)
@@ -49,6 +50,9 @@ func handlerConfig() {
 
 	e.POST("/member/info", handler.GetMemberInfo, handler.Filter)
 	e.POST("/member/bindWechat", handler.CreateWechatQrCode, handler.Filter)
+
+	e.POST("/wechat/group/start", handler.StartAddWechatGroup, handler.Filter)
+
 	e.GET("/ReceiveToken", handler.ReceiveToken)
 	e.GET("/signOut", handler.SignOut)
 }

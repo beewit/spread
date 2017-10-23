@@ -80,8 +80,7 @@ func GetPushJson(rule string) (*PushJson, error) {
 	var pj PushJson
 	err := json.Unmarshal([]byte(rule), &pj)
 	if err != nil {
-		global.Log.Error("规则：%s", rule)
-		global.Log.Error("规则解析错误：%s", err.Error()) 
+		global.Log.Error("规则解析错误：%s", err.Error())
 		return &PushJson{}, err
 	} else {
 		return &pj, nil

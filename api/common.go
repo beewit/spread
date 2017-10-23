@@ -32,6 +32,6 @@ func ApiPost(url string, m map[string]string) (utils.ResultParam, error) {
 	if err != nil {
 		return utils.ResultParam{}, err
 	}
-	global.Log.Info(string(body))
+	//global.Log.Info(string(body))
 	return utils.ToResultParam(body), nil
 }
