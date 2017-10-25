@@ -259,11 +259,13 @@ input {
 .union-ul li {
     cursor: pointer;
 }
-.union-ul li:hover img{
+
+.union-ul li:hover img {
     padding: 10px;
     background-color: #e4e4e4;
     border: 1px solid #cacaca;
 }
+
 .union-ul img {
     width: 100px;
     height: 100px;
@@ -274,4 +276,15 @@ input {
 .union-ul span {
     display: block;
     text-align: center;
+}
+
+.hive-tip {
+    width: 100%;
+    padding: 10px;
+    background: #ffe19c;
+    COLOR: #c57003;
+}
+
+.hive-tip a {
+    color: #43a8ff;
 }

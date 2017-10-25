@@ -60,3 +60,17 @@ func GetFuncByPlatformIdsAndAccId(platformIds, accId string) (utils.ResultParam,
 	url := fmt.Sprintf("/api/func/account/list?platformIds=%s&accId=%s", platformIds, accId)
 	return ApiPost(url, nil)
 }
+
+func GetEffectiveFuncById(funcId string) (utils.ResultParam, error) {
+	url := fmt.Sprintf("/api/func/account/funcId?funcId=%s", funcId)
+	return ApiPost(url, nil)
+}
+
+func EffectiveFuncById(funcId int64) bool {
+	r, err := GetEffectiveFuncById(convert.ToString(funcId))
+	if err != nil {
+		global.Log.Error("EffectiveFuncById ERROR %s", err.Error())
+		return false
+	}
+	return r.Ret == utils.SUCCESS_CODE
+}

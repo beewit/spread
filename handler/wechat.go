@@ -2,19 +2,19 @@ package handler
 
 import (
 	"encoding/json"
-	"math"
 	"time"
+
+	"fmt"
+	"strings"
 
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/beekit/utils/convert"
-	sapi "github.com/beewit/spread/api"
+	"github.com/beewit/spread/api"
 	"github.com/beewit/spread/global"
-	"github.com/beewit/wechat-ai/api"
 	"github.com/beewit/wechat-ai/enum"
-	"github.com/labstack/echo"
 	"github.com/beewit/wechat-ai/send"
-	"fmt"
-	"strings"
+	"github.com/labstack/echo"
+	"github.com/beewit/wechat-ai/ai"
 )
 
 var (
@@ -25,14 +25,32 @@ var (
 	ContactMap    map[string]send.User
 )
 
+func GetWechatFuncStatus(c echo.Context) error {
+	flog := api.EffectiveFuncById(global.FUNC_WECHAT)
+	return utils.SuccessNullMsg(c, flog)
+}
+
 func StartAddWechatGroup(c echo.Context) error {
-	go addWechat(c, "1", c.FormValue("area"), c.FormValue("type"))
+	//权限校验
+	if !api.EffectiveFuncById(global.FUNC_WECHAT) {
+		return utils.ErrorNull(c, "微信营销功能还未开通，请开通此功能后使用")
+	}
+	area := c.FormValue("area")
+	types := c.FormValue("type")
+	groupCount := c.FormValue("groupCount")
+	if groupCount == "" || !utils.IsValidNumber(groupCount) {
+		groupCount = "3"
+	}
+	sleepTime := c.FormValue("sleepTime")
+	if sleepTime == "" || !utils.IsValidNumber(sleepTime) {
+		sleepTime = "30"
+	}
+	go addWechat(c, "1", area, types, convert.MustInt(groupCount), convert.MustInt(sleepTime))
 	return utils.SuccessNull(c, "准备执行添加微信中..")
 }
 
-func addWechat(c echo.Context, pageIndex, area, types string) {
-	println(area + "   | " + types)
-	r, err := sapi.GetWechatGroupListData(pageIndex, area, types)
+func addWechat(c echo.Context, pageIndex, area, types string, groupCount, sleepTime int) {
+	r, err := api.GetWechatGroupListData(pageIndex, area, types)
 	if err != nil {
 		global.PageMsg("获取微信群信息失败")
 		return
@@ -57,32 +75,53 @@ func addWechat(c echo.Context, pageIndex, area, types string) {
 		return
 	}
 	global.Navigate(global.LoadPage)
-
+	gc := 0
 	for i := 0; i < len(pageData.Data); i++ {
-		global.Navigate(convert.ToString(pageData.Data[i]["url"]))
 		global.Page.Page.NextWindow()
+
+		gc++
+		if gc > groupCount {
+			global.PageMsg(fmt.Sprintf("%v秒后再添加数据", sleepTime))
+			time.Sleep(time.Duration(sleepTime) * time.Second)
+			gc = 0
+		}
+
+		global.Navigate(convert.ToString(pageData.Data[i]["url"]))
+
 		global.Page.RunScript(`$(".checkCode span:eq(1)").mouseover()`, nil, nil)
 		time.Sleep(time.Second * 3)
 		var of *enum.Offset
-		global.Page.RunScript(`return  $(".shiftcode:eq(1) img").offset()`, nil, &of)
+		err := global.Page.RunScript(`return  $(".shiftcode:eq(1) img").offset()`, nil, &of)
+		if err != nil {
+			global.Log.Error(" global.Page.RunScript ERROR:" + err.Error())
+			continue
+		}
+		global.Log.Info("offset ： " + convert.ToObjStr(of))
 		title, err := global.Page.Title()
 		if err != nil {
-			global.Log.Error("error:" + err.Error())
+			global.Log.Error("global.Page.Title ERROR:" + err.Error())
 			continue
 		}
 		if of != nil {
-			err = api.Wechat(title, of)
+			err = ai.Wechat(title, of)
 			if err != nil {
 				global.PageErrorMsg(err.Error()+"，已经停止添加微信群", global.Host+"?lastUrl=/app/page/admin/wechat/index.html")
 				return
 			}
+			//记录添加记录
+			flog, err := api.AddAccountWechatGroup(convert.MustInt64(pageData.Data[i]["id"]))
+			if err != nil {
+				global.Log.Error("AddAccountWechatGroup ERROR:" + err.Error())
+				continue
+			}
+			global.Log.Info("AddAccountWechatGroup 添加：%v", flog)
 		}
 	}
-	if pageData.PageIndex == int(math.Ceil(float64(pageData.Count)/float64(pageData.PageSize))) {
+	if pageData.Count == 1 {
 		global.PageSuccessMsg("待添加的数据已完成", global.Host+"?lastUrl=/app/page/admin/wechat/index.html")
 		return
 	} else {
-		addWechat(c, convert.ToString(pageData.PageIndex+1), area, types)
+		addWechat(c, "1", area, types, groupCount, sleepTime)
 	}
 }
 

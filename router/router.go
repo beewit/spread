@@ -10,12 +10,28 @@ import (
 	"github.com/beewit/spread/static"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"io"
+	"os"
 )
 
 var e *echo.Echo
 
+type LoggerConfig struct {
+	// 可选。默认值是 DefaultLoggerConfig.Format.
+	Format string `json:"format"`
+	// Output 是记录日志的位置。
+	// 可选。默认值是 os.Stdout.
+	Output io.Writer
+}
+
 func Router() {
 	e = echo.New()
+	file, _ := os.OpenFile("web.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	//e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+	//	Output: file,
+	//}))
+	//e.Logger.SetLevel(log.OFF)
+	e.Logger.SetOutput(file)
 
 	//e.Static("/app", "app")
 	e.GET("/*", echo.WrapHandler(static.Handler))
@@ -23,9 +39,8 @@ func Router() {
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
 	handlerConfig()
-	global.Log.Info("启动路由服务")
-	go e.Logger.Fatal(e.Start(fmt.Sprintf(":%v", global.Port)))
-	//go e.Start(fmt.Sprintf(":%v", global.Port))
+	//go e.Logger.Fatal(e.Start(fmt.Sprintf(":%v", global.Port)))
+	go e.Start(fmt.Sprintf(":%v", global.Port))
 }
 
 func handlerConfig() {
@@ -54,6 +69,7 @@ func handlerConfig() {
 	e.POST("/wechat/group/start/add", handler.StartAddWechatGroup, handler.Filter)
 	e.POST("/wechat/group/start/send", handler.SendWechatMsg, handler.Filter)
 	e.POST("/wechat/group/get/sendStatus", handler.GetSendWechatMsgStatus, handler.Filter)
+	e.POST("/wechat/funcStatus", handler.GetWechatFuncStatus, handler.Filter)
 
 	e.GET("/ReceiveToken", handler.ReceiveToken)
 	e.GET("/signOut", handler.SignOut)

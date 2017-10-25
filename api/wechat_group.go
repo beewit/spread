@@ -35,3 +35,13 @@ func GetWechatGroupListData(pageIndex, area, types string) (*utils.ResultParam, 
 	}
 	return &r, nil
 }
+
+func AddAccountWechatGroup(wgId int64) (bool, error) {
+	url := fmt.Sprintf("/api/account/wechat/group/add?wgId=%v", wgId)
+	r, err := ApiPost(url, nil)
+	if err != nil {
+		global.Log.Error(err.Error())
+		return false, err
+	}
+	return r.Ret == utils.SUCCESS_CODE, nil
+}

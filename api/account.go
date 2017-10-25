@@ -14,7 +14,6 @@ func CheckClientLogin(token string) *global.Account {
 		global.Log.Error(err.Error())
 		return nil
 	}
-	global.Log.Info("SSOToken：%s", string(b))
 	rp := utils.ToResultParam(b)
 	if rp.Ret != 200 {
 		return nil

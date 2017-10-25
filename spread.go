@@ -8,11 +8,11 @@ import (
 	"github.com/beewit/spread/handler"
 	"github.com/beewit/spread/router"
 	"github.com/lxn/walk"
-	"github.com/sclevine/agouti"
 
 	"log"
 
 	"github.com/beewit/beekit/utils"
+	"github.com/sclevine/agouti"
 )
 
 type MyWindow struct {
@@ -155,7 +155,6 @@ func Start() error {
 		return err
 	}
 	go func() {
-		global.Log.Info(load)
 		global.Page.Navigate(load)
 	}()
 	return nil

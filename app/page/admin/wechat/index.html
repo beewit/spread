@@ -62,6 +62,7 @@
                     <span class="am-icon-comments"></span> 微信营销
                 </div>
             </div>
+            <div class="hive-tip am-hide">微信营销功能未开通，点击<a>立即开通</a></div>
             <div class="am-g am-margin-top">
                 <div class="am-form">
                     <div class="hive-6">
@@ -80,12 +81,14 @@
                     <div class="hive-6">
                         <b class="am-form-label">加群设置：</b>
                         <span class="am-form-label">每加群：
-                               <input type="text" class="input am-input-sm" style="width: 80px;display: initial;"
-                                      placeholder="1"> 次
+                               <input type="text" id="groupCount" class="input am-input-sm"
+                                      style="width: 80px;display: initial;"
+                                      placeholder="3" value="3"> 次
                         </span>
                         <span class="am-form-label">延迟：
-                               <input type="text" class="input am-input-sm" style="width: 80px;display: initial;"
-                                      placeholder="1"> 秒后再加
+                               <input type="text" id="sleepTime" class="input am-input-sm"
+                                      style="width: 80px;display: initial;"
+                                      placeholder="30" value="30"> 秒后再加
                         </span>
                         <button type="button" class="am-btn am-btn-sm am-btn-success" id="StartAddWechatGroup"><span
                                 class="am-icon-plus"></span> 启动一键加群
@@ -168,6 +171,7 @@
     });
 
     $(function () {
+        wechatFuncStatus();
         $("#btnSearch").click(function () {
             pageIndex = 1;
             loadList()
@@ -176,7 +180,10 @@
             layer.confirm('请确定是否已开启微信电脑版客户端？', {
                 btn: ['确定', '取消'] //按钮
             }, function () {
-                var type = $("#type").val(), area = $("#area").val();
+                var type = $("#type").val(),
+                    area = $("#area").val(),
+                    groupCount = $("#groupCount").val() || 3,
+                    sleepTime = $("#sleepTime").val() || 30;
                 if (type != "") {
                     type = type.trim()
                 }
@@ -185,13 +192,13 @@
                 }
                 $.ajax({
                     url: "/wechat/group/start/add",
-                    data: {type: type, area: area},
+                    data: {type: type, area: area, groupCount: groupCount, sleepTime: sleepTime},
                     success: function (d) {
                         layer.msg(d.msg, {icon: 1})
                     }
                 });
             });
-        })
+        });
     });
 
     function loadList() {
@@ -305,6 +312,22 @@
             '<pre id="sendStatusMsg">扫码登录</pre></div></div>'
         });
         getWechatStatus()
+    }
+
+    function wechatFuncStatus() {
+        $.ajax({
+            load_tip: false,
+            url: "/wechat/funcStatus",
+            success: function (d) {
+                if (!d.data) {
+                    $(".hive-tip").removeClass("am-hide");
+                    getAccount(function (acc) {
+                        $(".hive-tip a").attr("href", "http://pay.tbqbz.com?fid=6&token=" + acc.account.Token +
+                            "&backUrl=" + encodeURIComponent(acc.host + "?lastUrl=/app/page/admin/wechat/index.html"))
+                    })
+                }
+            }
+        });
     }
 </script>
 </body>

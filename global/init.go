@@ -32,6 +32,10 @@ var (
 )
 
 const (
+	FUNC_WECHAT = 6
+)
+
+const (
 	API_SERVICE_DOMAN = "http://hive.tbqbz.com" //"http://127.0.0.1:8085" //
 	API_SSO_DOMAN     = "http://sso.tbqbz.com"
 	PAGE_SIZE         = 10
