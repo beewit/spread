@@ -6,12 +6,13 @@ import (
 
 	"strings"
 
+	"encoding/json"
 	"github.com/beewit/beekit/conf"
 	"github.com/beewit/beekit/log"
 	"github.com/beewit/beekit/sqlite"
 	"github.com/beewit/beekit/utils"
+	"github.com/beewit/wechat-ai/send"
 	"github.com/sclevine/agouti"
-	"encoding/json"
 )
 
 var (
@@ -29,6 +30,8 @@ var (
 	Platform = map[string]int{"新浪微博": 1, "简书": 2, "知乎": 3}
 	LoadPage = "http://www.tbqbz.com/page/load.html"
 	Page     = *new(utils.AgoutiPage)
+	LoginMap *send.LoginMap
+	TaskList = map[string]*Task{}
 )
 
 const (

@@ -333,22 +333,23 @@
 
     .cut-out {
         position: absolute;
-        font-size: 16px;
+        font-size: 12px;
         z-index: 99999999;
         border-radius: 50%;
-        line-height: 50px;
-        display: none;
         width: 50px;
         text-align: center;
-        color: #fff !important;
         left: 5px;
         bottom: 10px;
         cursor: pointer;
     }
 
     .cut-out img {
-        width: 50px;
-        height: 50px;
+        width: 50px !important;
+        height: 50px !important;
+    }
+
+    .cut-out span {
+        color: #1c1b1b !important;
     }
 
     .hide {
@@ -357,8 +358,11 @@
 </style>
 <div class="hive" style="position: relative">
     <div id="slidetoolbarContainer" class="slidetoolbarContainer" data-rm="default" style="display: block;">
-        <a class="cut-out" title="点击可以收起主页面">
-            <img data-src="/app/static/img/icon/back.png">
+        <a class="cut-out" title="点击可以查看当前任务">
+            <img data-src="/app/static/img/icon/hive_task.gif">
+            <audio src="/app/static/media/hive_tip.mp3" loop="loop" id="task">
+            </audio>
+            <span>查看任务</span>
         </a>
         <a class="logo">
             <img data-src="/app/page/admin/assets/i/favicon.png">

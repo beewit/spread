@@ -23,16 +23,33 @@ func Push(c echo.Context) error {
 		return utils.ErrorNull(c, "获取待发送的网站模块失败，err："+err.Error())
 	}
 	m, err := convert.Obj2ListMap(rp.Data)
+
+	task := global.GetTask(global.TASK_PLATFORM_PUSH)
+	if task != nil && task.State {
+		return utils.ErrorNull(c, "任务正在运行中，请勿重复执行")
+	}
+
 	go func() {
+
+		defer func() {
+			global.DelTask(global.TASK_PLATFORM_PUSH)
+		}()
+
 		var names []string
 		done := 0
 		if m != nil && len(m) > 0 {
+			for j := 0; j < len(m); j++ {
+				platformName := convert.ToString(m[j]["platform_name"])
+				names = append(names, platformName)
+			}
+			str := fmt.Sprintf("准备开始发送,发送平台：%s，发送标题：%s", strings.Join(names, ","), title)
+			global.UpdateTask(global.TASK_PLATFORM_PUSH, str)
+
 			//多帐号同时操作的时候进行切换帐号判断
 			oldPlatformAcc := map[int64]string{}
 			for j := 0; j < len(m); j++ {
 				platformName := convert.ToString(m[j]["platform_name"])
 				platformId := convert.MustInt64(m[j]["platform_id"])
-				names = append(names, platformName)
 
 				list, err := dao.GetUnionList(platformId, global.Acc.Id)
 				if err != nil {
@@ -47,6 +64,18 @@ func Push(c echo.Context) error {
 					platformAcc := convert.ToString(list[i]["platform_account"])
 					platformId := convert.MustInt64(list[i]["platform_id"])
 					platformPwd := convert.ToString(list[i]["platform_password"])
+
+					//任务记录
+					task = global.GetTask(global.TASK_PLATFORM_PUSH)
+					if task == nil || !task.State {
+						str = fmt.Sprintf("【%s】任务已取消", global.TaskNameMap[global.TASK_PLATFORM_PUSH])
+						global.Log.Info(str)
+						global.PageSuccessMsg(str, global.Host+"?lastUrl=/app/page/admin/index.html")
+						return
+					}
+					//更新任务记录
+					global.UpdateTask(global.TASK_PLATFORM_PUSH, fmt.Sprintf("账号【%s】正在发送：%s", platformAcc, m[j]["name"]))
+
 					rule := convert.ToString(m[j]["rule"])
 					paramMap := map[string]string{
 						"loginName": convert.ToString(platformAcc),

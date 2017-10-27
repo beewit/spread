@@ -13,6 +13,7 @@ import (
 
 	"github.com/beewit/beekit/utils"
 	"github.com/sclevine/agouti"
+	"time"
 )
 
 type MyWindow struct {
@@ -52,7 +53,12 @@ func (mw *MyWindow) AddNotifyIcon() {
 	checkError(err)
 	mw.SetIcon(icon)
 	mw.ni.SetIcon(icon)
-
+	mw.ni.MouseDown().Attach(func(x, y int, button walk.MouseButton) {
+		if button != walk.LeftButton {
+			return
+		}
+		global.Page.Page.NextWindow()
+	})
 	mw.addAction(nil, "显示主界面").Triggered().Attach(func() {
 		go func() {
 			err := Start()
@@ -61,6 +67,97 @@ func (mw *MyWindow) AddNotifyIcon() {
 			}
 		}()
 	})
+	title := "工蜂小智-系统提示"
+	taskMenu := mw.addMenu("进行中的任务")
+	mWechatGroupAdd := mw.addAction(taskMenu, "停止添加微信群")
+	mWechatGroupAdd.SetEnabled(false)
+	mWechatGroupAdd.Triggered().Attach(func() {
+		global.DelTask(global.TASK_WECHAT_ADD_GROUP)
+		walk.MsgBox(mw, title, "关闭批量添加微信群成功，请等待本次流程完毕", walk.MsgBoxOK)
+	})
+	mWechatMessageSend := mw.addAction(taskMenu, "停止发送微信消息")
+	mWechatMessageSend.SetEnabled(false)
+	mWechatMessageSend.Triggered().Attach(func() {
+		global.DelTask(global.TASK_WECHAT_SEND_MESSAGE)
+		walk.MsgBox(mw, title, "关闭批量发送微信消息成功", walk.MsgBoxOK)
+	})
+
+	mWechatUserAdd := mw.addAction(taskMenu, "停止添加微信群成员")
+	mWechatUserAdd.SetEnabled(false)
+	mWechatUserAdd.Triggered().Attach(func() {
+		global.DelTask(global.TASK_WECHAT_ADD_GROUP_USER)
+		walk.MsgBox(mw, title, "关闭批量添加微信群成员成功", walk.MsgBoxOK)
+	})
+
+	mPlatformPush := mw.addAction(taskMenu, "停止发送平台内容")
+	mPlatformPush.SetEnabled(false)
+	mPlatformPush.Triggered().Attach(func() {
+		global.DelTask(global.TASK_PLATFORM_PUSH)
+		walk.MsgBox(mw, title, "关闭批量添加微信群成员成功，请等待本次流程完毕", walk.MsgBoxOK)
+	})
+
+	go func() {
+		for {
+			/*
+				"TASK_PLATFORM_PUSH":         "平台自动化营销内容群发",
+				"TASK_WECHAT_ADD_GROUP":      "自动化添加微信群",
+				"TASK_WECHAT_SEND_MESSAGE":   "批量发送微信群或人的消息",
+				"TASK_WECHAT_ADD_GROUP_USER": "自动化发起添加微信群成员"
+			*/
+			taskFlog := false
+			task := global.GetTask(global.TASK_PLATFORM_PUSH)
+			if task == nil || !task.State {
+				if mPlatformPush.Enabled() {
+					mPlatformPush.SetEnabled(false)
+				}
+			} else {
+				taskFlog = true
+				if !mPlatformPush.Enabled() {
+					mPlatformPush.SetEnabled(true)
+				}
+			}
+
+			task = global.GetTask(global.TASK_WECHAT_ADD_GROUP)
+			if task == nil || !task.State {
+				if mWechatGroupAdd.Enabled() {
+					mWechatGroupAdd.SetEnabled(false)
+				}
+			} else {
+				taskFlog = true
+				if !mWechatGroupAdd.Enabled() {
+					mWechatGroupAdd.SetEnabled(true)
+				}
+			}
+
+			task = global.GetTask(global.TASK_WECHAT_SEND_MESSAGE)
+			if task == nil || !task.State {
+				if mWechatMessageSend.Enabled() {
+					mWechatMessageSend.SetEnabled(false)
+				}
+			} else {
+				taskFlog = true
+				if !mWechatMessageSend.Enabled() {
+					mWechatMessageSend.SetEnabled(true)
+				}
+			}
+
+			task = global.GetTask(global.TASK_WECHAT_ADD_GROUP_USER)
+			if task == nil || !task.State {
+				if mWechatUserAdd.Enabled() {
+					mWechatUserAdd.SetEnabled(false)
+				}
+			} else {
+				taskFlog = true
+				if !mWechatUserAdd.Enabled() {
+					mWechatUserAdd.SetEnabled(true)
+				}
+			}
+			if taskFlog {
+
+			}
+			time.Sleep(time.Second)
+		}
+	}()
 
 	mw.addAction(nil, "工蜂小智官网").Triggered().Attach(func() {
 		global.Log.Info("打开工蜂小智官网")

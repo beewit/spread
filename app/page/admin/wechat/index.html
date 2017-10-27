@@ -39,11 +39,15 @@
             transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
         }
 
-        .hive-6 {
+        .hive-4 {
             width: 50%;
             float: left;
         }
 
+        .hive-6 {
+            width: 50%;
+            float: left;
+        }
         @media only screen and (max-width: 1500px) {
             .hive-6 {
                 width: 100%;
@@ -93,8 +97,13 @@
                         <button type="button" class="am-btn am-btn-sm am-btn-success" id="StartAddWechatGroup"><span
                                 class="am-icon-plus"></span> 启动一键加群
                         </button>
-                        <button type="button" class="am-btn am-btn-sm am-btn-secondary" onclick="sendWechatMsg()">
+                        <button type="button" class="am-btn am-btn-sm am-btn-secondary"
+                                onclick="checkLoginWechat(sendWechatMsg)">
                             <span class="am-icon-location-arrow"></span> 群发微信
+                        </button>
+                        <button type="button" class="am-btn am-btn-sm am-btn-danger"
+                                onclick="checkLoginWechat(addWechatUser)">
+                            <span class="am-icon-plus"></span> 批量添加微信群成员
                         </button>
                     </div>
                 </div>
@@ -171,6 +180,7 @@
     });
 
     $(function () {
+        cancelLoginWechat();
         wechatFuncStatus();
         $("#btnSearch").click(function () {
             pageIndex = 1;
@@ -262,56 +272,129 @@
     }
 
 
+    var sendStatus = 0;
+    var checkStatus = true;
+
+    function checkLoginWechat(func) {
+        $.ajax({
+            url: "/wechat/login/check",
+            success: function (d) {
+                if (d.data.state == 1) {
+                    layer.confirm('当前登录账号：【' + d.data.wechatUser.SelfNickName + '】', {
+                        btn: ['切换账号', '继续'] //按钮
+                    }, function () {
+                        loginWechat(func)
+                    }, function () {
+                        func()
+                    });
+                } else {
+                    loginWechat(func)
+                }
+            }
+        });
+    }
+
+    function loginWechat(func) {
+        $.ajax({
+            url: "/wechat/login",
+            success: function (d) {
+                openQrCode(d.data, func)
+            }
+        });
+    }
+
+    function cancelLoginWechat() {
+        $.ajax({
+            url: "/wechat/cancel/login"
+        });
+    }
+
+
     function sendWechatMsg() {
         layer.prompt({title: '请输入微信群发消息内容', formType: 2}, function (text, index) {
-            layer.close(index);
             if (text == "") {
                 layer.msg('请输入发送内容');
                 return
             }
+            layer.close(index);
             $.ajax({
                 url: "/wechat/group/start/send",
                 data: {msg: text},
                 success: function (d) {
-                    openQrCode(d.data)
+                    layer.msg(d.msg)
                 }
             });
         });
     }
 
-    var sendStatus = 0;
-
-    function getWechatStatus() {
-        $.ajax({
-            load_tip: false,
-            url: "/wechat/group/get/sendStatus",
-            success: function (d) {
-                sendStatus = d.data.sendStatus
-                if (sendStatus != 2) {
-                    $("#sendStatusMsg").html("【" + d.data.sendStatus + "】" + d.data.sendStatusMsg);
-                    setTimeout(function () {
-                        getWechatStatus()
-                    }, 300)
-                }
+    function addWechatUser() {
+        layer.prompt({title: '请输入自动批量添加微信群成员的问候语', formType: 2}, function (text, index) {
+            if (text == "") {
+                layer.msg('请输入发送问候语的内容');
+                return
             }
+            layer.close(index);
+            $.ajax({
+                url: "/wechat/add/user",
+                data: {content: text},
+                success: function (d) {
+                    layer.msg(d.msg)
+                }
+            });
         });
     }
 
-    function openQrCode(qrcode) {
-        layer.open({
+    var qrcodeLayer;
+
+    function openQrCode(qrcode, func) {
+        checkStatus = true
+        qrcodeLayer = layer.open({
             type: 1,
-            title: "请用手机微信扫一扫二维码",
-            offset: '100px',
+            title: "请用手机微信扫一扫二维码登录",
+            offset: '10px',
+            area: '400px',
             closeBtn: false,
             shade: 0.8,
             id: 'LAY_layuipro',
             btn: ['取消发送'],
             moveType: 1,//拖拽模式，0或者1  ,
             content: '<div style="padding: 50px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;padding-bottom: 10px;">' +
-            '<img src="' + qrcode + '" style="display:black;"><div style="text-align:center">' +
-            '<pre id="sendStatusMsg">扫码登录</pre></div></div>'
+            '<img src="' + qrcode + '" style="display:black;width: 100%;"><div style="text-align:center">' +
+            '<pre id="sendStatusMsg">扫码登录</pre></div></div>',
+            yes: function () {
+                cancelLoginWechat()
+                checkStatus = false;
+                layer.close(qrcodeLayer)
+            },
+            cancel: function () {
+                cancelLoginWechat()
+                checkStatus = false;
+                layer.close(qrcodeLayer)
+            }
         });
-        getWechatStatus()
+        getWechatStatus(func)
+    }
+
+
+    function getWechatStatus(func) {
+        $.ajax({
+            load_tip: false,
+            url: "/wechat/group/get/sendStatus",
+            success: function (d) {
+                sendStatus = d.data.sendStatus
+                if (sendStatus != 1 && checkStatus) {
+                    $("#sendStatusMsg").html("【" + d.data.sendStatus + "】" + d.data.sendStatusMsg);
+                    setTimeout(function () {
+                        getWechatStatus(func)
+                    }, 300)
+                } else {
+                    if (sendStatus == 1) {
+                        layer.close(qrcodeLayer)
+                        func()
+                    }
+                }
+            }
+        });
     }
 
     function wechatFuncStatus() {
@@ -324,7 +407,7 @@
                     getAccount(function (acc) {
                         $(".hive-tip a").attr("href", "http://pay.tbqbz.com?fid=6&token=" + acc.account.Token +
                             "&backUrl=" + encodeURIComponent(acc.host + "?lastUrl=/app/page/admin/wechat/index.html"))
-                    })
+                    });
                 }
             }
         });

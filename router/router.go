@@ -6,12 +6,13 @@ import (
 
 	"fmt"
 
+	"io"
+	"os"
+
 	"github.com/beewit/spread/api"
 	"github.com/beewit/spread/static"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"io"
-	"os"
 )
 
 var e *echo.Echo
@@ -70,6 +71,12 @@ func handlerConfig() {
 	e.POST("/wechat/group/start/send", handler.SendWechatMsg, handler.Filter)
 	e.POST("/wechat/group/get/sendStatus", handler.GetSendWechatMsgStatus, handler.Filter)
 	e.POST("/wechat/funcStatus", handler.GetWechatFuncStatus, handler.Filter)
+
+	e.POST("/wechat/login", handler.LoginWechat, handler.Filter)
+	e.POST("/wechat/login/check", handler.LoginWechatCheck, handler.Filter)
+	e.POST("/wechat/add/user", handler.AddWechatUser, handler.Filter)
+	e.POST("/wechat/cancel/login", handler.CancelLoginWechat, handler.Filter)
+	e.POST("/task", handler.GetTask)
 
 	e.GET("/ReceiveToken", handler.ReceiveToken)
 	e.GET("/signOut", handler.SignOut)

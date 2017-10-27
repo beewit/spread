@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/beekit/utils/uhttp"
-	"github.com/beewit/spread/dao"
 	"github.com/beewit/spread/global"
 	"strings"
 )
 
 func ApiPost(url string, m map[string]string) (utils.ResultParam, error) {
-	token, _ := dao.QueryLoginToken()
-	nm := map[string]string{"token": token}
+	//token, _ := dao.QueryLoginToken()
+	nm := map[string]string{"token": global.Acc.Token}
 	if m != nil {
 		for k, v := range m {
 			nm[k] = v

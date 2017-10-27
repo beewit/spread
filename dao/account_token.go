@@ -38,6 +38,35 @@ func DeleteToken(acc *global.Account) (bool, error) {
 	return x > 0, err
 }
 
+func QueryWechatLogin(accId int64) (string, error) {
+	sql := `SELECT login_wechat_user FROM account_token WHERE account_id=? ORDER BY ut_time DESC LIMIT 1`
+	m, err := global.SLDB.Query(sql, accId)
+	if err != nil {
+		return "", err
+	}
+	if len(m) <= 0 {
+		return "", nil
+	}
+	return convert.ToString(m[0]["login_wechat_user"]), nil
+}
+
+func InsertWechatLogin(wxLoginInfo string, acc *global.Account) (bool, error) {
+	sql := `UPDATE account_token SET login_wechat_user=? WHERE account_id=?`
+	x, err := global.SLDB.Insert(sql, wxLoginInfo, acc.Id)
+	if err != nil {
+		return false, err
+	}
+	return x > 0, err
+}
+func DeleteWechatLogin(acc *global.Account) (bool, error) {
+	sql := `UPDATE account_token SET login_wechat_user=null WHERE account_id=?`
+	x, err := global.SLDB.Delete(sql, acc.Id)
+	if err != nil {
+		return false, err
+	}
+	return x > 0, err
+}
+
 func QueryTableExists(table string) (bool, error) {
 	sql := "`SELECT count(*) as num FROM sqlite_master WHERE type='table' AND name=?;`"
 	m, err := global.SLDB.Query(sql, table)
