@@ -99,7 +99,7 @@ func (mw *MyWindow) AddNotifyIcon() {
 	go func() {
 		for {
 			/*
-				"TASK_PLATFORM_PUSH":         "平台自动化营销内容群发",
+				"TASK_PLATFORM_PUSH":         "平台自动化营销内容群发2",
 				"TASK_WECHAT_ADD_GROUP":      "自动化添加微信群",
 				"TASK_WECHAT_SEND_MESSAGE":   "批量发送微信群或人的消息",
 				"TASK_WECHAT_ADD_GROUP_USER": "自动化发起添加微信群成员"
