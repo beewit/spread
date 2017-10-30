@@ -3,8 +3,6 @@
 *.dll
 *.so
 *.dylib
-!chromedriver.exe
-!fileb0x.exe
 ChromeUserData/*
 site.txt
 sitedetail.txt
