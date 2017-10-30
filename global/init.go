@@ -16,22 +16,23 @@ import (
 )
 
 var (
-	CFG      = conf.New("config.json")
-	SLDB     = sqlite.DB
-	Driver   *agouti.WebDriver
-	HiveHtml = utils.Read("app/page/index.html")
-	HiveJs   = utils.Read("app/static/js/inject.js")
-	Log      = log.Logger
-	IP       = CFG.Get("server.ip")
-	Port     = CFG.Get("server.port")
-	Host     = fmt.Sprintf("http://%v:%v", IP, Port)
-	Navigate = PageNavigate
-	Acc      *Account
-	Platform = map[string]int{"新浪微博": 1, "简书": 2, "知乎": 3}
-	LoadPage = "http://www.tbqbz.com/page/load.html"
-	Page     = *new(utils.AgoutiPage)
-	LoginMap *send.LoginMap
-	TaskList = map[string]*Task{}
+	CFG         = conf.New("config.json")
+	SLDB        = sqlite.DB
+	Driver      *agouti.WebDriver
+	HiveHtml    = utils.Read("app/page/index.html")
+	HiveJs      = utils.Read("app/static/js/inject.js")
+	Log         = log.Logger
+	IP          = CFG.Get("server.ip")
+	Port        = CFG.Get("server.port")
+	Host        = fmt.Sprintf("http://%v:%v", IP, Port)
+	Navigate    = PageNavigate
+	Acc         *Account
+	Platform    = map[string]int{"新浪微博": 1, "简书": 2, "知乎": 3}
+	LoadPage    = "http://www.tbqbz.com/page/load.html"
+	Page        = *new(utils.AgoutiPage)
+	LoginMap    *send.LoginMap
+	TaskList    = map[string]*Task{}
+	VoiceSwitch = true
 )
 
 const (

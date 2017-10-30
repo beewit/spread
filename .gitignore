@@ -4,6 +4,7 @@
 *.so
 *.dylib
 !chromedriver.exe
+!fileb0x.exe
 ChromeUserData/*
 site.txt
 sitedetail.txt
@@ -30,5 +31,3 @@ spread.db
 sso
 hive
 www
-static
-static/*

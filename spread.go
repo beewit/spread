@@ -155,22 +155,10 @@ func (mw *MyWindow) AddNotifyIcon() {
 				}
 			}
 
-			if taskFlog {
-				js := fmt.Sprintf("var tipMp3=document.getElementById('hive_tip');if(tipMp3==null){"+
-					"var tipMp3 = document.createElement('audio');"+
-					"tipMp3.id='hive_tip';"+
-					"tipMp3.loop='loop';"+
-					"tipMp3.src='%s/app/static/media/hive_tip.mp3';"+
-					"tipMp3.autoplay='autoplay';"+
-					"document.body.appendChild(tipMp3);}", global.Host)
-				if err := global.Page.RunScript(js, nil, nil); err != nil {
-					global.Log.Error("播放声音，错误：%s", err.Error())
-				}
+			if taskFlog && global.VoiceSwitch {
+				openVoice()
 			} else {
-				js := "var audio=document.getElementsByTagName('audio');for(var i = 0;i<(audio.length) * 2;i++){audio[0].remove();}"
-				if err := global.Page.RunScript(js, nil, nil); err != nil {
-					global.Log.Error("播放声音，错误：%s", err.Error())
-				}
+				closeVoice()
 			}
 			time.Sleep(time.Second)
 		}
@@ -191,6 +179,17 @@ func (mw *MyWindow) AddNotifyIcon() {
 		}
 	})
 
+	mVoiceSwitch := mw.addAction(nil, "关闭声音")
+	mVoiceSwitch.Triggered().Attach(func() {
+		if global.VoiceSwitch {
+			mVoiceSwitch.SetText("打开声音")
+			global.VoiceSwitch = false
+		} else {
+			mVoiceSwitch.SetText("关闭声音")
+			global.VoiceSwitch = true
+		}
+	})
+
 	mw.addAction(nil, "安全退出").Triggered().Attach(func() {
 		defer func() {
 			mw.ni.Dispose()
@@ -200,6 +199,31 @@ func (mw *MyWindow) AddNotifyIcon() {
 		Stop()
 	})
 
+}
+
+func openVoice() {
+	if global.Page.Page != nil {
+		js := fmt.Sprintf("var tipMp3=document.getElementById('hive_tip');if(tipMp3==null){"+
+			"var tipMp3 = document.createElement('audio');"+
+			"tipMp3.id='hive_tip';"+
+			"tipMp3.loop='loop';"+
+			"tipMp3.src='%s/app/static/media/hive_tip.mp3';"+
+			"tipMp3.autoplay='autoplay';"+
+			"tipMp3.volume = 0.2;"+
+			"document.body.appendChild(tipMp3);}", global.Host)
+		if err := global.Page.RunScript(js, nil, nil); err != nil {
+			global.Log.Error("播放声音，错误：%s", err.Error())
+		}
+	}
+}
+
+func closeVoice() {
+	if global.Page.Page != nil {
+		js := "var audio=document.getElementsByTagName('audio');for(var i = 0;i<(audio.length) * 2;i++){audio[0].remove();}"
+		if err := global.Page.RunScript(js, nil, nil); err != nil {
+			global.Log.Error("播放声音，错误：%s", err.Error())
+		}
+	}
 }
 
 func (mw *MyWindow) addMenu(name string) *walk.Menu {
@@ -270,8 +294,7 @@ func Start() error {
 	go func() {
 		global.Page.Navigate(load)
 	}()
-	global.UpdateTask(global.TASK_WECHAT_ADD_GROUP, fmt.Sprintf("正在前往获取微信群二维码正在前往获取微信群二维码正在前往获取微信群二维码正在前往获取微信群二维码正在前往获取微信群二维码：%s", ""))
-
+	//global.UpdateTask(global.TASK_WECHAT_ADD_GROUP, fmt.Sprintf("正在前往获取微信群二维码正在前往获取微信群二维码正在前往获取微信群二维码正在前往获取微信群二维码正在前往获取微信群二维码：%s", ""))
 	return nil
 }
 
