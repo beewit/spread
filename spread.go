@@ -11,9 +11,10 @@ import (
 
 	"log"
 
+	"time"
+
 	"github.com/beewit/beekit/utils"
 	"github.com/sclevine/agouti"
-	"time"
 )
 
 type MyWindow struct {
@@ -95,8 +96,9 @@ func (mw *MyWindow) AddNotifyIcon() {
 		global.DelTask(global.TASK_PLATFORM_PUSH)
 		walk.MsgBox(mw, title, "关闭批量添加微信群成员成功，请等待本次流程完毕", walk.MsgBoxOK)
 	})
-
 	go func() {
+		taskFlog := false
+		time.Sleep(time.Second * 5)
 		for {
 			/*
 				"TASK_PLATFORM_PUSH":         "平台自动化营销内容群发2",
@@ -104,7 +106,7 @@ func (mw *MyWindow) AddNotifyIcon() {
 				"TASK_WECHAT_SEND_MESSAGE":   "批量发送微信群或人的消息",
 				"TASK_WECHAT_ADD_GROUP_USER": "自动化发起添加微信群成员"
 			*/
-			taskFlog := false
+			taskFlog = false
 			task := global.GetTask(global.TASK_PLATFORM_PUSH)
 			if task == nil || !task.State {
 				if mPlatformPush.Enabled() {
@@ -152,13 +154,27 @@ func (mw *MyWindow) AddNotifyIcon() {
 					mWechatUserAdd.SetEnabled(true)
 				}
 			}
-			if taskFlog {
 
+			if taskFlog {
+				js := fmt.Sprintf("var tipMp3=document.getElementById('hive_tip');if(tipMp3==null){"+
+					"var tipMp3 = document.createElement('audio');"+
+					"tipMp3.id='hive_tip';"+
+					"tipMp3.loop='loop';"+
+					"tipMp3.src='%s/app/static/media/hive_tip.mp3';"+
+					"tipMp3.autoplay='autoplay';"+
+					"document.body.appendChild(tipMp3);}", global.Host)
+				if err := global.Page.RunScript(js, nil, nil); err != nil {
+					global.Log.Error("播放声音，错误：%s", err.Error())
+				}
+			} else {
+				js := "var audio=document.getElementsByTagName('audio');for(var i = 0;i<(audio.length) * 2;i++){audio[0].remove();}"
+				if err := global.Page.RunScript(js, nil, nil); err != nil {
+					global.Log.Error("播放声音，错误：%s", err.Error())
+				}
 			}
 			time.Sleep(time.Second)
 		}
 	}()
-
 	mw.addAction(nil, "工蜂小智官网").Triggered().Attach(func() {
 		global.Log.Info("打开工蜂小智官网")
 		err := utils.Open("http://www.tbqbz.com/")
@@ -254,6 +270,8 @@ func Start() error {
 	go func() {
 		global.Page.Navigate(load)
 	}()
+	global.UpdateTask(global.TASK_WECHAT_ADD_GROUP, fmt.Sprintf("正在前往获取微信群二维码正在前往获取微信群二维码正在前往获取微信群二维码正在前往获取微信群二维码正在前往获取微信群二维码：%s", ""))
+
 	return nil
 }
 

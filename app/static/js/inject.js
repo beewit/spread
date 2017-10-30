@@ -84,19 +84,13 @@ var $cotOut = document.getElementsByClassName('cut-out');
 for (var i = 0; i < $cotOut.length; i++) {
 
     $cotOut[i].addEventListener('click', function (e) {
-
-        var $hiveIframeDiv = document.getElementsByClassName('hive-iframe-div');
-        for (var k = 0; k < $hiveIframeDiv.length; k++) {
-            var _className = $hiveIframeDiv[k].className;
-
-            $hiveIframeDiv[k].className = _className.replace(new RegExp('active', 'gi'), '');
-        }
-
-        for (var k = 0; k < $cotOut.length; k++) {
-            $cotOut[k].style.display = 'none';
-        }
+        document.getElementsByClassName('task-win')[0].style.display = 'block';
     }, false);
 }
+
+document.getElementsByClassName('task-win-close')[0].addEventListener('click', function (e) {
+    document.getElementsByClassName('task-win')[0].style.display = 'none';
+}, false);
 
 if (local) {
     var $hiveIframeDiv = document.getElementsByClassName('hive-iframe-div')[0];
@@ -160,15 +154,15 @@ if (Request["lastUrl"]) {
 }
 
 
-function playTaskVoice() {
-    var task = document.getElementById("task")
-    task.play()
-}
-
-function pauseTaskVoice() {
-    var task = document.getElementById("task")
-    task.pause()
-}
+// function playTaskVoice() {
+//     var task = document.getElementById("task")
+//     task.play()
+// }
+//
+// function pauseTaskVoice() {
+//     var task = document.getElementById("task")
+//     task.pause()
+// }
 
 var Ajax = {
     get: function (url, fn) {
@@ -196,15 +190,44 @@ var Ajax = {
 
 getTask()
 
-function getTask() {
-    Ajax.post(host + "/task", null, function (d) {
-        if (d.data != null) {
-            for (var i = 0; i < d.data.length; i++) {
-                console.log(d.data[i].name)
-            }
+function loadScript(url, callback) {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    if (typeof (callback) != "undefined") {
+        if (script.readyState) {
+            script.onreadystatechange = function () {
+                if (script.readyState == "loaded" || script.readyState == "complete") {
+                    script.onreadystatechange = null;
+                    callback();
+                }
+            };
+        } else {
+            script.onload = function () {
+                callback();
+            };
         }
-    });
+    }
+    script.src = url;
+    document.body.appendChild(script);
+}
+
+function getTask() {
+    loadScript(host + "/task.js?rand=" + Date.parse(new Date()))
     setTimeout(function () {
         getTask()
     }, 1000);
+    // Ajax.post(host + "/task", null, function (d) {
+    //     var result = eval('(' + d + ')');
+    //     var trTemplete = "<tr><td>{name}</td><td>{content}</td><td>{handle}</td></tr>";
+    //     var trStr = '';
+    //     for (var s in result.data) {
+    //         if (result.data[s].state) {
+    //             trStr += trTemplete.replace('{name}', result.data[s].name).replace('{content}', result.data[s].content).replace('{handle}', "<a onclick='stopTask(\"" + s + "\")'>停止</a>")
+    //         }
+    //     }
+    //     if (trStr == "") {
+    //         trStr = '<td colspan="3">暂无任务</td>'
+    //     }
+    //     document.getElementById("taskList").innerHTML = trStr
+    // });
 }

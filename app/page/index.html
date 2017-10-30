@@ -355,15 +355,71 @@
     .hide {
         display: none
     }
+
+    .task-win {
+        position: absolute;
+        z-index: 999999999;
+        top: 10px;
+        width: 500px;
+        left: 50%;
+        margin-left: -250px;
+        background-color: #fff;
+        border-radius: 5px;
+        filter: progid:DXImageTransform.Microsoft.Shadow(color='#969696', Direction=135, Strength=5);
+        -moz-box-shadow: 5px 5px 20px 0px #c3c3c3;
+        -webkit-box-shadow: 5px 5px 20px 0px #c3c3c3;
+        box-shadow: 5px 5px 20px 0px #c3c3c3;
+        display: none;
+    }
+
+    .task-win-head {
+        text-align: center;
+        padding: 10px;
+        background-color: #49a2df;
+        color: #fff;
+    }
+
+    .task-win-body {
+        height: 300px;
+        overflow-y: auto;
+        padding: 5px 10px;
+    }
+
+    .task-win-table {
+        width: 100%;
+    }
+
+    .task-win-table td {
+        text-align: center;
+    }
+
+    .task-win-table td a {
+        color: #fff;
+        background-color: #ff3958;
+        padding: 2px 5px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .task-win-table td a:hover {
+        background-color: #ff1f15;
+    }
+
+    .task-win-close {
+        position: absolute;
+        right: 10px;
+        color: #f9f194;
+        cursor: pointer;
+    }
 </style>
 <div class="hive" style="position: relative">
     <div id="slidetoolbarContainer" class="slidetoolbarContainer" data-rm="default" style="display: block;">
-        <a class="cut-out" title="点击可以查看当前任务">
+        <div class="cut-out" title="点击可以查看当前任务">
             <img data-src="/app/static/img/icon/hive_task.gif">
-            <audio src="/app/static/media/hive_tip.mp3" loop="loop" id="task">
-            </audio>
             <span>查看任务</span>
-        </a>
+        </div>
         <a class="logo">
             <img data-src="/app/page/admin/assets/i/favicon.png">
         </a>
@@ -482,7 +538,23 @@
         </div>
     </div>
 </div>
-
+<div class="task-win">
+    <div class="task-win-head">当前任务<a class="task-win-close">关闭</a></div>
+    <div class="task-win-body">
+        <table class="task-win-table">
+            <thead>
+            <tr>
+                <td>任务名称</td>
+                <td>任务内容</td>
+                <td>操作</td>
+            </tr>
+            </thead>
+            <tbody id="taskList">
+            <td colspan="3">暂无任务</td>
+            </tbody>
+        </table>
+    </div>
+</div>
 <script>
     var account = {};
     if (location.href.indexOf("127.0.0.1") <= -1 || location.href.indexOf("localhost") <= -1) {

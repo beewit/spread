@@ -109,7 +109,7 @@ func addWechat(area, types string, groupCount, sleepTime int) {
 			return
 		}
 		//更新任务记录
-		global.UpdateTask(global.TASK_PLATFORM_PUSH, fmt.Sprintf("正在前往获取微信群二维码：%s", convert.ToString(pageData.Data[i]["url"])))
+		global.UpdateTask(global.TASK_WECHAT_ADD_GROUP, fmt.Sprintf("正在前往获取微信群二维码：%s", convert.ToString(pageData.Data[i]["url"])))
 
 		global.Page.Page.NextWindow()
 

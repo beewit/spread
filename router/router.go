@@ -76,7 +76,8 @@ func handlerConfig() {
 	e.POST("/wechat/login/check", handler.LoginWechatCheck, handler.Filter)
 	e.POST("/wechat/add/user", handler.AddWechatUser, handler.Filter)
 	e.POST("/wechat/cancel/login", handler.CancelLoginWechat, handler.Filter)
-	e.POST("/task", handler.GetTask)
+	e.GET("/task.js", handler.GetTask, handler.Filter)
+	e.GET("/task/stop.js", handler.StopTask, handler.Filter)
 
 	e.GET("/ReceiveToken", handler.ReceiveToken)
 	e.GET("/signOut", handler.SignOut)
