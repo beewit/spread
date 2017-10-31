@@ -9,7 +9,7 @@ sitedetail.txt
 siteDoMain.txt
 siteOld.txt
 debug
-
+chromedriver
 # Test binary, build with `go test -c`
 *.test
 
