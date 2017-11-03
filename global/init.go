@@ -11,32 +11,35 @@ import (
 	"github.com/beewit/beekit/log"
 	"github.com/beewit/beekit/sqlite"
 	"github.com/beewit/beekit/utils"
-	"github.com/beewit/wechat-ai/send"
+	"github.com/beewit/wechat-ai/smartQQ"
+	"github.com/beewit/wechat-ai/smartWechat"
 	"github.com/sclevine/agouti"
 )
 
 var (
-	CFG         = conf.New("config.json")
-	SLDB        = sqlite.DB
-	Driver      *agouti.WebDriver
-	HiveHtml    = utils.Read("app/page/index.html")
-	HiveJs      = utils.Read("app/static/js/inject.js")
-	Log         = log.Logger
-	IP          = CFG.Get("server.ip")
-	Port        = CFG.Get("server.port")
-	Host        = fmt.Sprintf("http://%v:%v", IP, Port)
-	Navigate    = PageNavigate
-	Acc         *Account
-	Platform    = map[string]int{"新浪微博": 1, "简书": 2, "知乎": 3}
-	LoadPage    = "http://www.tbqbz.com/page/load.html"
-	Page        = *new(utils.AgoutiPage)
-	LoginMap    *send.LoginMap
-	TaskList    = map[string]*Task{}
-	VoiceSwitch = true
+	CFG          = conf.New("config.json")
+	SLDB         = sqlite.DB
+	Driver       *agouti.WebDriver
+	HiveHtml     = utils.Read("app/page/index.html")
+	HiveJs       = utils.Read("app/static/js/inject.js")
+	Log          = log.Logger
+	IP           = CFG.Get("server.ip")
+	Port         = CFG.Get("server.port")
+	Host         = fmt.Sprintf("http://%v:%v", IP, Port)
+	Navigate     = PageNavigate
+	Acc          *Account
+	Platform     = map[string]int{"新浪微博": 1, "简书": 2, "知乎": 3}
+	LoadPage     = "http://www.tbqbz.com/page/load.html"
+	Page         = *new(utils.AgoutiPage)
+	WechatClient *smartWechat.WechatClient
+	QQClient     = smartQQ.NewQQClient(&smartQQ.QQClient{})
+	TaskList     = map[string]*Task{}
+	VoiceSwitch  = true
 )
 
 const (
 	FUNC_WECHAT = 6
+	FUNC_QQ     = 7
 )
 
 const (

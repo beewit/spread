@@ -14,7 +14,10 @@ import (
 	"time"
 
 	"github.com/beewit/beekit/utils"
+	"github.com/beewit/beekit/utils/convert"
+	"github.com/beewit/wechat-ai/ai"
 	"github.com/sclevine/agouti"
+	"sync"
 )
 
 type MyWindow struct {
@@ -58,15 +61,10 @@ func (mw *MyWindow) AddNotifyIcon() {
 		if button != walk.LeftButton {
 			return
 		}
-		global.Page.Page.NextWindow()
+		go mw.openSpread()
 	})
 	mw.addAction(nil, "显示主界面").Triggered().Attach(func() {
-		go func() {
-			err := Start()
-			if err != nil {
-				walk.MsgBox(mw, "工蜂小智-系统提示", "工蜂小智启动失败,错误："+err.Error(), walk.MsgBoxIconInformation)
-			}
-		}()
+		go mw.openSpread()
 	})
 	title := "工蜂小智-系统提示"
 	taskMenu := mw.addMenu("进行中的任务")
@@ -76,10 +74,18 @@ func (mw *MyWindow) AddNotifyIcon() {
 		global.DelTask(global.TASK_WECHAT_ADD_GROUP)
 		walk.MsgBox(mw, title, "关闭批量添加微信群成功，请等待本次流程完毕", walk.MsgBoxOK)
 	})
+
 	mWechatMessageSend := mw.addAction(taskMenu, "停止发送微信消息")
 	mWechatMessageSend.SetEnabled(false)
 	mWechatMessageSend.Triggered().Attach(func() {
 		global.DelTask(global.TASK_WECHAT_SEND_MESSAGE)
+		walk.MsgBox(mw, title, "关闭批量发送微信消息成功", walk.MsgBoxOK)
+	})
+
+	mQQMessageSend := mw.addAction(taskMenu, "停止发送QQ消息")
+	mQQMessageSend.SetEnabled(false)
+	mQQMessageSend.Triggered().Attach(func() {
+		global.DelTask(global.TASK_QQ_SEND_MESSAGE)
 		walk.MsgBox(mw, title, "关闭批量发送微信消息成功", walk.MsgBoxOK)
 	})
 
@@ -143,6 +149,18 @@ func (mw *MyWindow) AddNotifyIcon() {
 				}
 			}
 
+			task = global.GetTask(global.TASK_QQ_SEND_MESSAGE)
+			if task == nil || !task.State {
+				if mQQMessageSend.Enabled() {
+					mQQMessageSend.SetEnabled(false)
+				}
+			} else {
+				taskFlog = true
+				if !mQQMessageSend.Enabled() {
+					mQQMessageSend.SetEnabled(true)
+				}
+			}
+
 			task = global.GetTask(global.TASK_WECHAT_ADD_GROUP_USER)
 			if task == nil || !task.State {
 				if mWechatUserAdd.Enabled() {
@@ -199,6 +217,31 @@ func (mw *MyWindow) AddNotifyIcon() {
 		Stop()
 	})
 
+}
+
+var syncMutex *sync.Mutex
+
+func (mw *MyWindow) openSpread() {
+	syncMutex.Lock()
+	defer func() {
+		if err := recover(); err != nil {
+			global.Page.Page, err = global.Driver.NewPage()
+			if err != nil {
+				walk.MsgBox(mw, "工蜂小智-系统提示", "工蜂小智启动失败，请重新启动程序,错误："+convert.ToString(err), walk.MsgBoxIconInformation)
+			} else {
+				global.Page.Page.Navigate(global.Host)
+			}
+		}
+	}()
+	global.Page.Page.NextWindow()
+	title, err := global.Page.Title()
+	if err != nil {
+		global.Log.Error("global.Page.Title ERROR:" + err.Error())
+		panic(err)
+	} else {
+		ai.ForegroundWindow("Chrome_WidgetWin_1", title)
+	}
+	syncMutex.Unlock()
 }
 
 func openVoice() {
@@ -267,6 +310,7 @@ func checkError(err error) {
 }
 
 func Start() error {
+	syncMutex = new(sync.Mutex)
 	go router.Router()
 	utils.CloseChrome()
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -300,10 +344,15 @@ func Start() error {
 
 func Stop() {
 	global.Log.Info("退出桌面应用")
-	global.Page.Page.CloseWindow()
-	global.Driver.Stop()
+	if global.Page.Page != nil {
+		global.Page.Page.CloseWindow()
+	}
+	if global.Driver != nil {
+		global.Driver.Stop()
+	}
 	global.Log.Info("退出服务")
 	router.Stop()
+	utils.CloseSpread()
 }
 
 func Show() {

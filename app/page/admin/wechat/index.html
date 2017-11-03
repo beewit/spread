@@ -48,6 +48,7 @@
             width: 50%;
             float: left;
         }
+
         @media only screen and (max-width: 1500px) {
             .hive-6 {
                 width: 100%;
@@ -61,11 +62,10 @@
 <div class="tpl-page-container tpl-page-header-fixed">
     <div class="tpl-content-wrapper">
         <div class="tpl-portlet-components">
-            <div class="portlet-title">
-                <div class="caption font-green bold">
-                    <span class="am-icon-comments"></span> 微信营销
-                </div>
-            </div>
+            <ul class="am-nav am-nav-tabs">
+                <li class="am-active"><a href="../wechat/index.html"><span class="am-icon-comments"></span> 微信营销</a></li>
+                <li><a href="../qq/index.html"><span class="am-icon-qq"></span> QQ营销</a></li>
+            </ul>
             <div class="hive-tip am-hide">微信营销功能未开通，点击<a>立即开通</a></div>
             <div class="am-g am-margin-top">
                 <div class="am-form">
@@ -157,7 +157,7 @@
     {{#  }); }}
     {{#  if(d == null){ }}
     <div class="table-no-result">
-        账单记录为空
+        暂无微信群
     </div>
     {{#  } }}
 </script>
@@ -318,7 +318,7 @@
             }
             layer.close(index);
             $.ajax({
-                url: "/wechat/group/start/send",
+                url: "/wechat/send/message",
                 data: {msg: text},
                 success: function (d) {
                     layer.msg(d.msg)

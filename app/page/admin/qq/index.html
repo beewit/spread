@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>工蜂小智 </title>
+    <meta name="description" content="QQ营销">
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="icon" type="image/png" href="../assets/i/favicon.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/i/favicon.png">
+    <meta name="apple-mobile-web-app-title" content="工蜂小智"/>
+    <link rel="stylesheet" href="/app/static/js/plugs/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../assets/css/amazeui.min.css"/>
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <link rel="stylesheet" href="/app/static/css/base.css">
+    <style>
+        .am-form-label {
+            font-size: 16px;
+        }
+
+        .input {
+            padding: .5em;
+            font-size: 1.6rem;
+            line-height: 1.2;
+            color: #555;
+            vertical-align: middle;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid #ccc !important;
+            border-radius: 0;
+            -webkit-appearance: none;
+            -webkit-transition: border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+            transition: border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+        }
+
+        .hive-4 {
+            width: 50%;
+            float: left;
+        }
+
+        .hive-6 {
+            width: 50%;
+            float: left;
+        }
+
+        @media only screen and (max-width: 1500px) {
+            .hive-6 {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+
+    </style>
+</head>
+<body data-type="generalComponents">
+<div class="tpl-page-container tpl-page-header-fixed">
+    <div class="tpl-content-wrapper">
+        <div class="tpl-portlet-components">
+            <ul class="am-nav am-nav-tabs">
+                <li><a href="../wechat/index.html"><span class="am-icon-weixin"></span> 微信营销</a></li>
+                <li class="am-active"><a href="../qq/index.html"><span class="am-icon-qq"></span> QQ营销</a></li>
+            </ul>
+            <div class="hive-tip am-hide">QQ营销功能未开通，点击<a>立即开通</a></div>
+            <div class="am-g am-margin-top">
+                <div class="am-form">
+                    <div class="hive-6">
+                        <b class="am-form-label">采集设置：</b>
+                        <select id="province" class="am-form-select" placeholder="-- 省份 --"
+                                style="width: 150px;float: none;    display: initial;">
+                            <option value=" ">-- 所有省份 --</option>
+                        </select>
+                        <select id="city" class="am-form-select" placeholder="-- 城市 --"
+                                style="width: 150px;float: none;    display: initial;">
+                            <option value=" ">-- 所有城市 --</option>
+                        </select>
+                        <select id="area" placeholder="-- 区 --" style="width: 150px;float: none;display: initial;">
+                            <option value=" ">-- 所有区 --</option>
+                        </select>
+                        <select id="plate" placeholder="-- 县 --" style="width: 150px;float: none;display: initial;">
+                            <option value=" ">-- 所有县 --</option>
+                        </select>
+                    </div>
+                    <div class="hive-6">
+                        <b class="am-form-label">群发消息：</b>
+                        <span class="am-form-label">每加群：
+                               <input type="text" id="groupCount" class="input am-input-sm"
+                                      style="width: 80px;display: initial;"
+                                      placeholder="3" value="3"> 次
+                        </span>
+                        <span class="am-form-label">延迟：
+                               <input type="text" id="sleepTime" class="input am-input-sm"
+                                      style="width: 80px;display: initial;"
+                                      placeholder="30" value="30"> 秒后再加
+                        </span>
+                        <button type="button" class="am-btn am-btn-sm am-btn-success" id="StartAddQQGroup"><span
+                                class="am-icon-plus"></span> 启动QQ加群
+                        </button>
+                        <button type="button" class="am-btn am-btn-sm am-btn-secondary"
+                                onclick="checkLoginQQ(sendQQMsg)">
+                            <span class="am-icon-location-arrow"></span> QQ群发
+                        </button>
+                        <button type="button" class="am-btn am-btn-sm am-btn-danger"
+                                onclick="checkLoginQQ(addQQUser)">
+                            <span class="am-icon-plus"></span> 批量添加QQ群成员
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="am-u-md-6 am-u-sm-12 row-mb">
+                    <div class="tpl-portlet">
+                        <div class="tpl-portlet-title">
+                            <div class="tpl-caption font-red ">
+                                <i class="am-icon-qq"></i>
+                                <span> QQ好友</span>
+                            </div>
+                        </div>
+                        <div class="tpl-scrollable">
+                            <div class="number-stats">
+                                <div class="stat-number am-fl am-u-md-6">
+                                    <div class="title am-text-right"> 总共好友</div>
+                                    <div class="number am-text-right am-text-warning" id="UserCount"> 0</div>
+                                </div>
+                            </div>
+                            <div style="overflow-y: auto;height: 400px;">
+                                <table class="am-table tpl-table">
+                                    <thead>
+                                    <tr class="tpl-table-uppercase">
+                                        <th>Uin</th>
+                                        <th>昵称</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="qqList">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="am-u-md-6 am-u-sm-12 row-mb">
+                    <div class="tpl-portlet">
+                        <div class="tpl-portlet-title">
+                            <div class="tpl-caption font-red ">
+                                <i class="am-icon-users"></i>
+                                <span> QQ群</span>
+                            </div>
+                        </div>
+                        <div class="tpl-scrollable">
+                            <div class="number-stats">
+                                <div class="stat-number am-fl am-u-md-6">
+                                    <div class="title am-text-right"> Total</div>
+                                    <div class="number am-text-right am-text-warning" id="GroupCount"> 0</div>
+                                </div>
+                            </div>
+
+                            <div style="overflow-y: auto;height: 400px;">
+                            <table class="am-table tpl-table">
+                                <thead>
+                                <tr class="tpl-table-uppercase">
+                                    <th>GID</th>
+                                    <th>昵称</th>
+                                </tr>
+                                </thead>
+                                <tbody id="qqGroupList">
+                                </tbody>
+                            </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tpl-alert"></div>
+    </div>
+</div>
+</div>
+
+<script src="../assets/js/jquery.min.js"></script>
+<script src="../assets/js/amazeui.min.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="/app/static/js/plugs/layui/layui.all.js"></script>
+<script src="../assets/js/common.ajax.js"></script>
+<script src="../assets/js/common.js"></script>
+<script>
+    var pageIndex = 1;
+    $(function () {
+        getLoginQQInfo();
+        cancelLoginQQ();
+        qqFuncStatus();
+        $("#btnSearch").click(function () {
+            pageIndex = 1;
+            loadList()
+        });
+        $("#StartAddQQGroup").click(function () {
+            layer.confirm('请确定是否已开启QQ电脑版客户端？', {
+                btn: ['确定', '取消'] //按钮
+            }, function () {
+                var type = $("#type").val(),
+                    area = $("#area").val(),
+                    groupCount = $("#groupCount").val() || 3,
+                    sleepTime = $("#sleepTime").val() || 30;
+                if (type != "") {
+                    type = type.trim()
+                }
+                if (area != "") {
+                    area = area.trim()
+                }
+                $.ajax({
+                    url: "/qq/group/start/add",
+                    data: {type: type, area: area, groupCount: groupCount, sleepTime: sleepTime},
+                    success: function (d) {
+                        layer.msg(d.msg, {icon: 1})
+                    }
+                });
+            });
+        });
+    });
+
+
+    function getLoginQQInfo() {
+        $.ajax({
+            load_tip: false,
+            url: "/qq/login/check",
+            success: function (d) {
+                if (d.data != null && d.data.QQUser.Status) {
+                    var temp = "<tr><td>{Uin}</td><td>{Nick}</td></tr>";
+                    var info = d.data.QQUser.FriendsMap.info
+                    var i = 0;
+                    $("#qqList").html('')
+                    for (var u in info) {
+                        $("#qqList").append(temp.replace("{Uin}", info[u].uin).replace("{Nick}", info[u].nick))
+                        i++;
+                    }
+                    $("#UserCount").html(" " + i);
+                    i = 0;
+                    info = d.data.QQUser.GroupInfo
+                    $("#qqGroupList").html('')
+                    for (var u in info) {
+                        $("#qqGroupList").append(temp.replace("{Uin}", info[u].gid).replace("{Nick}", info[u].name))
+                        i++;
+                    }
+                    $("#GroupCount").html(" " + i);
+                } else {
+                    setTimeout(getLoginQQInfo, 3000)
+                }
+            }
+        });
+    }
+
+
+    var sendStatus = false;
+    var checkStatus = true;
+
+    function checkLoginQQ(func) {
+        $.ajax({
+            load_tip: false,
+            url: "/qq/login/check",
+            success: function (d) {
+                if (d.data != null && d.data.QQUser.Status) {
+                    layer.confirm('当前登录账号：【' + d.data.QQUser.Login.Nickname + '】', {
+                        btn: ['切换账号', '继续'] //按钮
+                    }, function () {
+                        if (func != null) {
+                            loginQQ(func)
+                        }
+                    }, function () {
+                        if (func != null) {
+                            func()
+                        }
+                    });
+                } else {
+                    if (func != null) {
+                        loginQQ(func)
+                    }
+                }
+            }
+        });
+    }
+
+    function loginQQ(func) {
+        $.ajax({
+            url: "/qq/login",
+            success: function (d) {
+                openQrCode(d.data, func)
+            }
+        });
+    }
+
+    function cancelLoginQQ() {
+        $.ajax({
+            url: "/qq/cancel/login"
+        });
+    }
+
+
+    function sendQQMsg() {
+        layer.prompt({title: '请输入QQ群发消息内容', formType: 2}, function (text, index) {
+            if (text == "") {
+                layer.msg('请输入发送内容');
+                return
+            }
+            layer.close(index);
+            $.ajax({
+                url: "/qq/send/message",
+                data: {msg: text},
+                success: function (d) {
+                    layer.msg(d.msg)
+                }
+            });
+        });
+    }
+
+    function addQQUser() {
+        layer.prompt({title: '请输入自动批量添加QQ群成员的问候语', formType: 2}, function (text, index) {
+            if (text == "") {
+                layer.msg('请输入发送问候语的内容');
+                return
+            }
+            layer.close(index);
+            $.ajax({
+                url: "/qq/add/user",
+                data: {content: text},
+                success: function (d) {
+                    layer.msg(d.msg)
+                }
+            });
+        });
+    }
+
+    var qrcodeLayer;
+
+    function openQrCode(qrcode, func) {
+        checkStatus = true
+        qrcodeLayer = layer.open({
+            type: 1,
+            title: "请用手机QQ扫一扫二维码登录",
+            offset: '10px',
+            area: '400px',
+            closeBtn: false,
+            shade: 0.8,
+            id: 'LAY_layuipro',
+            btn: ['取消发送'],
+            moveType: 1,//拖拽模式，0或者1  ,
+            content: '<div style="padding: 50px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;padding-bottom: 10px;">' +
+            '<img src="' + qrcode + '" style="display:black;width: 100%;"><div style="text-align:center">' +
+            '<pre id="sendStatusMsg">扫码登录</pre></div></div>',
+            yes: function () {
+                cancelLoginQQ()
+                checkStatus = false;
+                layer.close(qrcodeLayer)
+            },
+            cancel: function () {
+                cancelLoginQQ()
+                checkStatus = false;
+                layer.close(qrcodeLayer)
+            }
+        });
+        getQQStatus(func)
+    }
+
+
+    function getQQStatus(func) {
+        $.ajax({
+            load_tip: false,
+            url: "/qq/status",
+            success: function (d) {
+                sendStatus = d.data.sendStatus
+                if (!sendStatus && checkStatus) {
+                    $("#sendStatusMsg").html("【" + d.data.sendStatus + "】" + d.data.sendStatusMsg);
+                    setTimeout(function () {
+                        getQQStatus(func)
+                    }, 300)
+                } else {
+                    if (sendStatus == 1) {
+                        layer.close(qrcodeLayer)
+                        func()
+                    }
+                }
+            }
+        });
+    }
+
+    function qqFuncStatus() {
+        $.ajax({
+            load_tip: false,
+            url: "/qq/funcStatus",
+            success: function (d) {
+                if (!d.data) {
+                    $(".hive-tip").removeClass("am-hide");
+                    getAccount(function (acc) {
+                        $(".hive-tip a").attr("href", "http://pay.tbqbz.com?fid=7&token=" + acc.account.Token +
+                            "&backUrl=" + encodeURIComponent(acc.host + "?lastUrl=/app/page/admin/qq/index.html"))
+                    });
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

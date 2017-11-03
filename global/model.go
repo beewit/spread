@@ -13,14 +13,19 @@ const (
 	TASK_WECHAT_ADD_GROUP      = "TASK_WECHAT_ADD_GROUP"      //自动化添加微信群
 	TASK_WECHAT_SEND_MESSAGE   = "TASK_WECHAT_SEND_MESSAGE"   //批量发送微信群或人的消息
 	TASK_WECHAT_ADD_GROUP_USER = "TASK_WECHAT_ADD_GROUP_USER" //自动化发起添加微信群成员
+
+	TASK_QQ_SEND_MESSAGE = "TASK_QQ_SEND_MESSAGE" //批量发送QQ群或好友的消息
 )
 
 var (
 	TaskNameMap = map[string]string{
 		"TASK_PLATFORM_PUSH":         "平台自动化营销内容群发",
 		"TASK_WECHAT_ADD_GROUP":      "自动化添加微信群",
-		"TASK_WECHAT_SEND_MESSAGE":   "批量发送微信群或人的消息",
-		"TASK_WECHAT_ADD_GROUP_USER": "自动化发起添加微信群成员"}
+		"TASK_WECHAT_SEND_MESSAGE":   "批量发送微信群或好友的消息",
+		"TASK_WECHAT_ADD_GROUP_USER": "自动化发起添加微信群成员",
+
+		"TASK_QQ_SEND_MESSAGE": "批量发送QQ群或好友的消息",
+	}
 )
 
 type JSONTime time.Time

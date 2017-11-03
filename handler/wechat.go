@@ -14,16 +14,16 @@ import (
 	"github.com/beewit/spread/global"
 	"github.com/beewit/wechat-ai/ai"
 	"github.com/beewit/wechat-ai/enum"
-	"github.com/beewit/wechat-ai/send"
+	"github.com/beewit/wechat-ai/smartWechat"
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
 )
 
 var (
-	SendStatusMsg   string
-	SendStatus      int
-	SyncCheckStatus = false //时间开启了登录心跳检测
-	LoginCheck      = true  //登录校验时间停止标记
+	SendStatusMsg    string
+	SendStatus       int
+	SyncCheckStatus  = false //时间开启了登录心跳检测
+	WechatLoginCheck = true  //登录校验时间停止标记
 )
 
 const (
@@ -59,7 +59,6 @@ func StartAddWechatGroup(c echo.Context) error {
 	if task != nil && task.State {
 		return utils.ErrorNull(c, "任务正在运行中，请勿重复执行")
 	}
-
 	go func() {
 		defer func() {
 			global.DelTask(global.TASK_WECHAT_ADD_GROUP)
@@ -71,7 +70,6 @@ func StartAddWechatGroup(c echo.Context) error {
 }
 
 func addWechat(area, types string, groupCount, sleepTime int) {
-
 	r, err := api.GetWechatGroupListData("1", area, types)
 	if err != nil {
 		global.PageMsg("获取微信群信息失败")
@@ -176,8 +174,8 @@ func syncCheck() {
 
 func loginCheck() bool {
 	flog := false
-	if global.LoginMap != nil {
-		ret, selector, err := send.SyncCheck(global.LoginMap)
+	if global.WechatClient != nil {
+		ret, selector, err := smartWechat.SyncCheck(global.WechatClient)
 		if err == nil {
 			flog = true
 		} else {
@@ -185,21 +183,21 @@ func loginCheck() bool {
 		}
 	}
 	if !flog {
-		global.LoginMap = nil
+		global.WechatClient = nil
 		dao.DeleteWechatLogin(global.Acc)
 	}
 	return flog
 }
 
 func LoginWechatCheck(c echo.Context) error {
-	if global.LoginMap == nil {
+	if global.WechatClient == nil {
 		wl, err := dao.QueryWechatLogin(global.Acc.Id)
 		if err != nil {
 			global.Log.Error(err.Error())
 		} else {
 			if wl != "" {
 				global.Log.Info("微信信息是数据库缓存")
-				err = json.Unmarshal([]byte(wl), &global.LoginMap)
+				err = json.Unmarshal([]byte(wl), &global.WechatClient)
 				if err != nil {
 					global.Log.Info("微信信息是数据库缓存解析错误：")
 					global.Log.Error(err.Error())
@@ -213,7 +211,7 @@ func LoginWechatCheck(c echo.Context) error {
 		if !SyncCheckStatus {
 			go syncCheck()
 		}
-		return utils.SuccessNullMsg(c, map[string]interface{}{"state": WECHAT_STATUS_SUCCESS, "wechatUser": global.LoginMap})
+		return utils.SuccessNullMsg(c, map[string]interface{}{"state": WECHAT_STATUS_SUCCESS, "wechatUser": global.WechatClient})
 	}
 	SendStatus = WECHAT_STATUS_FAIL
 	SendStatusMsg = "微信未登陆"
@@ -221,17 +219,17 @@ func LoginWechatCheck(c echo.Context) error {
 }
 
 func LoginWechat(c echo.Context) error {
-	global.LoginMap = nil
+	global.WechatClient = nil
 	dao.DeleteWechatLogin(global.Acc)
 	SendStatusMsg = "准备获取微信登录二维码"
 	SendStatus = 0
 	/* 从微信服务器获取UUID */
-	UUid, err := send.GetUUIDFromWX()
+	UUid, err := smartWechat.GetUUIDFromWX()
 	if err != nil {
 		return utils.ErrorNull(c, "从微信服务器获取UUID失败")
 	}
 	/* 根据UUID获取二维码 */
-	base64Img, err := send.DownloadImage(enum.QRCODE_URL + UUid)
+	base64Img, err := smartWechat.DownloadImage(enum.QRCODE_URL + UUid)
 	if err != nil {
 		return utils.ErrorNull(c, "根据UUID获取微信登录二维码失败")
 	}
@@ -240,8 +238,11 @@ func LoginWechat(c echo.Context) error {
 }
 
 func SendWechatMsg(c echo.Context) error {
-	if global.LoginMap == nil {
-		if global.LoginMap == nil {
+	if !api.EffectiveFuncById(global.FUNC_WECHAT) {
+		return utils.ErrorNull(c, "微信营销功能还未开通，请开通此功能后使用")
+	}
+	if global.WechatClient == nil {
+		if global.WechatClient == nil {
 			return utils.ErrorNull(c, "未登录，请重新扫码登录后群发消息")
 		}
 	}
@@ -261,7 +262,10 @@ func SendWechatMsg(c echo.Context) error {
 }
 
 func AddWechatUser(c echo.Context) error {
-	if global.LoginMap == nil {
+	if !api.EffectiveFuncById(global.FUNC_WECHAT) {
+		return utils.ErrorNull(c, "微信营销功能还未开通，请开通此功能后使用")
+	}
+	if global.WechatClient == nil {
 		return utils.ErrorNull(c, "未登录，请重新扫码登录后添加群成员")
 	}
 
@@ -277,7 +281,7 @@ func AddWechatUser(c echo.Context) error {
 			global.DelTask(global.TASK_WECHAT_ADD_GROUP_USER)
 		}()
 
-		ContactMap, err := send.GetAllContact(global.LoginMap)
+		ContactMap, err := smartWechat.GetAllContact(global.WechatClient)
 		if err != nil {
 			global.Log.Info("获取联系人信息，ERROR：" + err.Error())
 			global.PageMsg("添加微信群成员中断，获取联系人信息，ERROR：" + err.Error())
@@ -287,11 +291,11 @@ func AddWechatUser(c echo.Context) error {
 			global.PageMsg("添加微信群成员中断，没有获取到联系人")
 			return
 		}
-		global.LoginMap.ContactMap = ContactMap
+		global.WechatClient.ContactMap = ContactMap
 		sucNum := 0
 		errNum := 0
 		sleep := 10
-		initInfo := global.LoginMap.InitInfo
+		initInfo := global.WechatClient.InitInfo
 		if initInfo != nil {
 			global.UpdateTask(global.TASK_WECHAT_ADD_GROUP_USER, "准备添加微信群成员..")
 			var str string
@@ -310,11 +314,11 @@ func AddWechatUser(c echo.Context) error {
 					//更新任务记录
 					global.UpdateTask(global.TASK_WECHAT_ADD_GROUP_USER, fmt.Sprintf("正在添加微信群【%s】第【%v】群成员", v.NickName, uIndex))
 
-					u := global.LoginMap.ContactMap[vv.UserName]
+					u := global.WechatClient.ContactMap[vv.UserName]
 					if u.UserName == "" {
-						vu := send.VerifyUser{}
+						vu := smartWechat.VerifyUser{}
 						vu.Value = vv.UserName
-						br, err := send.AddUser(global.LoginMap, content, []send.VerifyUser{vu})
+						br, err := smartWechat.AddUser(global.WechatClient, content, []smartWechat.VerifyUser{vu})
 						if err != nil {
 							global.Log.Error("【%v】%v 发送请求错误：%s", v.NickName, vv.UserName, err.Error())
 							errNum++
@@ -353,22 +357,23 @@ func GetSendWechatMsgStatus(c echo.Context) error {
 }
 
 func CancelLoginWechat(c echo.Context) error {
-	LoginCheck = false
+	WechatLoginCheck = false
 	return utils.SuccessNull(c, "")
 }
 
 func loginWechat(UUid string) (err error) {
-	LoginCheck = true
+	WechatLoginCheck = true
 	timeOut := 0
 	for {
-		if LoginCheck {
+		thisUrl, _ := global.Page.Page.URL()
+		if WechatLoginCheck && strings.Contains(thisUrl, "/app/page/admin/wechat/index.html") {
 			SendStatusMsg = "【" + UUid + "】正在验证登陆... ..."
 			global.Log.Info(SendStatusMsg)
-			status, msg := send.CheckLogin(UUid)
+			status, msg := smartWechat.CheckLogin(UUid)
 			if status == 200 {
 				SendStatusMsg = "登陆成功,处理登陆信息..."
 				global.Log.Info(SendStatusMsg)
-				global.LoginMap, err = send.ProcessLoginInfo(msg)
+				global.WechatClient, err = smartWechat.ProcessLoginInfo(msg)
 				if err != nil {
 					SendStatus = WECHAT_STATUS_FAIL
 					SendStatusMsg = "错误：登陆成功,处理登陆信息...，error：" + err.Error()
@@ -377,13 +382,13 @@ func loginWechat(UUid string) (err error) {
 				}
 				SendStatusMsg = "登陆信息处理完毕,正在初始化微信..."
 				global.Log.Info(SendStatusMsg)
-				global.Log.Info("global.LoginMap：%s", convert.ToObjStr(global.LoginMap))
-				err = send.InitWX(global.LoginMap)
+				global.Log.Info("global.WechatClient：%s", convert.ToObjStr(global.WechatClient))
+				err = smartWechat.InitWX(global.WechatClient)
 				if err != nil {
 					SendStatusMsg = "【1】错误：登陆信息处理完毕,正在初始化微信...，error：" + err.Error()
 					global.Log.Info(SendStatusMsg)
-					if global.LoginMap.InitInfo.BaseResponse.Ret == 1010 {
-						err = send.InitWX(global.LoginMap)
+					if global.WechatClient.InitInfo.BaseResponse.Ret == 1010 {
+						err = smartWechat.InitWX(global.WechatClient)
 					}
 					if err != nil {
 						SendStatusMsg = "【2】错误：登陆信息处理完毕,正在初始化微信...，error：" + err.Error()
@@ -394,7 +399,7 @@ func loginWechat(UUid string) (err error) {
 				}
 				SendStatusMsg = "初始化完毕,通知微信服务器登陆状态变更..."
 				global.Log.Info(SendStatusMsg)
-				err = send.NotifyStatus(global.LoginMap)
+				err = smartWechat.NotifyStatus(global.WechatClient)
 				if err != nil {
 					SendStatus = WECHAT_STATUS_FAIL
 					SendStatusMsg = "通知微信服务器状态变化失败：" + err.Error()
@@ -403,7 +408,7 @@ func loginWechat(UUid string) (err error) {
 				SendStatus = WECHAT_STATUS_SUCCESS
 				SendStatusMsg = "微信登陆成功"
 				global.Log.Info(SendStatusMsg)
-				dao.InsertWechatLogin(convert.ToObjStr(global.LoginMap), global.Acc)
+				dao.InsertWechatLogin(convert.ToObjStr(global.WechatClient), global.Acc)
 				//开启心跳检测
 				syncCheck()
 				break
@@ -434,7 +439,6 @@ func loginWechat(UUid string) (err error) {
 }
 
 func sendWechat(msg string) (err error) {
-
 	defer func() {
 		global.DelTask(global.TASK_WECHAT_SEND_MESSAGE)
 	}()
@@ -444,7 +448,7 @@ func sendWechat(msg string) (err error) {
 	/* 轮询服务器判断二维码是否扫过暨是否登陆了 */
 	SendStatusMsg = "开始获取联系人信息..."
 	global.Log.Info(SendStatusMsg)
-	ContactMap, err := send.GetAllContact(global.LoginMap)
+	ContactMap, err := smartWechat.GetAllContact(global.WechatClient)
 	if err != nil {
 		SendStatusMsg = "获取联系人信息，ERROR：" + err.Error()
 		global.Log.Info(SendStatusMsg)
@@ -460,7 +464,7 @@ func sendWechat(msg string) (err error) {
 	SendStatusMsg = "【" + convert.ToString(len(ContactMap)) + "】准备群发消息..."
 	global.Log.Info(SendStatusMsg)
 	SendStatus = WECHAT_STATUS_PROCESS
-	global.LoginMap.ContactMap = ContactMap
+	global.WechatClient.ContactMap = ContactMap
 	for k, v := range ContactMap {
 		//任务记录
 		task := global.GetTask(global.TASK_WECHAT_SEND_MESSAGE)
@@ -477,14 +481,14 @@ func sendWechat(msg string) (err error) {
 		global.Log.Info(ContactMap[k].UserName)
 		if len(v.UserName) > 40 {
 			//给所有人都发送消息
-			wxSendMsg := send.WxSendMsg{}
+			wxSendMsg := smartWechat.WxSendMsg{}
 			wxSendMsg.Type = 1
 			wxSendMsg.Content = msg
-			wxSendMsg.FromUserName = global.LoginMap.SelfUserName
+			wxSendMsg.FromUserName = global.WechatClient.SelfUserName
 			wxSendMsg.ToUserName = v.UserName
 			wxSendMsg.LocalID = fmt.Sprintf("%d", time.Now().Unix())
 			wxSendMsg.ClientMsgId = wxSendMsg.LocalID
-			bts, err := send.SendMsg(global.LoginMap, wxSendMsg)
+			bts, err := smartWechat.SendMsg(global.WechatClient, wxSendMsg)
 			if err != nil {
 				SendStatusMsg = "错误：发送消息...，json:" + convert.ToObjStr(wxSendMsg) + "，error：" + err.Error()
 				global.Log.Info(SendStatusMsg)
@@ -498,7 +502,7 @@ func sendWechat(msg string) (err error) {
 		}
 	}
 	SendStatus = WECHAT_STATUS_COMPLETE
-	SendStatusMsg = "微信群发消息完成！"
+	SendStatusMsg = "微信群发消息任务完成！"
 	global.Log.Info(SendStatusMsg)
 	global.PageSuccessMsg(SendStatusMsg, global.Host+"?lastUrl=/app/page/admin/wechat/index.html")
 	err = nil

@@ -10,7 +10,7 @@ import (
 	"os"
 
 	"github.com/beewit/spread/api"
-	"github.com/beewit/spread/static"
+	//"github.com/beewit/spread/static"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -26,6 +26,13 @@ type LoggerConfig struct {
 }
 
 func Router() {
+	defer func() {
+		if err := recover(); err != nil {
+			global.Log.Error("《程序出现严重错误，终止运行！》，ERROR：%v", err)
+		} else {
+			global.Log.Error("程序正常关闭！")
+		}
+	}()
 	e = echo.New()
 	file, _ := os.OpenFile("web.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	//e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
@@ -34,14 +41,14 @@ func Router() {
 	//e.Logger.SetLevel(log.OFF)
 	e.Logger.SetOutput(file)
 
-	//e.Static("/app", "app")
-	e.GET("/*", echo.WrapHandler(static.Handler))
+	e.Static("/app", "app")
+	//e.GET("/*", echo.WrapHandler(static.Handler))
 	e.File("/", "app/page/index.html")
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
 	handlerConfig()
 	//go e.Logger.Fatal(e.Start(fmt.Sprintf(":%v", global.Port)))
-	go e.Start(fmt.Sprintf(":%v", global.Port))
+	e.Start(fmt.Sprintf(":%v", global.Port))
 }
 
 func handlerConfig() {
@@ -68,7 +75,7 @@ func handlerConfig() {
 	e.POST("/member/bindWechat", handler.CreateWechatQrCode, handler.Filter)
 
 	e.POST("/wechat/group/start/add", handler.StartAddWechatGroup, handler.Filter)
-	e.POST("/wechat/group/start/send", handler.SendWechatMsg, handler.Filter)
+	e.POST("/wechat/send/message", handler.SendWechatMsg, handler.Filter)
 	e.POST("/wechat/group/get/sendStatus", handler.GetSendWechatMsgStatus, handler.Filter)
 	e.POST("/wechat/funcStatus", handler.GetWechatFuncStatus, handler.Filter)
 
@@ -76,6 +83,14 @@ func handlerConfig() {
 	e.POST("/wechat/login/check", handler.LoginWechatCheck, handler.Filter)
 	e.POST("/wechat/add/user", handler.AddWechatUser, handler.Filter)
 	e.POST("/wechat/cancel/login", handler.CancelLoginWechat, handler.Filter)
+
+	e.POST("/qq/login", handler.QQLogin, handler.Filter)
+	e.POST("/qq/funcStatus", handler.GetQQFuncStatus, handler.Filter)
+	e.POST("/qq/cancel/login", handler.CancelLoginQQ, handler.Filter)
+	e.POST("/qq/login/check", handler.LoginQQCheck, handler.Filter)
+	e.POST("/qq/status", handler.GetQQStatus, handler.Filter)
+	e.POST("/qq/send/message", handler.SendQQMessage, handler.Filter)
+
 	e.GET("/task.js", handler.GetTask, handler.Filter)
 	e.GET("/task/stop.js", handler.StopTask, handler.Filter)
 
@@ -84,5 +99,7 @@ func handlerConfig() {
 }
 
 func Stop() {
-	e.Close()
+	if e != nil {
+		e.Close()
+	}
 }
