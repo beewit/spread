@@ -10,6 +10,7 @@ import (
 	"github.com/beewit/spread/global"
 	"github.com/beewit/wechat-ai/smartQQ"
 	"github.com/labstack/echo"
+	"strings"
 	"sync"
 )
 
@@ -125,7 +126,7 @@ func SendQQMessage(c echo.Context) error {
 		return utils.ErrorNull(c, "QQ营销功能还未开通，请开通此功能后使用")
 	}
 	if global.QQClient == nil || !global.QQClient.Login.Status {
-		return utils.ErrorNull(c, "未登录，请重新扫码登录后添加QQ好友")
+		return utils.ErrorNull(c, "未登录，请重新扫码登录后发送QQ消息")
 	}
 	task := global.GetTask(global.TASK_QQ_SEND_MESSAGE)
 	if task != nil && task.State {
@@ -258,4 +259,53 @@ func SendQQMessage(c echo.Context) error {
 		}
 	}()
 	return utils.SuccessNull(c, "后台发送中...")
+}
+
+func SearchQQGroup(c echo.Context) error {
+	if !api.EffectiveFuncById(global.FUNC_QQ) {
+		return utils.ErrorNull(c, "QQ营销功能还未开通，请开通此功能后使用")
+	}
+	if global.QQClient == nil || !global.QQClient.Login.Status {
+		return utils.ErrorNull(c, "未登录，请重新扫码登录后操作")
+	}
+	task := global.GetTask(global.TASK_QQ_SEND_MESSAGE)
+	if task != nil && task.State {
+		return utils.ErrorNull(c, "正在发送中，请勿重复执行")
+	}
+	keyword, pageStr, cityStr := c.FormValue("keyword"), c.FormValue("page"), c.FormValue("city")
+	if strings.Trim(keyword, "") == "" {
+		return utils.ErrorNull(c, "请输入搜索群关键词")
+	}
+	page, city := 0, 0
+	if pageStr != "" && utils.IsValidNumber(pageStr) {
+		page = convert.MustInt(pageStr)
+	}
+	if cityStr != "" && utils.IsValidNumber(cityStr) {
+		city = convert.MustInt(cityStr)
+	}
+	if page == 0 {
+		global.QQClient.SearchGroup.Total = 0
+		global.QQClient.SearchGroup.SearchGroupList = nil
+		global.QQClient.SearchKeyWord = keyword
+	}
+	groupSearch, err := global.QQClient.GetGroupSearch(keyword, city, page)
+	if err != nil {
+		global.Log.Error(err.Error())
+		return utils.ErrorNull(c, "获取QQ群失败，ERROR:"+err.Error())
+	}
+	if groupSearch.RetCode.RetCode != 0 {
+		return utils.ErrorNull(c, "获取QQ群失败，请重新登录QQ操作")
+	}
+	global.QQClient.SearchGroup.Total = groupSearch.Total
+	if len(groupSearch.SearchGroupList) > 0 {
+		for _, v := range groupSearch.SearchGroupList {
+			global.QQClient.SearchGroup.SearchGroupList = append(global.QQClient.SearchGroup.SearchGroupList, v)
+		}
+	}
+	return utils.SuccessNullMsg(c, groupSearch)
+}
+
+func AddQQGroup(c echo.Context) error {
+
+	return utils.SuccessNull(c, "'正在启动执行程序")
 }

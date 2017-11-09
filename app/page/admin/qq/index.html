@@ -40,17 +40,17 @@
         }
 
         .hive-4 {
-            width: 50%;
+            width: 40%;
             float: left;
         }
 
         .hive-6 {
-            width: 50%;
+            width: 60%;
             float: left;
         }
 
-        @media only screen and (max-width: 1500px) {
-            .hive-6 {
+        @media only screen and (max-width: 1640px) {
+            .hive-6, .hive-4 {
                 width: 100%;
                 margin-bottom: 20px;
             }
@@ -69,9 +69,23 @@
             <div class="hive-tip am-hide">QQ营销功能未开通，点击<a>立即开通</a></div>
             <div class="am-g am-margin-top">
                 <div class="am-form">
-                    <div class="hive-6">
-                        <b class="am-form-label">采集设置：</b>
-                        <select id="province" class="am-form-select" placeholder="-- 省份 --"
+                    <div>
+                        <button type="button" class="am-btn am-btn-sm am-btn-warning" onclick="checkLoginQQ(null)"
+                                id="loginBtn">
+                            登录QQ
+                        </button>
+                        <br>
+                        <br>
+                    </div>
+                    <div class="hive-4">
+                        <b class="am-form-label">QQ群关键词：</b>
+                        <input type="text" class="input am-input-sm"
+                               style="width: 280px;display: initial;"
+                               placeholder="QQ群关键词" id="keyword">
+                        <button type="button" class="am-btn am-btn-sm" id="searchQQGroup"><span
+                                class="am-icon-search"></span> 搜索
+                        </button>
+                        <!--*<select id="province" class="am-form-select" placeholder="-- 省份 --"
                                 style="width: 150px;float: none;    display: initial;">
                             <option value=" ">-- 所有省份 --</option>
                         </select>
@@ -84,11 +98,11 @@
                         </select>
                         <select id="plate" placeholder="-- 县 --" style="width: 150px;float: none;display: initial;">
                             <option value=" ">-- 所有县 --</option>
-                        </select>
+                        </select>-->
                     </div>
                     <div class="hive-6">
-                        <b class="am-form-label">群发消息：</b>
-                        <span class="am-form-label">每加群：
+                        <b class="am-form-label">加群/群发设置：</b>
+                        <span class="am-form-label">每加/发群：
                                <input type="text" id="groupCount" class="input am-input-sm"
                                       style="width: 80px;display: initial;"
                                       placeholder="3" value="3"> 次
@@ -98,17 +112,31 @@
                                       style="width: 80px;display: initial;"
                                       placeholder="30" value="30"> 秒后再加
                         </span>
-                        <button type="button" class="am-btn am-btn-sm am-btn-success" id="StartAddQQGroup"><span
-                                class="am-icon-plus"></span> 启动QQ加群
-                        </button>
                         <button type="button" class="am-btn am-btn-sm am-btn-secondary"
                                 onclick="checkLoginQQ(sendQQMsg)">
                             <span class="am-icon-location-arrow"></span> QQ群发
                         </button>
-                        <button type="button" class="am-btn am-btn-sm am-btn-danger"
-                                onclick="checkLoginQQ(addQQUser)">
-                            <span class="am-icon-plus"></span> 批量添加QQ群成员
+                        <button type="button" class="am-btn am-btn-sm am-btn-success" id="StartAddQQGroup"><span
+                                class="am-icon-plus"></span> 启动QQ加群
                         </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="am-u-md-12 row-mb">
+                    <div style="overflow-y: auto;max-height: 400px;">
+                        <table class="am-table tpl-table">
+                            <thead>
+                            <tr class="tpl-table-uppercase">
+                                <th width="100">QQ</th>
+                                <th width="100">头像</th>
+                                <th width="100">群名称</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody id="searchQQGroupList">
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -119,6 +147,11 @@
                             <div class="tpl-caption font-red ">
                                 <i class="am-icon-qq"></i>
                                 <span> QQ好友</span>
+                            </div>
+                            <div class="actions">
+                                <ul class="actions-btn">
+                                    <li class="green" onclick="getLoginQQInfo()">刷新</li>
+                                </ul>
                             </div>
                         </div>
                         <div class="tpl-scrollable">
@@ -150,6 +183,15 @@
                                 <i class="am-icon-users"></i>
                                 <span> QQ群</span>
                             </div>
+                            <div class="actions">
+                                <ul class="actions-btn">
+                                    <li onclick="checkLoginQQ(addQQUser)">
+                                        <span class="am-icon-plus"></span>
+                                        添加QQ群成员
+                                    </li>
+                                    <li class="green" onclick="getLoginQQInfo()">刷新</li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="tpl-scrollable">
                             <div class="number-stats">
@@ -160,16 +202,16 @@
                             </div>
 
                             <div style="overflow-y: auto;height: 400px;">
-                            <table class="am-table tpl-table">
-                                <thead>
-                                <tr class="tpl-table-uppercase">
-                                    <th>GID</th>
-                                    <th>昵称</th>
-                                </tr>
-                                </thead>
-                                <tbody id="qqGroupList">
-                                </tbody>
-                            </table>
+                                <table class="am-table tpl-table">
+                                    <thead>
+                                    <tr class="tpl-table-uppercase">
+                                        <th>GID</th>
+                                        <th>昵称</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="qqGroupList">
+                                    </tbody>
+                                </table>
                             </div>
 
                         </div>
@@ -194,18 +236,14 @@
         getLoginQQInfo();
         cancelLoginQQ();
         qqFuncStatus();
-        $("#btnSearch").click(function () {
-            pageIndex = 1;
-            loadList()
-        });
         $("#StartAddQQGroup").click(function () {
             layer.confirm('请确定是否已开启QQ电脑版客户端？', {
                 btn: ['确定', '取消'] //按钮
             }, function () {
                 var type = $("#type").val(),
-                    area = $("#area").val(),
-                    groupCount = $("#groupCount").val() || 3,
-                    sleepTime = $("#sleepTime").val() || 30;
+                        area = $("#area").val(),
+                        groupCount = $("#groupCount").val() || 3,
+                        sleepTime = $("#sleepTime").val() || 30;
                 if (type != "") {
                     type = type.trim()
                 }
@@ -221,7 +259,40 @@
                 });
             });
         });
+        $("#searchQQGroup").click(function () {
+            $("#searchQQGroupList").html('');
+            var keyword = $("#keyword").val();
+            search(keyword, 0, 0)
+        });
     });
+
+    function search(keyword, city, page) {
+        $.ajax({
+            url: "/qq/search/group",
+            data: {keyword: keyword, city: city, page: page},
+            success: function (d) {
+                if (d.data.group_list != undefined && d.data.group_list != null && d.data.gTotal > 0) {
+                    bindSearchList(d.data.group_list)
+                    if (page < Math.ceil(d.data.gTotal / 24) && page < 7) {
+                        page++;
+                        setTimeout(function () {
+                            search(keyword, city, page)
+                        }, 500);
+                    }
+                }
+            }
+        });
+    }
+
+    function bindSearchList(info) {
+        var temp = "<tr><td>{gid}</td><td><img src=\"{url}\" alt=\"\" class=\"user-pic\"></td><td>{Name}</td><td>{richfingermemo}</td></tr>";
+        for (var i in info) {
+            $("#searchQQGroupList").append(temp.replace("{url}", info[i].url)
+                    .replace("{gid}", info[i].gid)
+                    .replace("{Name}", info[i].Name)
+                    .replace("{richfingermemo}", info[i].richfingermemo))
+        }
+    }
 
 
     function getLoginQQInfo() {
@@ -247,8 +318,15 @@
                         i++;
                     }
                     $("#GroupCount").html(" " + i);
+                    $("#loginBtn").html("已登录【" + d.data.QQUser.Login.Nickname + "】");
+                    $("#loginBtn").addClass("am-btn-success");
+                    $("#loginBtn").removeClass("am-btn-warning");
+                    //群
+                    bindSearchList(d.data.QQUser.SearchGroup.group_list)
+                    $("#keyword").val(d.data.QQUser.SearchKeyWord);
+
                 } else {
-                    setTimeout(getLoginQQInfo, 3000)
+                    $("#loginBtn").html("登录QQ");
                 }
             }
         });
@@ -267,18 +345,14 @@
                     layer.confirm('当前登录账号：【' + d.data.QQUser.Login.Nickname + '】', {
                         btn: ['切换账号', '继续'] //按钮
                     }, function () {
-                        if (func != null) {
-                            loginQQ(func)
-                        }
+                        loginQQ(func)
                     }, function () {
                         if (func != null) {
                             func()
                         }
                     });
                 } else {
-                    if (func != null) {
-                        loginQQ(func)
-                    }
+                    loginQQ(func)
                 }
             }
         });
@@ -373,14 +447,17 @@
             success: function (d) {
                 sendStatus = d.data.sendStatus
                 if (!sendStatus && checkStatus) {
-                    $("#sendStatusMsg").html("【" + d.data.sendStatus + "】" + d.data.sendStatusMsg);
+                    $("#sendStatusMsg").html(d.data.sendStatusMsg);
                     setTimeout(function () {
                         getQQStatus(func)
                     }, 300)
                 } else {
                     if (sendStatus == 1) {
+                        getLoginQQInfo()
                         layer.close(qrcodeLayer)
-                        func()
+                        if (func != null) {
+                            func()
+                        }
                     }
                 }
             }
@@ -396,7 +473,7 @@
                     $(".hive-tip").removeClass("am-hide");
                     getAccount(function (acc) {
                         $(".hive-tip a").attr("href", "http://pay.tbqbz.com?fid=7&token=" + acc.account.Token +
-                            "&backUrl=" + encodeURIComponent(acc.host + "?lastUrl=/app/page/admin/qq/index.html"))
+                                "&backUrl=" + encodeURIComponent(acc.host + "?lastUrl=/app/page/admin/qq/index.html"))
                     });
                 }
             }
