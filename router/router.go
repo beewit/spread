@@ -92,6 +92,9 @@ func handlerConfig() {
 	e.POST("/qq/send/message", handler.SendQQMessage, handler.Filter)
 	e.POST("/qq/search/group", handler.SearchQQGroup, handler.Filter)
 	e.POST("/qq/add/group", handler.AddQQGroup, handler.Filter)
+	e.POST("/qq/add/qq", handler.AddQQ, handler.Filter)
+	e.POST("/qq/group/members", handler.GetQQGroupMembers, handler.Filter)
+	e.POST("/qq/group/one/members", handler.GetQQGroupMembersByQQ, handler.Filter)
 
 	e.GET("/task.js", handler.GetTask, handler.Filter)
 	e.GET("/task/stop.js", handler.StopTask, handler.Filter)

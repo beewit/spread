@@ -15,16 +15,20 @@ const (
 	TASK_WECHAT_ADD_GROUP_USER = "TASK_WECHAT_ADD_GROUP_USER" //自动化发起添加微信群成员
 
 	TASK_QQ_SEND_MESSAGE = "TASK_QQ_SEND_MESSAGE" //批量发送QQ群或好友的消息
+	TASK_QQ_ADD_GROUP    = "TASK_QQ_ADD_GROUP"    //自动化添加QQ群
+	TASK_QQ_ADD_FRIEND   = "TASK_QQ_ADD_FRIEND"   //自动化添加QQ好友
 )
 
 var (
 	TaskNameMap = map[string]string{
-		"TASK_PLATFORM_PUSH":         "平台自动化营销内容群发",
-		"TASK_WECHAT_ADD_GROUP":      "自动化添加微信群",
-		"TASK_WECHAT_SEND_MESSAGE":   "批量发送微信群或好友的消息",
-		"TASK_WECHAT_ADD_GROUP_USER": "自动化发起添加微信群成员",
+		"TASK_PLATFORM_PUSH":         "平台营销内容群发",
+		"TASK_WECHAT_ADD_GROUP":      "添加微信群",
+		"TASK_WECHAT_SEND_MESSAGE":   "批量发送微信群和好友的消息",
+		"TASK_WECHAT_ADD_GROUP_USER": "添加微信群成员",
 
-		"TASK_QQ_SEND_MESSAGE": "批量发送QQ群或好友的消息",
+		"TASK_QQ_SEND_MESSAGE": "发送QQ群和好友的消息",
+		"TASK_QQ_ADD_GROUP":    "添加QQ群",
+		"TASK_QQ_ADD_FRIEND":   "添加QQ群成员",
 	}
 )
 

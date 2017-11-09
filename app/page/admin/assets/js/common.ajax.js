@@ -28,6 +28,9 @@
         if (opt.success) {
             fn.success = opt.success;
         }
+        if (opt.complete) {
+            fn.complete = opt.complete;
+        }
         var loadi;
         var _opt = $.extend(opt, {
             beforeSend: function () {

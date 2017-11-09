@@ -74,6 +74,18 @@
                                 id="loginBtn">
                             登录QQ
                         </button>
+                        <b class="am-form-label">QQ账号：</b>
+                        <input type="number" class="input am-input-sm" style="width: 150px;display: initial;"
+                               placeholder="QQ账号" id="qqAcc">
+                        <b class="am-form-label">QQ密码：</b>
+                        <input type="text" class="input am-input-sm" style="width: 150px;display: initial;"
+                               placeholder="QQ密码" id="qqPwd">
+                        <b class="am-form-label">问候语：</b>
+                        <input type="text" class="input am-input-sm" style="width: 250px;display: initial;"
+                               placeholder="问候语" id="qqRemark">
+                        <button type="button" class="am-btn am-btn-sm am-btn-primary" onclick="saveQQAccount()">
+                            <i class="am-icon-save"></i> 保存
+                        </button>
                         <br>
                         <br>
                     </div>
@@ -141,7 +153,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="am-u-md-6 am-u-sm-12 row-mb">
+                <div class="am-u-md-6 am-u-sm-12 row-mb am-padding-0">
                     <div class="tpl-portlet">
                         <div class="tpl-portlet-title">
                             <div class="tpl-caption font-red ">
@@ -165,7 +177,7 @@
                                 <table class="am-table tpl-table">
                                     <thead>
                                     <tr class="tpl-table-uppercase">
-                                        <th>Uin</th>
+                                        <th>QQ</th>
                                         <th>昵称</th>
                                     </tr>
                                     </thead>
@@ -176,7 +188,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="am-u-md-6 am-u-sm-12 row-mb">
+                <div class="am-u-md-6 am-u-sm-12 row-mb am-padding-0">
                     <div class="tpl-portlet">
                         <div class="tpl-portlet-title">
                             <div class="tpl-caption font-red ">
@@ -185,9 +197,13 @@
                             </div>
                             <div class="actions">
                                 <ul class="actions-btn">
-                                    <li onclick="checkLoginQQ(addQQUser)">
+                                    <li onclick="getQQGroupMembers()">
+                                        <span class="am-icon-arrow-down"></span>
+                                        获取全部QQ群成员
+                                    </li>
+                                    <li class="blue" onclick="addQQUser()">
                                         <span class="am-icon-plus"></span>
-                                        添加QQ群成员
+                                        添加全部QQ群成员
                                     </li>
                                     <li class="green" onclick="getLoginQQInfo()">刷新</li>
                                 </ul>
@@ -205,8 +221,8 @@
                                 <table class="am-table tpl-table">
                                     <thead>
                                     <tr class="tpl-table-uppercase">
-                                        <th>GID</th>
-                                        <th>昵称</th>
+                                        <th>群QQ</th>
+                                        <th>群名称</th>
                                     </tr>
                                     </thead>
                                     <tbody id="qqGroupList">
@@ -237,26 +253,14 @@
         cancelLoginQQ();
         qqFuncStatus();
         $("#StartAddQQGroup").click(function () {
-            layer.confirm('请确定是否已开启QQ电脑版客户端？', {
-                btn: ['确定', '取消'] //按钮
-            }, function () {
-                var type = $("#type").val(),
-                        area = $("#area").val(),
-                        groupCount = $("#groupCount").val() || 3,
-                        sleepTime = $("#sleepTime").val() || 30;
-                if (type != "") {
-                    type = type.trim()
+            var groupCount = $("#groupCount").val() || 3, sleepTime = $("#sleepTime").val() || 30;
+            var qqAcc = $("#qqAcc").val(), qqPwd = $("#qqPwd").val(), qqRemark = $("#qqRemark").val();
+            $.ajax({
+                url: "/qq/add/group",
+                data: {groupCount: groupCount, sleepTime: sleepTime, qq: qqAcc, pwd: qqPwd, remark: qqRemark},
+                success: function (d) {
+                    layer.msg(d.msg, {icon: 1})
                 }
-                if (area != "") {
-                    area = area.trim()
-                }
-                $.ajax({
-                    url: "/qq/group/start/add",
-                    data: {type: type, area: area, groupCount: groupCount, sleepTime: sleepTime},
-                    success: function (d) {
-                        layer.msg(d.msg, {icon: 1})
-                    }
-                });
             });
         });
         $("#searchQQGroup").click(function () {
@@ -301,20 +305,23 @@
             url: "/qq/login/check",
             success: function (d) {
                 if (d.data != null && d.data.QQUser.Status) {
-                    var temp = "<tr><td>{Uin}</td><td>{Nick}</td></tr>";
-                    var info = d.data.QQUser.FriendsMap.info
+                    var temp = "<tr data-id='{id}'><td>{img}{QQ}</td><td>{Nick}</td></tr>";
+                    var info = d.data.QQUser.FriendsMap2
                     var i = 0;
                     $("#qqList").html('')
                     for (var u in info) {
-                        $("#qqList").append(temp.replace("{Uin}", info[u].uin).replace("{Nick}", info[u].nick))
+                        $("#qqList").append(temp.replace("{img}", "<img src='http://q4.qlogo.cn/g?b=qq&nk=" + info[u].QQ + "&s=140' class='user-pic'/> ").replace("{id}", info[u].QQ).replace("{QQ}", info[u].QQ).replace("{Nick}", info[u].NiceName))
                         i++;
                     }
                     $("#UserCount").html(" " + i);
+                    temp = "<tr data-id='{id}'><td>{img}{QQ}</td><td>{Nick}</td><td class='handle'></td></tr>";
                     i = 0;
-                    info = d.data.QQUser.GroupInfo
+                    info = d.data.QQUser.Group2Map
                     $("#qqGroupList").html('')
                     for (var u in info) {
-                        $("#qqGroupList").append(temp.replace("{Uin}", info[u].gid).replace("{Nick}", info[u].name))
+                        $("#qqGroupList").append(temp.replace("{id}", info[u].gc).replace("{img}", "<img src=" + info[u].Logo + " class=\"user-pic\"> ")
+                                .replace("{QQ}", info[u].gc)
+                                .replace("{Nick}", info[u].gn))
                         i++;
                     }
                     $("#GroupCount").html(" " + i);
@@ -324,6 +331,20 @@
                     //群
                     bindSearchList(d.data.QQUser.SearchGroup.group_list)
                     $("#keyword").val(d.data.QQUser.SearchKeyWord);
+                    //群成员
+                    info = d.data.QQUser.GroupMembersMap
+                    if (info != null) {
+                        $.each($("#qqGroupList tr"), function (i, item) {
+                            var qq = $(item).attr("data-id");
+                            if (info[qq] != null && info[qq] != undefined) {
+                                $(item).find(".handle").html("<a  data-layer='members.html?qq=" + qq +
+                                        "' data-layer-w='500px' " +
+                                        "data-layer-h='70%' data-layer-title='【" + $(item).find("td:eq(1)").html() + "】群成员'>查看成员</a>" +
+                                        "&nbsp;&nbsp;<a class='am-text-success' onclick='addQQUser(" + qq + ")'>添加群成员</a>"
+                                )
+                            }
+                        });
+                    }
 
                 } else {
                     $("#loginBtn").html("登录QQ");
@@ -391,20 +412,41 @@
         });
     }
 
-    function addQQUser() {
-        layer.prompt({title: '请输入自动批量添加QQ群成员的问候语', formType: 2}, function (text, index) {
-            if (text == "") {
-                layer.msg('请输入发送问候语的内容');
-                return
-            }
-            layer.close(index);
-            $.ajax({
-                url: "/qq/add/user",
-                data: {content: text},
-                success: function (d) {
-                    layer.msg(d.msg)
+    function getQQGroupMembers() {
+        var trGroup = $("#qqGroupList tr");
+        if (trGroup.length > 0) {
+            getQQGroupMember(0, trGroup)
+        }
+    }
+
+    function getQQGroupMember(i, trGroup) {
+        var qq = $(trGroup[i]).attr("data-id")
+        $.ajax({
+            url: "/qq/group/members",
+            data: {qq: qq},
+            success: function (d) {
+                $(trGroup[i]).find(".handle").html("<a data-layer=''>查看成员</a>&nbsp;&nbsp;<a onclick='addQQUser(" + qq + ")'>添加群成员</a>")
+            },
+            complete: function () {
+                i++;
+                if (i < trGroup.length) {
+                    setTimeout(function () {
+                        getQQGroupMember(i, trGroup)
+                    }, 1000);
                 }
-            });
+            }
+        });
+    }
+
+    function addQQUser(gqq) {
+        var groupCount = $("#groupCount").val() || 3, sleepTime = $("#sleepTime").val() || 30;
+        var qqAcc = $("#qqAcc").val(), qqPwd = $("#qqPwd").val(), qqRemark = $("#qqRemark").val();
+        $.ajax({
+            url: "/qq/add/qq",
+            data: {gqq: gqq, groupCount: groupCount, sleepTime: sleepTime, qq: qqAcc, pwd: qqPwd, remark: qqRemark},
+            success: function (d) {
+                layer.msg(d.msg, {icon: 1})
+            }
         });
     }
 

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>工蜂小智 </title>
+    <meta name="description" content="QQ营销 - 群成员">
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="icon" type="image/png" href="../assets/i/favicon.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/i/favicon.png">
+    <meta name="apple-mobile-web-app-title" content="工蜂小智"/>
+    <link rel="stylesheet" href="/app/static/js/plugs/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../assets/css/amazeui.min.css"/>
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <link rel="stylesheet" href="/app/static/css/base.css">
+</head>
+<body data-type="generalComponents">
+<div class="tpl-page-container tpl-page-header-fixed">
+    <div class="tpl-content-wrapper">
+        <div class="tpl-portlet-components">
+            <div class="row">
+                <div class="am-u-md-12 row-mb">
+                    <div class="number-stats">
+                        <div class="stat-number am-fl am-u-md-6">
+                            <div class="title am-text-right" style="    text-align: center !important;"> 总共群成员</div>
+                            <div class="number am-text-right am-text-warning" id="UserCount"
+                                 style="    text-align: center !important;"> 0
+                            </div>
+                        </div>
+                    </div>
+                    <table class="am-table tpl-table">
+                        <thead>
+                        <tr class="tpl-table-uppercase">
+                            <th width="100">头像</th>
+                            <th width="100">QQ</th>
+                            <th width="100">群名称</th>
+                        </tr>
+                        </thead>
+                        <tbody id="qqList">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/js/jquery.min.js"></script>
+<script src="../assets/js/amazeui.min.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="/app/static/js/plugs/layui/layui.all.js"></script>
+<script src="../assets/js/common.ajax.js"></script>
+<script src="../assets/js/common.js"></script>
+<script>
+    $(function () {
+        var qq = LinkUrl.Request("qq")
+        $.ajax({
+            url: "/qq/group/one/members",
+            data: {qq: qq},
+            success: function (d) {
+                var temp = "<tr data-id='{id}'><td>{img}</td><td>{QQ}</td><td>{Nick}</td><td class='handle'></td></tr>";
+                var info = d.data.mems;
+                $("#qqList").html("");
+                var i = 0;
+                for (var u in info) {
+                    $("#qqList").append(temp.replace("{id}", info[u].u).replace("{img}", "<img src='http://q4.qlogo.cn/g?b=qq&nk=" + info[u].u + "&s=140' class='user-pic'/> ")
+                            .replace("{QQ}", info[u].u)
+                            .replace("{Nick}", info[u].n));
+                    i++;
+                }
+                $("#UserCount").html(" " + i);
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -82,6 +82,20 @@ func (mw *MyWindow) AddNotifyIcon() {
 		walk.MsgBox(mw, title, "关闭批量发送微信消息成功", walk.MsgBoxOK)
 	})
 
+	mQQGroupAdd := mw.addAction(taskMenu, "停止添加QQ群")
+	mQQGroupAdd.SetEnabled(false)
+	mQQGroupAdd.Triggered().Attach(func() {
+		global.DelTask(global.TASK_QQ_ADD_GROUP)
+		walk.MsgBox(mw, title, "关闭批量添加QQ群成功，请等待本次流程完毕", walk.MsgBoxOK)
+	})
+
+	mQQFriendAdd := mw.addAction(taskMenu, "停止添加QQ好友")
+	mQQFriendAdd.SetEnabled(false)
+	mQQFriendAdd.Triggered().Attach(func() {
+		global.DelTask(global.TASK_QQ_ADD_FRIEND)
+		walk.MsgBox(mw, title, "关闭批量添加QQ好友成功，请等待本次流程完毕", walk.MsgBoxOK)
+	})
+
 	mQQMessageSend := mw.addAction(taskMenu, "停止发送QQ消息")
 	mQQMessageSend.SetEnabled(false)
 	mQQMessageSend.Triggered().Attach(func() {
@@ -170,6 +184,30 @@ func (mw *MyWindow) AddNotifyIcon() {
 				taskFlog = true
 				if !mWechatUserAdd.Enabled() {
 					mWechatUserAdd.SetEnabled(true)
+				}
+			}
+
+			task = global.GetTask(global.TASK_QQ_ADD_GROUP)
+			if task == nil || !task.State {
+				if mQQGroupAdd.Enabled() {
+					mQQGroupAdd.SetEnabled(false)
+				}
+			} else {
+				taskFlog = true
+				if !mQQGroupAdd.Enabled() {
+					mQQGroupAdd.SetEnabled(true)
+				}
+			}
+
+			task = global.GetTask(global.TASK_QQ_ADD_FRIEND)
+			if task == nil || !task.State {
+				if mQQFriendAdd.Enabled() {
+					mQQFriendAdd.SetEnabled(false)
+				}
+			} else {
+				taskFlog = true
+				if !mQQFriendAdd.Enabled() {
+					mQQFriendAdd.SetEnabled(true)
 				}
 			}
 

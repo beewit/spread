@@ -111,7 +111,7 @@ func PageJumpMsg(status, tip, url string) {
 		}
 		urls = fmt.Sprintf("setTimeout(function () {     location.href='%v';    },1500)", url)
 	}
-	js := fmt.Sprintf("var div = document.createElement('div');div.innerHTML=`%v`;document.body.appendChild(div);%s", tipDiv, urls)
+	js := fmt.Sprintf("document.getElementById('pageMsg');pageMsg.parentNode.removeChild(pageMsg);var div = document.createElement('div');div.innerHTML=`%v`;document.body.appendChild(div);%s", tipDiv, urls)
 	Page.RunScript(js, nil, nil)
 }
 

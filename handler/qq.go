@@ -8,6 +8,7 @@ import (
 	"github.com/beewit/beekit/utils/convert"
 	"github.com/beewit/spread/api"
 	"github.com/beewit/spread/global"
+	"github.com/beewit/wechat-ai/ai"
 	"github.com/beewit/wechat-ai/smartQQ"
 	"github.com/labstack/echo"
 	"strings"
@@ -56,13 +57,13 @@ func QQLogin(c echo.Context) error {
 
 //加载群信息
 func LoadGroupInfo() {
-	if global.QQClient != nil && global.QQClient.GroupInfo != nil {
-		for _, v := range global.QQClient.GroupInfo {
-			reg, err := global.QQClient.GetGroupInfo(v.Code)
+	if global.QQClient != nil && global.QQClient.GroupInfoMap != nil {
+		for _, v := range global.QQClient.GroupInfoMap {
+			_, err := global.QQClient.GetGroupInfo(v.Code)
 			if err != nil {
 				global.Log.Error("【%s】加载群信息失败，ERROR：%s", v.Name, err.Error())
 			} else {
-				global.Log.Info("【%s】加载群信息结果：%s", v.Name, convert.ToObjStr(reg))
+				global.Log.Info("【%s】加载群信息完成", v.Name)
 			}
 			time.Sleep(time.Second * 3)
 		}
@@ -95,23 +96,23 @@ func Pull() {
 	time.Sleep(time.Second * 5)
 	pollResult, err := global.QQClient.Poll2(func(qq *smartQQ.QQClient, result smartQQ.QQResponsePoll) {
 		if len(result.Result) > 0 && len(result.Result[0].Value.Content) > 0 {
-			var message string
-			if result.Result[0].PollType == "group_message" {
-				group := qq.GroupInfo[result.Result[0].Value.GroupCode]
-				if group.GId > 0 {
-					message = " 【群消息 - " + group.Name + "】 "
-				}
-			}
-			sendUser := qq.FriendsMap.Info[result.Result[0].Value.SendUin]
-			if sendUser.Uin > 0 {
-				message += "   -   发送人《" + qq.FriendsMap.Info[result.Result[0].Value.SendUin].Nick + "》"
-			}
-			for i := 0; i < len(result.Result[0].Value.Content); i++ {
-				if i > 0 {
-					message += convert.ToObjStr(result.Result[0].Value.Content[i])
-				}
-			}
-			global.Log.Info("您有新消息了哦！ ==>> ", message)
+			//var message string
+			//if result.Result[0].PollType == "group_message" {
+			//	group := qq.GroupInfoMap[result.Result[0].Value.GroupCode]
+			//	if group.GId > 0 {
+			//		message = " 【群消息 - " + group.Name + "】 "
+			//	}
+			//}
+			//sendUser := qq.FriendsMap.Info[result.Result[0].Value.SendUin]
+			//if sendUser.Uin > 0 {
+			//	message += "   -   发送人《" + qq.FriendsMap.Info[result.Result[0].Value.SendUin].Nick + "》"
+			//}
+			//for i := 0; i < len(result.Result[0].Value.Content); i++ {
+			//	if i > 0 {
+			//		message += convert.ToObjStr(result.Result[0].Value.Content[i])
+			//	}
+			//}
+			//global.Log.Info("您有新消息了哦！ ==>> ", message)
 		}
 	})
 	if err != nil {
@@ -119,6 +120,54 @@ func Pull() {
 		return
 	}
 	global.Log.Info("QQClient -->Poll2 , Info：%s", convert.ToObjStr(pollResult))
+}
+
+func GetQQGroupMembers(c echo.Context) error {
+	if !api.EffectiveFuncById(global.FUNC_QQ) {
+		return utils.ErrorNull(c, "QQ营销功能还未开通，请开通此功能后使用")
+	}
+	if global.QQClient == nil || !global.QQClient.Login.Status {
+		return utils.ErrorNull(c, "未登录，请重新扫码登录后发送QQ消息")
+	}
+	qq := c.FormValue("qq")
+	if qq == "" || !utils.IsValidNumber(qq) {
+		return utils.ErrorNull(c, "群QQ错误")
+	}
+	if global.QQClient.Group2Map == nil {
+		global.QQClient.GetMyGroupList()
+	}
+	if global.QQClient.Group2Map == nil {
+		return utils.ErrorNull(c, "加载QQ群失败")
+	}
+	v := global.QQClient.Group2Map[convert.MustInt64(qq)]
+	if v.QQ > 0 {
+		global.QQClient.GetGroupMembers(v)
+		return utils.SuccessNull(c, "加载群信息成功")
+	} else {
+		return utils.ErrorNull(c, fmt.Sprintf("查询群QQ%s失败", qq))
+	}
+}
+
+func GetQQGroupMembersByQQ(c echo.Context) error {
+	if !api.EffectiveFuncById(global.FUNC_QQ) {
+		return utils.ErrorNull(c, "QQ营销功能还未开通，请开通此功能后使用")
+	}
+	if global.QQClient == nil || !global.QQClient.Login.Status {
+		return utils.ErrorNull(c, "未登录，请重新扫码登录后发送QQ消息")
+	}
+	qq := c.FormValue("qq")
+	if qq == "" || !utils.IsValidNumber(qq) {
+		return utils.ErrorNull(c, "群QQ错误")
+	}
+	if global.QQClient.GroupMembersMap == nil {
+		return utils.ErrorNull(c, "请先加载QQ群成员")
+	}
+	v := global.QQClient.GroupMembersMap[convert.MustInt64(qq)]
+	if len(v.Mems) > 0 {
+		return utils.Success(c, "加载群成员信息成功", v)
+	} else {
+		return utils.ErrorNull(c, "加载群成员失败")
+	}
 }
 
 func SendQQMessage(c echo.Context) error {
@@ -153,7 +202,7 @@ func SendQQMessage(c echo.Context) error {
 		defer func() {
 			global.DelTask(global.TASK_QQ_SEND_MESSAGE)
 		}()
-		if global.QQClient.FriendsMap.Info != nil && global.QQClient.GroupInfo != nil {
+		if global.QQClient.FriendsMap.Info != nil && global.QQClient.GroupInfoMap != nil {
 			global.UpdateTask(global.TASK_QQ_SEND_MESSAGE, "准备开发发送QQ消息..")
 			global.QQClient.StatusMessage = "准备开发发送QQ消息！"
 			global.Log.Info(global.QQClient.StatusMessage)
@@ -207,9 +256,9 @@ func SendQQMessage(c echo.Context) error {
 				}
 			}
 			count = 0
-			if global.QQClient.GroupInfo != nil {
+			if global.QQClient.GroupInfoMap != nil {
 				global.Log.Info("准备开始发送群消息")
-				for _, v := range global.QQClient.GroupInfo {
+				for _, v := range global.QQClient.GroupInfoMap {
 					count++
 					if count > groupCount {
 						global.UpdateTask(global.TASK_QQ_SEND_MESSAGE, fmt.Sprintf("延迟【%v】秒后发送QQ群消息", sleepTime))
@@ -306,6 +355,208 @@ func SearchQQGroup(c echo.Context) error {
 }
 
 func AddQQGroup(c echo.Context) error {
+	if !api.EffectiveFuncById(global.FUNC_QQ) {
+		return utils.ErrorNull(c, "QQ营销功能还未开通，请开通此功能后使用")
+	}
+	if global.QQClient == nil || !global.QQClient.Login.Status {
+		return utils.ErrorNull(c, "未登录，请重新扫码登录后操作")
+	}
+	if len(global.QQClient.SearchGroup.SearchGroupList) <= 0 {
+		return utils.ErrorNull(c, "请先搜索群关键词后再启动QQ加群")
+	}
 
-	return utils.SuccessNull(c, "'正在启动执行程序")
+	task := global.GetTask(global.TASK_QQ_ADD_FRIEND)
+	if task != nil && task.State {
+		return utils.ErrorNull(c, "正在添加好友中，不能同时进行")
+	}
+	task = global.GetTask(global.TASK_QQ_ADD_GROUP)
+	if task != nil && task.State {
+		return utils.ErrorNull(c, "正在加群中，请勿重复执行")
+	}
+	groupCountStr := c.FormValue("groupCount")
+	if groupCountStr == "" || !utils.IsValidNumber(groupCountStr) {
+		groupCountStr = "3"
+	}
+	sleepTimeStr := c.FormValue("sleepTime")
+	if sleepTimeStr == "" || !utils.IsValidNumber(sleepTimeStr) {
+		sleepTimeStr = "30"
+	}
+
+	groupCount := convert.MustInt(groupCountStr)
+	sleepTime := convert.MustInt64(sleepTimeStr)
+	qq := c.FormValue("qq")
+	pwd := c.FormValue("pwd")
+	remark := c.FormValue("remark")
+	if qq == "" || pwd == "" {
+		return utils.ErrorNull(c, "请设置QQ账号密码")
+	}
+	go func() {
+		defer func() {
+			global.DelTask(global.TASK_QQ_ADD_GROUP)
+		}()
+		global.UpdateTask(global.TASK_QQ_ADD_GROUP, "准备开发添加QQ好友..")
+		utils.Close("QQ")
+		time.Sleep(time.Second * 3)
+		println(qq, pwd)
+		err := ai.QQLogin(convert.MustInt64(qq), pwd)
+		if err != nil {
+			global.Log.Error(err.Error())
+			global.PageMsg(err.Error())
+			return
+		}
+		//获取最新群列表，进行排除添加用
+		groupList, err := global.QQClient.GetMyGroupList()
+		//连续5次错误放弃加群
+		errCount, count := 0, 0
+		var str string
+		for _, v := range global.QQClient.SearchGroup.SearchGroupList {
+			if IsExistGroup(groupList, v.GId) {
+				str = fmt.Sprintf(" QQ群【%v】%s已添加过了", v.GId, v.Name)
+				global.Log.Info(str)
+				continue
+			}
+			count++
+			if count > groupCount {
+				global.UpdateTask(global.TASK_QQ_ADD_GROUP, fmt.Sprintf("延迟【%v】秒后添加QQ群", sleepTime))
+				time.Sleep(time.Duration(sleepTime) * time.Second)
+				count = 0
+			}
+			task := global.GetTask(global.TASK_QQ_ADD_GROUP)
+			if task == nil || !task.State {
+				str = fmt.Sprintf("【%s】已取消了", global.TaskNameMap[global.TASK_QQ_ADD_GROUP])
+				global.Log.Info(str)
+				global.PageMsg(str)
+				return
+			}
+			//更新任务记录
+			global.UpdateTask(global.TASK_QQ_ADD_GROUP, fmt.Sprintf("正在添加QQ群【%v】%s", v.GId, v.Name))
+			err = ai.AddQQGroup(v.GId, remark)
+			if err != nil {
+				errCount++
+				str = fmt.Sprintf("添加QQ群【%v】%s失败，原因：%s", v.GId, v.Name, err.Error())
+				global.Log.Error(str)
+				global.PageErrorMsg(str, "")
+			} else {
+				errCount = 0
+				str = fmt.Sprintf("添加QQ群【%v】%s成功", v.GId, v.Name)
+				global.PageSuccessMsg(str, "")
+			}
+
+			global.UpdateTask(global.TASK_QQ_ADD_GROUP, str)
+			time.Sleep(time.Second * time.Duration(utils.NewRandom().Number(1)))
+			//连续错误5次停止发送
+			if errCount > 5 {
+				global.PageMsg("连续5次以上添加QQ群失败，终止添加，请稍后重试！")
+			}
+		}
+	}()
+	return utils.SuccessNull(c, "'正在启动添加群成员")
+}
+
+func IsExistGroup(groupList map[int64]smartQQ.Group2, qq int64) bool {
+	for _, v2 := range groupList {
+		if v2.QQ == qq {
+			return true
+		}
+	}
+	return false
+}
+
+func AddQQ(c echo.Context) error {
+	if !api.EffectiveFuncById(global.FUNC_QQ) {
+		return utils.ErrorNull(c, "QQ营销功能还未开通，请开通此功能后使用")
+	}
+	if global.QQClient == nil || !global.QQClient.Login.Status {
+		return utils.ErrorNull(c, "未登录，请重新扫码登录后操作")
+	}
+	if len(global.QQClient.MemberMap) <= 0 {
+		return utils.ErrorNull(c, "请先获取群成员后再启动QQ加好友")
+	}
+	task := global.GetTask(global.TASK_QQ_ADD_GROUP)
+	if task != nil && task.State {
+		return utils.ErrorNull(c, "正在加群中，不能同时进行")
+	}
+	task = global.GetTask(global.TASK_QQ_ADD_FRIEND)
+	if task != nil && task.State {
+		return utils.ErrorNull(c, "正在加好友中，请勿重复执行")
+	}
+
+	groupCountStr := c.FormValue("groupCount")
+	if groupCountStr == "" || !utils.IsValidNumber(groupCountStr) {
+		groupCountStr = "3"
+	}
+	sleepTimeStr := c.FormValue("sleepTime")
+	if sleepTimeStr == "" || !utils.IsValidNumber(sleepTimeStr) {
+		sleepTimeStr = "30"
+	}
+
+	groupCount := convert.MustInt(groupCountStr)
+	sleepTime := convert.MustInt64(sleepTimeStr)
+	gqq := c.FormValue("gqq")
+	qq := c.FormValue("qq")
+	pwd := c.FormValue("pwd")
+	remark := c.FormValue("remark")
+	if qq == "" || pwd == "" {
+		return utils.ErrorNull(c, "请设置QQ账号密码")
+	}
+	go func() {
+		defer func() {
+			global.DelTask(global.TASK_QQ_ADD_FRIEND)
+		}()
+		global.UpdateTask(global.TASK_QQ_ADD_FRIEND, "准备开发添加QQ好友..")
+
+		utils.Close("QQ")
+		time.Sleep(time.Second * 3)
+		err := ai.QQLogin(convert.MustInt64(qq), pwd)
+		if err != nil {
+			global.PageMsg(err.Error())
+			global.Log.Error(err.Error())
+			return
+		}
+		//连续5次错误放弃加群
+		errCount, count := 0, 0
+		var str string
+		for _, v := range global.QQClient.MemberMap {
+			if gqq != "" {
+				//不是当前待加的QQ群
+				if v.GroupQQ != convert.MustInt64(gqq) {
+					continue
+				}
+			}
+			count++
+			if count > groupCount {
+				global.UpdateTask(global.TASK_QQ_ADD_FRIEND, fmt.Sprintf("延迟【%v】秒后添加QQ好友", sleepTime))
+				time.Sleep(time.Duration(sleepTime) * time.Second)
+				count = 0
+			}
+			task := global.GetTask(global.TASK_QQ_ADD_FRIEND)
+			if task == nil || !task.State {
+				str = fmt.Sprintf("【%s】已取消了", global.TaskNameMap[global.TASK_QQ_ADD_FRIEND])
+				global.Log.Info(str)
+				global.PageMsg(str)
+				return
+			}
+			//更新任务记录
+			global.UpdateTask(global.TASK_QQ_ADD_FRIEND, fmt.Sprintf("正在添加QQ好友【%v】%s", v.QQ, v.Nick))
+			err = ai.AddQQFriend(v.QQ, remark)
+			if err != nil {
+				errCount++
+				str = fmt.Sprintf("添加QQ好友【%v】%s失败，原因：%s", v.QQ, v.Nick, err.Error())
+				global.Log.Error(str)
+				global.PageErrorMsg(str, "")
+			} else {
+				errCount = 0
+				str = fmt.Sprintf("添加QQ好友【%v】%s成功", v.QQ, v.Nick)
+				global.PageSuccessMsg(str, "")
+			}
+
+			global.UpdateTask(global.TASK_QQ_ADD_FRIEND, str)
+			time.Sleep(time.Second * time.Duration(utils.NewRandom().Number(1)))
+			//连续错误5次停止发送
+			if errCount > 5 {
+				global.PageMsg("连续5次以上添加QQ好友失败，终止添加，请稍后重试！")
+			}
+		}
+	}()
+	return utils.SuccessNull(c, "'正在启动添加QQ好友")
 }
