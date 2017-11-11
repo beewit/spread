@@ -37,14 +37,12 @@ func ReceiveToken(c echo.Context) error {
 			return utils.Redirect(c, global.Host)
 		}
 	}
-	return utils.RedirectAndAlert(c, "登陆失败", global.API_SSO_DOMAN+"?backUrl="+global.Host+"/ReceiveToken")
+	return utils.RedirectAndAlert(c, "登陆失败", global.API_SSO_DOMAIN+"?backUrl="+global.Host+"/ReceiveToken")
 }
 
 func SignOut(c echo.Context) error {
 	api.DeleteToken(global.Acc.Token)
 	dao.DeleteToken(global.Acc)
 	global.Acc = nil
-	//global.Navigate(global.API_SSO_DOMAN + "?backUrl=" + global.Host + "/ReceiveToken")
-
-	return utils.RedirectAndAlert(c, "", global.API_SSO_DOMAN+"?backUrl="+global.Host+"/ReceiveToken")
+	return utils.RedirectAndAlert(c, "", global.API_SSO_DOMAIN+"?backUrl="+global.Host+"/ReceiveToken")
 }

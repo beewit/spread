@@ -83,7 +83,7 @@
                         <b class="am-form-label">问候语：</b>
                         <input type="text" class="input am-input-sm" style="width: 250px;display: initial;"
                                placeholder="问候语" id="qqRemark">
-                        <button type="button" class="am-btn am-btn-sm am-btn-primary" onclick="saveQQAccount()">
+                        <button type="button" class="am-btn am-btn-sm am-btn-primary" id="saveAccount">
                             <i class="am-icon-save"></i> 保存
                         </button>
                         <br>
@@ -247,11 +247,11 @@
 <script src="../assets/js/common.ajax.js"></script>
 <script src="../assets/js/common.js"></script>
 <script>
-    var pageIndex = 1;
     $(function () {
         getLoginQQInfo();
         cancelLoginQQ();
         qqFuncStatus();
+        getQQAccount();
         $("#StartAddQQGroup").click(function () {
             var groupCount = $("#groupCount").val() || 3, sleepTime = $("#sleepTime").val() || 30;
             var qqAcc = $("#qqAcc").val(), qqPwd = $("#qqPwd").val(), qqRemark = $("#qqRemark").val();
@@ -263,12 +263,37 @@
                 }
             });
         });
+        $("#saveAccount").click(function () {
+            var qqAcc = $("#qqAcc").val(), qqPwd = $("#qqPwd").val(), qqRemark = $("#qqRemark").val();
+            $.ajax({
+                url: "/qq/account/save",
+                data: {qq: qqAcc, pwd: qqPwd, remark: qqRemark},
+                success: function (d) {
+                    layer.msg(d.msg, {icon: 1})
+                }
+            });
+        });
         $("#searchQQGroup").click(function () {
             $("#searchQQGroupList").html('');
             var keyword = $("#keyword").val();
             search(keyword, 0, 0)
         });
     });
+
+    function getQQAccount() {
+        $.ajax({
+            url: "/qq/account/get",
+            success: function (d) {
+                if (d.data != null && d.data.length) {
+                    for (var i in d.data) {
+                        $("#qqAcc").val(d.data[i].platform_account);
+                        $("#qqPwd").val(d.data[i].platform_password);
+                        $("#qqRemark").val(d.data[i].remark);
+                    }
+                }
+            }
+        });
+    }
 
     function search(keyword, city, page) {
         $.ajax({

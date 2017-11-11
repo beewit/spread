@@ -21,7 +21,7 @@ func ApiPost(url string, m map[string]string) (utils.ResultParam, error) {
 	if strings.Index(url, "http://") == 0 || strings.Index(url, "https://") == 0 {
 		newURL = url
 	} else {
-		newURL = global.API_SERVICE_DOMAN + url
+		newURL = global.API_SERVICE_DOMAIN + url
 	}
 	body, err := uhttp.Cmd(uhttp.Request{
 		Method: "POST",

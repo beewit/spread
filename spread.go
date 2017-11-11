@@ -13,11 +13,13 @@ import (
 
 	"time"
 
+	"sync"
+
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/beekit/utils/convert"
+	"github.com/beewit/spread-update/update"
 	"github.com/beewit/wechat-ai/ai"
 	"github.com/sclevine/agouti"
-	"sync"
 )
 
 type MyWindow struct {
@@ -221,7 +223,7 @@ func (mw *MyWindow) AddNotifyIcon() {
 	}()
 	mw.addAction(nil, "工蜂小智官网").Triggered().Attach(func() {
 		global.Log.Info("打开工蜂小智官网")
-		err := utils.Open("http://www.tbqbz.com/")
+		err := utils.Open(global.API_DOMAIN)
 		if err != nil {
 			global.Log.Error(err.Error())
 		}
@@ -229,7 +231,7 @@ func (mw *MyWindow) AddNotifyIcon() {
 
 	mw.addAction(nil, "联系我们").Triggered().Attach(func() {
 		global.Log.Info("打开工蜂小智-联系我们")
-		err := utils.Open("http://www.tbqbz.com/page/about/contact.html")
+		err := utils.Open(global.CONTACT_PAGE)
 		if err != nil {
 			global.Log.Error(err.Error())
 		}
@@ -261,14 +263,17 @@ var syncMutex *sync.Mutex
 
 func (mw *MyWindow) openSpread() {
 	syncMutex.Lock()
+	global.Log.Info("正在打开工蜂小智主界面")
 	defer func() {
 		if err := recover(); err != nil {
+			global.Log.Info("新打开工蜂小智主界面")
 			global.Page.Page, err = global.Driver.NewPage()
 			if err != nil {
 				walk.MsgBox(mw, "工蜂小智-系统提示", "工蜂小智启动失败，请重新启动程序,错误："+convert.ToString(err), walk.MsgBoxIconInformation)
 			} else {
 				global.Page.Page.Navigate(global.Host)
 			}
+			syncMutex.Unlock()
 		}
 	}()
 	global.Page.Page.NextWindow()
@@ -279,6 +284,7 @@ func (mw *MyWindow) openSpread() {
 	} else {
 		ai.ForegroundWindow("Chrome_WidgetWin_1", title)
 	}
+	global.Log.Info("已打开工蜂小智主界面")
 	syncMutex.Unlock()
 }
 
@@ -335,7 +341,26 @@ func (mw *MyWindow) msgbox(title, message string, style walk.MsgBoxStyle) {
 }
 
 func main() {
+	global.Log.Info("启动程序")
 	mw := NewMyWindow()
+	_, err := update.CheckUpload(update.Version{Major: 1, Minor: 0, Patch: 0})
+	if err == nil {
+		//启动更新程序
+		flog, err := utils.PathExists("spread-update.exe")
+		if err != nil || !flog {
+			global.Log.Error("找不到更新程序")
+			//提示更新程序错误
+			walk.MsgBox(mw, "工蜂小智-系统提示", "工蜂小智更新程序不存在，请进入官网重新下载", walk.MsgBoxIconError)
+			go utils.Open(global.API_DOMAIN)
+		} else {
+			global.Log.Info("启动更新程序")
+			err := utils.CallEXE("C:\\Users\\Administrator\\Desktop\\spread\\工蜂小智-v1.6.1\\spread-update.exe")
+			if err != nil {
+				global.Log.Error(err.Error())
+			}
+			return
+		}
+	}
 	mw.init()
 	mw.AddNotifyIcon()
 	mw.Run()
@@ -355,7 +380,7 @@ func Start() error {
 	load := global.Host
 	acc := handler.CheckClientLogin()
 	if acc == nil {
-		load = global.API_SSO_DOMAN + "?backUrl=" + global.Host + "/ReceiveToken"
+		load = global.API_SSO_DOMAIN + "?backUrl=" + global.Host + "/ReceiveToken"
 	} else {
 		global.Acc = acc
 	}
@@ -364,7 +389,7 @@ func Start() error {
 		"--gpu-process",
 		"--start-maximized",
 		"--disable-infobars",
-		"--app=" + global.LoadPage,
+		"--app=" + global.LOAD_PAGE,
 		"--webkit-text-size-adjust"}))
 	global.Driver.Start()
 	var err error
@@ -391,17 +416,4 @@ func Stop() {
 	global.Log.Info("退出服务")
 	router.Stop()
 	utils.CloseSpread()
-}
-
-func Show() {
-	err := global.Page.Page.NextWindow()
-	if err != nil {
-		global.Page.Page, err = global.Driver.NewPage()
-		if err != nil {
-			fmt.Println("Failed to open page.")
-		}
-		go func() {
-			global.Page.Navigate(global.Host)
-		}()
-	}
 }

@@ -58,7 +58,7 @@ func UnionDelete(c echo.Context) error {
 
 func UnionBind(m map[string]interface{}) {
 	if global.Acc == nil || global.Acc.Id <= 0 {
-		global.PageAlertMsg("帐号未登陆，请登陆后操作", global.API_SSO_DOMAN+"?backUrl="+global.Host+"/ReceiveToken")
+		global.PageAlertMsg("帐号未登陆，请登陆后操作", global.API_SSO_DOMAIN+"?backUrl="+global.Host+"/ReceiveToken")
 		return
 	}
 	//进入登陆页面
@@ -148,7 +148,7 @@ func CheckLogin(domain, identity, platform, as, ps, iframeSeletor string, platfo
 
 		if flog {
 			if platformAcc != "" && platformPwd != "" {
-				dbFlog, err := dao.SetUnion(platform, platformAcc, platformPwd, platformId, global.Acc.Id)
+				dbFlog, err := dao.SetUnion(platform, platformAcc, platformPwd, "", platformId, global.Acc.Id)
 				if err != nil {
 					global.Log.Error("添加帐号绑定数据，异常：%v", err.Error())
 				}

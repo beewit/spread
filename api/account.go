@@ -9,7 +9,7 @@ import (
 )
 
 func CheckClientLogin(token string) *global.Account {
-	b, err := uhttp.PostForm(global.API_SSO_DOMAN+"/pass/checkToken?token="+token, nil)
+	b, err := uhttp.PostForm(global.API_SSO_DOMAIN+"/pass/checkToken?token="+token, nil)
 	if err != nil {
 		global.Log.Error(err.Error())
 		return nil
@@ -25,7 +25,7 @@ func CheckClientLogin(token string) *global.Account {
 
 func DeleteToken(token string) bool {
 	url := fmt.Sprintf("/pass/deleteToken?token=%s", token)
-	b, err := uhttp.PostForm(global.API_SSO_DOMAN+url, nil)
+	b, err := uhttp.PostForm(global.API_SSO_DOMAIN+url, nil)
 	if err != nil {
 		global.Log.Error(err.Error())
 		return false
@@ -42,7 +42,7 @@ func UpdatePwd(c echo.Context) error {
 	pwdNew := c.FormValue("pwdNew")
 	url := fmt.Sprintf("/api/account/updatePwd?pwd=%s&pwdNew=%s", pwd, pwdNew)
 
-	rp, err := ApiPost(global.API_SERVICE_DOMAN+url, nil)
+	rp, err := ApiPost(global.API_SERVICE_DOMAIN+url, nil)
 	if err != nil {
 		global.Log.Error(err.Error())
 		return utils.ErrorNull(c, "修改密码失败")

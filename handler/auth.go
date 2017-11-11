@@ -24,7 +24,7 @@ func Filter(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		acc := CheckClientLogin()
 		if acc == nil {
-			go global.Navigate(global.API_SSO_DOMAN + "?backUrl=" + global.Host + "/ReceiveToken")
+			go global.Page.Page.Navigate(global.API_SSO_DOMAIN + "?backUrl=" + global.Host + "/ReceiveToken")
 			return utils.AuthFail(c, "登陆信息已失效，请重新登陆")
 		}
 		return next(c)

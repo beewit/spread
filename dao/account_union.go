@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func SetUnion(platform, platformAcc, platformPwd string, platformId, accId int64) (bool, error) {
+func SetUnion(platform, platformAcc, platformPwd, remark string, platformId, accId int64) (bool, error) {
 	if global.Acc == nil {
 		return false, nil
 	}
@@ -16,19 +16,17 @@ func SetUnion(platform, platformAcc, platformPwd string, platformId, accId int64
 	if err != nil {
 		return false, err
 	}
+	nt := utils.CurrentTime()
 	var x int64
-	var err2 error
 	if m == nil {
 		//修改原有Cookie
-		sql := `INSERT INTO account_union(id,platform,status,ct_time,ut_time,platform_account,platform_password,account_id,platform_id) values(?,?,1,?,?,?,?,?,?)`
-		nt := time.Now().Format("2006-01-02 15:04:05")
-		x, err2 = global.SLDB.Insert(sql, id, platform, nt, nt, platformAcc, platformPwd, accId, platformId)
+		sql := `INSERT INTO account_union(id,platform,status,ct_time,ut_time,platform_account,platform_password,account_id,platform_id,remark) values(?,?,1,?,?,?,?,?,?,?)`
+		x, err = global.SLDB.Insert(sql, id, platform, nt, nt, platformAcc, platformPwd, accId, platformId, remark)
 	} else {
-		sql := `UPDATE account_union SET platform_password=?,ut_time=? WHERE platform_id=? AND account_id=? AND platform_account=?`
-		nt := time.Now().Format("2006-01-02 15:04:05")
-		x, err2 = global.SLDB.Update(sql, platformPwd, nt, platformId, accId, platformAcc)
+		sql := `UPDATE account_union SET platform_password=?,ut_time=? WHERE platform_id=? AND account_id=? AND platform_account=? AND remark=?`
+		x, err = global.SLDB.Update(sql, platformPwd, nt, platformId, accId, platformAcc, remark)
 	}
-	if err2 != nil {
+	if err != nil {
 		return false, err
 	}
 	return x > 0, err

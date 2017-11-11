@@ -6,7 +6,9 @@ import (
 
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/beekit/utils/convert"
+	"github.com/beewit/beekit/utils/enum"
 	"github.com/beewit/spread/api"
+	"github.com/beewit/spread/dao"
 	"github.com/beewit/spread/global"
 	"github.com/beewit/wechat-ai/ai"
 	"github.com/beewit/wechat-ai/smartQQ"
@@ -559,4 +561,70 @@ func AddQQ(c echo.Context) error {
 		}
 	}()
 	return utils.SuccessNull(c, "'正在启动添加QQ好友")
+}
+
+func SaveQQAccount(c echo.Context) error {
+	qq := c.FormValue("qq")
+	pwd := c.FormValue("pwd")
+	remark := c.FormValue("remark")
+	if qq == "" || pwd == "" {
+		return utils.ErrorNull(c, "请设置QQ账号密码")
+	}
+	flog, err := dao.SetUnion(enum.QQ, qq, pwd, remark, enum.QQ_ID, global.Acc.Id)
+	if err != nil {
+		str := fmt.Sprintf("保存QQ账号失败，原因：%s", err.Error())
+		global.Log.Error(str)
+		return utils.ErrorNull(c, str)
+	} else {
+		if flog {
+			return utils.SuccessNull(c, "保存QQ账号成功！")
+		} else {
+			return utils.ErrorNull(c, "保存QQ账号失败！")
+		}
+	}
+}
+
+func GetQQAccount(c echo.Context) error {
+	m, err := dao.GetUnionList(enum.QQ_ID, global.Acc.Id)
+	if err != nil {
+		str := fmt.Sprintf("查询QQ账号异常，原因：%s", err.Error())
+		global.Log.Error(str)
+		return utils.SuccessNull(c, "")
+	} else {
+		return utils.SuccessNullMsg(c, m)
+	}
+}
+
+func UpdateFriend(c echo.Context) error {
+	if !api.EffectiveFuncById(global.FUNC_QQ) {
+		return utils.ErrorNull(c, "QQ营销功能还未开通，请开通此功能后使用")
+	}
+	if global.QQClient == nil || !global.QQClient.Login.Status {
+		return utils.ErrorNull(c, "未登录，请重新扫码登录后操作")
+	}
+	_, err := global.QQClient.GetFriendList()
+	if err != nil {
+		str := fmt.Sprintf("更新好友错误，原因：%s", err.Error())
+		global.Log.Error(str)
+		return utils.ErrorNull(c, "更新失败")
+	} else {
+		return utils.SuccessNullMsg(c, "更新成功")
+	}
+}
+
+func UpdateGroup(c echo.Context) error {
+	if !api.EffectiveFuncById(global.FUNC_QQ) {
+		return utils.ErrorNull(c, "QQ营销功能还未开通，请开通此功能后使用")
+	}
+	if global.QQClient == nil || !global.QQClient.Login.Status {
+		return utils.ErrorNull(c, "未登录，请重新扫码登录后操作")
+	}
+	_, err := global.QQClient.GetMyGroupList()
+	if err != nil {
+		str := fmt.Sprintf("更新群错误，原因：%s", err.Error())
+		global.Log.Error(str)
+		return utils.ErrorNull(c, "更新失败")
+	} else {
+		return utils.SuccessNullMsg(c, "更新成功")
+	}
 }

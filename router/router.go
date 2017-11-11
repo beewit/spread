@@ -10,7 +10,7 @@ import (
 	"os"
 
 	"github.com/beewit/spread/api"
-	//"github.com/beewit/spread/static"
+	"github.com/beewit/spread/static"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -41,8 +41,8 @@ func Router() {
 	//e.Logger.SetLevel(log.OFF)
 	e.Logger.SetOutput(file)
 
-	e.Static("/app", "app")
-	//e.GET("/*", echo.WrapHandler(static.Handler))
+	//e.Static("/app", "app")
+	e.GET("/*", echo.WrapHandler(static.Handler))
 	e.File("/", "app/page/index.html")
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
@@ -95,6 +95,8 @@ func handlerConfig() {
 	e.POST("/qq/add/qq", handler.AddQQ, handler.Filter)
 	e.POST("/qq/group/members", handler.GetQQGroupMembers, handler.Filter)
 	e.POST("/qq/group/one/members", handler.GetQQGroupMembersByQQ, handler.Filter)
+	e.POST("/qq/account/save", handler.SaveQQAccount, handler.Filter)
+	e.POST("/qq/account/get", handler.GetQQAccount, handler.Filter)
 
 	e.GET("/task.js", handler.GetTask, handler.Filter)
 	e.GET("/task/stop.js", handler.StopTask, handler.Filter)

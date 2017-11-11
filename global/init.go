@@ -16,6 +16,15 @@ import (
 	"github.com/sclevine/agouti"
 )
 
+const (
+	API_DOMAIN         = "http://www.tbqbz.com:8080"
+	API_SERVICE_DOMAIN = "http://hive.tbqbz.com:8082"
+	API_SSO_DOMAIN     = "http://sso.tbqbz.com:8081"
+	PAGE_SIZE          = 10
+	FUNC_WECHAT        = 6
+	FUNC_QQ            = 7
+)
+
 var (
 	CFG          = conf.New("config.json")
 	SLDB         = sqlite.DB
@@ -28,31 +37,18 @@ var (
 	Host         = fmt.Sprintf("http://%v:%v", IP, Port)
 	Navigate     = PageNavigate
 	Acc          *Account
-	Platform     = map[string]int{"新浪微博": 1, "简书": 2, "知乎": 3}
-	LoadPage     = "http://www.tbqbz.com/page/load.html"
 	Page         = *new(utils.AgoutiPage)
 	WechatClient *smartWechat.WechatClient
 	QQClient     = smartQQ.NewQQClient(&smartQQ.QQClient{})
 	TaskList     = map[string]*Task{}
 	VoiceSwitch  = true
-)
-
-const (
-	FUNC_WECHAT = 6
-	FUNC_QQ     = 7
-)
-
-const (
-	API_SERVICE_DOMAN = "http://hive.tbqbz.com:8082"
-	API_SSO_DOMAN     = "http://sso.tbqbz.com:8081"
-	PAGE_SIZE         = 10
+	LOAD_PAGE    = API_DOMAIN + "/page/load.html"
+	CONTACT_PAGE = API_DOMAIN + "/page/about/contact.html"
 )
 
 func injection() {
 	time.Sleep(300 * time.Millisecond)
 	arguments := map[string]interface{}{"hiveHtml": HiveHtml, "host": Host}
-	//jquery
-	//js := ";$(function () {$('body').append(hiveHtml)});" + HiveJs
 	js := "var hiveHtmlDiv = document.createElement('div');hiveHtmlDiv.innerHTML=hiveHtml;document.body.appendChild(hiveHtmlDiv);" + HiveJs
 	Page.RunScript(js, arguments, nil)
 }
@@ -111,7 +107,7 @@ func PageJumpMsg(status, tip, url string) {
 		}
 		urls = fmt.Sprintf("setTimeout(function () {     location.href='%v';    },1500)", url)
 	}
-	js := fmt.Sprintf("document.getElementById('pageMsg');pageMsg.parentNode.removeChild(pageMsg);var div = document.createElement('div');div.innerHTML=`%v`;document.body.appendChild(div);%s", tipDiv, urls)
+	js := fmt.Sprintf("var pageMsg = document.getElementById('pageMsg'); if(pageMsg!=null) pageMsg.parentNode.removeChild(pageMsg);var div = document.createElement('div');div.innerHTML=`%v`;document.body.appendChild(div);%s", tipDiv, urls)
 	Page.RunScript(js, nil, nil)
 }
 
@@ -171,9 +167,9 @@ func PageAddLocalStorage(ls string) bool {
 		arguments := map[string]interface{}{"key": k, "value": v}
 		err = Page.RunScript("localStorage.setItem(key,value)", arguments, nil)
 		if err != nil {
-			Log.Error("<<<<<<<<<<< localStorage.setItem('%s','%s')失败", k, v)
+			Log.Error(fmt.Sprintf("localStorage.setItem('%s','%s')失败", k, v))
 		} else {
-			Log.Info("<<<<<<<<<<< localStorage.setItem('%s','%s')成功", k, v)
+			Log.Info("localStorage.setItem('%s','%s')成功", k, v)
 		}
 	}
 	return true
@@ -206,9 +202,9 @@ func PageAddSessionStorage(ss string) bool {
 		arguments := map[string]interface{}{"key": k, "value": v}
 		err = Page.RunScript("sessionStorage.setItem(key,value)", arguments, nil)
 		if err != nil {
-			Log.Error("<<<<<<<<<<< sessionStorage.setItem('%s','%s')失败", k, v)
+			Log.Error(fmt.Sprintf("sessionStorage.setItem('%s','%s')失败", k, v))
 		} else {
-			Log.Info("<<<<<<<<<<< sessionStorage.setItem('%s','%s')成功", k, v)
+			Log.Info("sessionStorage.setItem('%s','%s')成功", k, v)
 		}
 	}
 	return true
