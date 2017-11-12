@@ -95,7 +95,7 @@ func addWechat(area, types string, groupCount, sleepTime int) {
 		return
 	}
 	var str string
-	global.Navigate(global.LOAD_PAGE)
+	global.Navigate(global.LoadPage)
 	gc := 0
 	for i := 0; i < len(pageData.Data); i++ {
 		//任务记录

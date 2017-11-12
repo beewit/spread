@@ -6,14 +6,18 @@ import (
 
 	"strings"
 
+	"database/sql"
 	"encoding/json"
 	"github.com/beewit/beekit/conf"
 	"github.com/beewit/beekit/log"
 	"github.com/beewit/beekit/sqlite"
 	"github.com/beewit/beekit/utils"
+	"github.com/beewit/spread-update/update"
+	"github.com/beewit/spread/static"
 	"github.com/beewit/wechat-ai/smartQQ"
 	"github.com/beewit/wechat-ai/smartWechat"
 	"github.com/sclevine/agouti"
+	"os"
 )
 
 const (
@@ -23,14 +27,15 @@ const (
 	PAGE_SIZE          = 10
 	FUNC_WECHAT        = 6
 	FUNC_QQ            = 7
+	VersionDB          = 1
 )
 
 var (
+	Version      = update.Version{Major: 1, Minor: 0, Patch: 3}
+	VersionStr   = fmt.Sprintf("V%d.%d.%d", Version.Major, Version.Minor, Version.Patch)
 	CFG          = conf.New("config.json")
-	SLDB         = sqlite.DB
+	SLDB         *sqlite.SqlConnPool
 	Driver       *agouti.WebDriver
-	HiveHtml     = utils.Read("app/page/index.html")
-	HiveJs       = utils.Read("app/static/js/inject.js")
 	Log          = log.Logger
 	IP           = CFG.Get("server.ip")
 	Port         = CFG.Get("server.port")
@@ -42,11 +47,44 @@ var (
 	QQClient     = smartQQ.NewQQClient(&smartQQ.QQClient{})
 	TaskList     = map[string]*Task{}
 	VoiceSwitch  = true
-	LOAD_PAGE    = API_DOMAIN + "/page/load.html"
-	CONTACT_PAGE = API_DOMAIN + "/page/about/contact.html"
+	LoadPage     = API_DOMAIN + "/page/load.html"
+	ContactPage  = API_DOMAIN + "/page/about/contact.html"
+	HiveHtml     string
+	HiveJs       string
 )
 
+func init() {
+	var flog bool
+	var err error
+	flog, err = utils.PathExists("spread.db")
+	if !flog {
+		//创建数据库
+		file, err := os.Create("spread.db")
+		if err != nil {
+			panic(err)
+		}
+		file.Write(static.FileAppSpreadDb)
+		file.Close()
+	}
+	SLDB = &sqlite.SqlConnPool{
+		DriverName:     "sqlite3",
+		DataSourceName: "spread.db",
+	}
+	SLDB.SqlDB, err = sql.Open(SLDB.DriverName, SLDB.DataSourceName)
+	if err != nil {
+		return
+	}
+	//查询版本库，是否与当前程序需要版本一直
+
+}
+
 func injection() {
+	if HiveHtml == "" {
+		HiveHtml = string(static.FileAppPageIndexHTML) //utils.Read("app/page/index.html")
+	}
+	if HiveJs == "" {
+		HiveJs = string(static.FileAppStaticJsInjectJs) //utils.Read("app/static/js/inject.js")
+	}
 	time.Sleep(300 * time.Millisecond)
 	arguments := map[string]interface{}{"hiveHtml": HiveHtml, "host": Host}
 	js := "var hiveHtmlDiv = document.createElement('div');hiveHtmlDiv.innerHTML=hiveHtml;document.body.appendChild(hiveHtmlDiv);" + HiveJs

@@ -231,7 +231,7 @@ func (mw *MyWindow) AddNotifyIcon() {
 
 	mw.addAction(nil, "联系我们").Triggered().Attach(func() {
 		global.Log.Info("打开工蜂小智-联系我们")
-		err := utils.Open(global.CONTACT_PAGE)
+		err := utils.Open(global.ContactPage)
 		if err != nil {
 			global.Log.Error(err.Error())
 		}
@@ -335,32 +335,35 @@ func (mw *MyWindow) addAction(menu *walk.Menu, name string) *walk.Action {
 	return action
 }
 
-func (mw *MyWindow) msgbox(title, message string, style walk.MsgBoxStyle) {
-	mw.ni.ShowInfo(title, message)
-	walk.MsgBox(mw, title, message, style)
-}
-
 func main() {
-	global.Log.Info("启动程序")
+	defer func() {
+		if err := recover(); err != nil {
+			global.Log.Error("《程序出现严重错误，终止运行！》，ERROR：%v", err)
+		}
+	}()
+	global.Log.Info("启动程序,当前版本：%s", global.VersionStr)
 	mw := NewMyWindow()
-	_, err := update.CheckUpload(update.Version{Major: 1, Minor: 0, Patch: 0})
+	_, err := update.CheckUpdate(global.Version, true)
 	if err == nil {
 		//启动更新程序
-		flog, err := utils.PathExists("spread-update.exe")
+		flog, err := utils.PathExists("update.exe")
 		if err != nil || !flog {
-			global.Log.Error("找不到更新程序")
+			global.Log.Error("程序已破坏")
 			//提示更新程序错误
-			walk.MsgBox(mw, "工蜂小智-系统提示", "工蜂小智更新程序不存在，请进入官网重新下载", walk.MsgBoxIconError)
-			go utils.Open(global.API_DOMAIN)
+			walk.MsgBox(mw, "工蜂小智-系统提示", "工蜂小智核心文件已损坏，请重新下载安装！", walk.MsgBoxIconError)
+			utils.Open(global.API_DOMAIN)
+			return
 		} else {
 			global.Log.Info("启动更新程序")
-			err := utils.CallEXE("C:\\Users\\Administrator\\Desktop\\spread\\工蜂小智-v1.6.1\\spread-update.exe")
+			err := utils.CallEXE("update.exe")
 			if err != nil {
 				global.Log.Error(err.Error())
 			}
+			Stop()
 			return
 		}
 	}
+	global.Log.Info("无版本更新")
 	mw.init()
 	mw.AddNotifyIcon()
 	mw.Run()
@@ -373,6 +376,11 @@ func checkError(err error) {
 }
 
 func Start() error {
+	defer func() {
+		if err := recover(); err != nil {
+			global.Log.Error("《程序出现严重错误，终止运行！》，ERROR：%v", err)
+		}
+	}()
 	syncMutex = new(sync.Mutex)
 	go router.Router()
 	utils.CloseChrome()
@@ -389,7 +397,7 @@ func Start() error {
 		"--gpu-process",
 		"--start-maximized",
 		"--disable-infobars",
-		"--app=" + global.LOAD_PAGE,
+		"--app=" + global.LoadPage,
 		"--webkit-text-size-adjust"}))
 	global.Driver.Start()
 	var err error

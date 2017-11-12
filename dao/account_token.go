@@ -58,6 +58,7 @@ func InsertWechatLogin(wxLoginInfo string, acc *global.Account) (bool, error) {
 	}
 	return x > 0, err
 }
+
 func DeleteWechatLogin(acc *global.Account) (bool, error) {
 	sql := `UPDATE account_token SET login_wechat_user=null WHERE account_id=?`
 	x, err := global.SLDB.Delete(sql, acc.Id)

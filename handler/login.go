@@ -6,8 +6,13 @@ import (
 	"github.com/beewit/spread/api"
 	"github.com/beewit/spread/dao"
 	"github.com/beewit/spread/global"
+	"github.com/beewit/spread/static"
 	"github.com/labstack/echo"
 )
+
+func Index(c echo.Context) error {
+	return utils.ResultHtml(c, string(static.FileAppPageIndexHTML))
+}
 
 func SetClientToken(token string) *global.Account {
 	acc := api.CheckClientLogin(token)

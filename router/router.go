@@ -29,8 +29,6 @@ func Router() {
 	defer func() {
 		if err := recover(); err != nil {
 			global.Log.Error("《程序出现严重错误，终止运行！》，ERROR：%v", err)
-		} else {
-			global.Log.Error("程序正常关闭！")
 		}
 	}()
 	e = echo.New()
@@ -42,8 +40,8 @@ func Router() {
 	e.Logger.SetOutput(file)
 
 	//e.Static("/app", "app")
+	//e.File("/", "app/page/index.html")
 	e.GET("/*", echo.WrapHandler(static.Handler))
-	e.File("/", "app/page/index.html")
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
 	handlerConfig()
@@ -52,6 +50,8 @@ func Router() {
 }
 
 func handlerConfig() {
+	e.GET("/", handler.Index)
+
 	e.POST("/push/push", handler.Push, handler.Filter)
 
 	e.POST("/api/template", api.GetTemplateByList, handler.Filter)
