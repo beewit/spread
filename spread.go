@@ -17,12 +17,45 @@ import (
 
 	"os"
 
+	//"errors"
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/beekit/utils/convert"
 	"github.com/beewit/spread-update/update"
 	"github.com/beewit/wechat-ai/ai"
 	"github.com/sclevine/agouti"
+	//"io/ioutil"
+	//"strconv"
 )
+
+//func init() {
+//	iManPid := fmt.Sprint(os.Getpid())
+//	if err := ProcExsit(); err == nil {
+//		pidFile, _ := os.Create("pid.pid")
+//		defer pidFile.Close()
+//		pidFile.WriteString(iManPid)
+//	} else {
+//		global.Logs(fmt.Sprintf("*************************【%s】*************************", err.Error()))
+//		os.Exit(1)
+//	}
+//}
+//
+//// 判断进程是否启动
+//func ProcExsit() (err error) {
+//	pid, err := os.Open("pid.pid")
+//	defer pid.Close()
+//	if err == nil {
+//		filePid, err := ioutil.ReadAll(pid)
+//		if err == nil {
+//			pidStr := fmt.Sprintf("%s", filePid)
+//			pid, _ := strconv.Atoi(pidStr)
+//			_, err := os.FindProcess(pid)
+//			if err == nil {
+//				return errors.New("工蜂小智已启动")
+//			}
+//		}
+//	}
+//	return nil
+//}
 
 type MyWindow struct {
 	*walk.MainWindow
@@ -341,13 +374,7 @@ func main() {
 	defer func() {
 		if err := recover(); err != nil {
 			errStr := fmt.Sprintf("《程序出现严重错误，终止运行！》，ERROR：%v", err)
-			file, err := os.Create("error.log")
-			defer file.Close()
-			if err != nil {
-				println(errStr)
-			} else {
-				file.Write([]byte(errStr))
-			}
+			global.Logs(errStr)
 		}
 	}()
 	global.Log.Info("启动程序,当前版本：%s", global.VersionStr)

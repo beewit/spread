@@ -17,6 +17,7 @@ import (
 	"github.com/beewit/wechat-ai/smartQQ"
 	"github.com/beewit/wechat-ai/smartWechat"
 	"github.com/sclevine/agouti"
+	"os"
 )
 
 const (
@@ -45,9 +46,10 @@ var (
 	Navigate         = PageNavigate
 	Acc              *Account
 	Page             = *new(utils.AgoutiPage)
-	WechatClientList = map[string]smartWechat.WechatClient{}
+	WechatClientList = map[string]*smartWechat.WechatClient{}
+	WechatNickName   = map[string]string{}
 	WechatClient     *smartWechat.WechatClient
-	QQClientList     = map[int64]smartQQ.QQClient{}
+	QQClientList     = map[int64]*smartQQ.QQClient{}
 	QQClient         = smartQQ.NewQQClient(&smartQQ.QQClient{})
 	TaskList         = map[string]*Task{}
 	VoiceSwitch      = true
@@ -59,6 +61,10 @@ var (
 
 func init() {
 	initLog()
+	err := CheckUpdateDB()
+	if err != nil {
+		Log.Error(err.Error())
+	}
 	iniSqliteDB()
 }
 
@@ -279,4 +285,15 @@ func PageAddSessionStorage(ss string) bool {
 		}
 	}
 	return true
+}
+
+func Logs(errStr string) {
+	errStr = time.Now().Format("2006-01-02 15:04:05") + "   " + errStr
+	file, err := os.OpenFile("error.log", os.O_CREATE|os.O_APPEND, 0x644)
+	defer file.Close()
+	if err != nil {
+		println(errStr)
+	} else {
+		file.Write([]byte(errStr))
+	}
 }

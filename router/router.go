@@ -10,7 +10,7 @@ import (
 	"os"
 
 	"github.com/beewit/spread/api"
-	"github.com/beewit/spread/static"
+	//"github.com/beewit/spread/static"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -39,9 +39,10 @@ func Router() {
 	//e.Logger.SetLevel(log.OFF)
 	e.Logger.SetOutput(file)
 
-	//e.Static("/app", "app")
-	//e.File("/", "app/page/index.html")
-	e.GET("/*", echo.WrapHandler(static.Handler))
+	e.Static("/app", "app")
+	e.File("/", "app/page/index.html")
+
+	//e.GET("/*", echo.WrapHandler(static.Handler))
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
 	handlerConfig()
@@ -84,6 +85,12 @@ func handlerConfig() {
 	e.POST("/wechat/add/user", handler.AddWechatUser, handler.Filter)
 	e.POST("/wechat/cancel/login", handler.CancelLoginWechat, handler.Filter)
 
+	e.POST("/wechat/client/list", handler.GetWechatClientList, handler.Filter)
+	e.POST("/wechat/list/accountStatus", handler.GetWechatAccountStatus, handler.Filter)
+	e.POST("/wechat/list/loginAccount", handler.LoginWechatListAccount, handler.Filter)
+	e.POST("/wechat/list/sendMsg", handler.SendWechatListMsg, handler.Filter)
+	e.POST("/wechat/list/addUser", handler.AddWechatListUser, handler.Filter)
+
 	e.POST("/qq/login", handler.QQLogin, handler.Filter)
 	e.POST("/qq/funcStatus", handler.GetQQFuncStatus, handler.Filter)
 	e.POST("/qq/cancel/login", handler.CancelLoginQQ, handler.Filter)
@@ -97,6 +104,7 @@ func handlerConfig() {
 	e.POST("/qq/group/one/members", handler.GetQQGroupMembersByQQ, handler.Filter)
 	e.POST("/qq/account/save", handler.SaveQQAccount, handler.Filter)
 	e.POST("/qq/account/get", handler.GetQQAccount, handler.Filter)
+	e.POST("/qq/client/list", handler.GetQQClientList, handler.Filter)
 
 	e.GET("/task.js", handler.GetTask, handler.Filter)
 	e.GET("/task/stop.js", handler.StopTask, handler.Filter)

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>工蜂小智 </title>
+    <meta name="description" content="微信营销">
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="icon" type="image/png" href="../assets/i/favicon.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/i/favicon.png">
+    <meta name="apple-mobile-web-app-title" content="工蜂小智"/>
+    <link rel="stylesheet" href="/app/static/js/plugs/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../assets/css/amazeui.min.css"/>
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <link rel="stylesheet" href="/app/static/css/base.css">
+    <style>
+        .am-form-label {
+            font-size: 16px;
+        }
+
+        .input {
+            padding: .5em;
+            font-size: 1.6rem;
+            line-height: 1.2;
+            color: #555;
+            vertical-align: middle;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid #ccc !important;
+            border-radius: 0;
+            -webkit-appearance: none;
+            -webkit-transition: border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+            transition: border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+        }
+
+        .hive-4 {
+            width: 50%;
+            float: left;
+        }
+
+        .hive-6 {
+            width: 50%;
+            float: left;
+        }
+
+        @media only screen and (max-width: 1500px) {
+            .hive-6 {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+
+    </style>
+</head>
+<body data-type="generalComponents">
+<div class="tpl-page-container tpl-page-header-fixed">
+    <div class="tpl-content-wrapper">
+        <div class="tpl-portlet-components">
+            <ul class="am-nav am-nav-tabs">
+                <li class="am-active"><a href="../wechat/index.html"><span class="am-icon-comments"></span> 微信营销</a>
+                </li>
+                <li><a href="../qq/index.html"><span class="am-icon-qq"></span> QQ营销</a></li>
+            </ul>
+            <div class="hive-tip am-hide">微信营销功能未开通，点击<a>立即开通</a></div>
+            <div class="tpl-block">
+                <div class="am-g">
+                    <div class="am-u-sm-12 am-u-md-6">
+                        <div class="am-btn-toolbar">
+                            <div class="am-btn-group am-btn-group-xs">
+                                <button type="button" class="am-btn am-btn-default am-btn-success" id="loginAccount"><span
+                                        class="am-icon-plus"></span> 添加微信登录账号
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="am-g">
+                    <div class="am-u-sm-12">
+                        <form class="am-form">
+                            <table class="am-table am-table-striped am-table-hover table-main">
+                                <thead>
+                                <tr>
+                                    <th class="table-title">UUID</th>
+                                    <th class="table-title">昵称</th>
+                                    <th class="table-set">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="accountList">
+                                </tbody>
+                            </table>
+                            <hr>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            <div class="am-g am-margin-top">
+                <div class="am-form">
+                    <div class="hive-6">
+                        <b class="am-form-label">采集设置：</b>
+                        <select id="area" class="am-form-select" placeholder="-- 所有区域 --"
+                                style="width: 150px;float: none;    display: initial;">
+                            <option value=" ">-- 所有区域 --</option>
+                        </select>
+                        <select id="type" placeholder="-- 所有分类 --" style="width: 150px;float: none;display: initial;">
+                            <option value=" ">-- 所有分类 --</option>
+                        </select>
+                        <button type="button" class="am-btn am-btn-sm am-btn-warning " id="btnSearch">
+                            <span class="am-icon-search"></span> 查询微信群采集
+                        </button>
+                    </div>
+                    <div class="hive-6">
+                        <b class="am-form-label">加群设置：</b>
+                        <span class="am-form-label">每加群：
+                               <input type="text" id="groupCount" class="input am-input-sm"
+                                      style="width: 80px;display: initial;"
+                                      placeholder="3" value="3"> 次
+                        </span>
+                        <span class="am-form-label">延迟：
+                               <input type="text" id="sleepTime" class="input am-input-sm"
+                                      style="width: 80px;display: initial;"
+                                      placeholder="30" value="30"> 秒后再加
+                        </span>
+                        <button type="button" class="am-btn am-btn-sm am-btn-success" id="StartAddWechatGroup"><span
+                                class="am-icon-plus"></span> 启动一键加群
+                        </button>
+                        <button type="button" class="am-btn am-btn-sm am-btn-secondary"
+                                onclick="checkLoginWechat(sendWechatMsg)">
+                            <span class="am-icon-location-arrow"></span> 群发微信
+                        </button>
+                        <button type="button" class="am-btn am-btn-sm am-btn-danger"
+                                onclick="checkLoginWechat(addWechatUser)">
+                            <span class="am-icon-plus"></span> 批量添加微信群成员
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="am-g">
+                <div class="am-u-sm-12">
+                    <form class="am-form">
+                        <table class="am-table am-table-striped am-table-hover table-main">
+                            <thead>
+                            <tr>
+                                <th class="table-id">ID</th>
+                                <th class="table-author">类型</th>
+                                <th class="table-title">群名称</th>
+                                <th class="table-type">区域</th>
+                                <th class="table-author">标签</th>
+                                <th class="table-date">群主</th>
+                                <th class="table-set">更新时间</th>
+                                <th class="table-set">热度</th>
+                            </tr>
+                            </thead>
+                            <tbody id="view">
+
+                            </tbody>
+                        </table>
+                        <div class="am-cf">
+                            <div class="am-fr" id="page">
+                            </div>
+                        </div>
+                        <hr>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        <div class="tpl-alert"></div>
+    </div>
+</div>
+<script id="list" type="text/html">
+{{#  layui.each(d, function(index, item){ }}
+<tr>
+<td>{{ item.id }}</td>
+<td>{{ item.type }}</td>
+<td>{{ item.name }}</td>
+<td>{{ item.area }}</td>
+<td>{{ item.code }}</td>
+<td>{{ item.owner_wechat }}</td>
+<td>{{ item.re_time }}</td>
+<td>{{ item.hot }}</td>
+</tr>
+{{#  }); }}
+    {{#  if(d == null){ }}
+<div class="table-no-result">
+    暂无微信群
+</div>
+{{#  } }}
+</script>
+<script src="../assets/js/jquery.min.js"></script>
+<script src="../assets/js/amazeui.min.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="/app/static/js/plugs/layui/layui.all.js"></script>
+<script src="../assets/js/common.ajax.js"></script>
+<script src="../assets/js/common.js"></script>
+<script>
+    var laytpl;
+    var laypage;
+    var pageIndex = 1;
+    var getTpl = list.innerHTML, view = document.getElementById('view');
+    layui.use(['laytpl', 'laypage'], function () {
+        laytpl = layui.laytpl;
+        laypage = layui.laypage;
+        loadClass();
+        loadList();
+    });
+
+    $(function () {
+        cancelLoginWechat();
+        bindLoginWechatList()
+        wechatFuncStatus();
+        $("#loginAccount").click(function () {
+            $.ajax({
+                url: "/wechat/list/loginAccount",
+                success: function (d) {
+                    openQrCode(d.UUid,d.data.base64Img,function () {
+                        //绑定账号
+                        bindLoginWechatList()
+                    })
+                }
+            });
+        });
+        $("#btnSearch").click(function () {
+            pageIndex = 1;
+            loadList()
+        });
+        $("#StartAddWechatGroup").click(function () {
+            layer.confirm('请确定是否已开启微信电脑版客户端？', {
+                btn: ['确定', '取消'] //按钮
+            }, function () {
+                var type = $("#type").val(),
+                        area = $("#area").val(),
+                        groupCount = $("#groupCount").val() || 3,
+                        sleepTime = $("#sleepTime").val() || 30;
+                if (type != "") {
+                    type = type.trim()
+                }
+                if (area != "") {
+                    area = area.trim()
+                }
+                $.ajax({
+                    url: "/wechat/group/start/add",
+                    data: {type: type, area: area, groupCount: groupCount, sleepTime: sleepTime},
+                    success: function (d) {
+                        layer.msg(d.msg, {icon: 1})
+                    }
+                });
+            });
+        });
+    });
+
+    function loadList() {
+        var type = $("#type").val(), area = $("#area").val();
+        if (type != "") {
+            type = type.trim()
+        }
+        if (area != "") {
+            area = area.trim()
+        }
+        $.ajax({
+            url: "/api/wechat/group/list",
+            data: {type: type, area: area, pageIndex: pageIndex},
+            success: function (d) {
+                if (d.ret == 200) {
+                    laytpl(getTpl).render(d.data.Data, function (html) {
+                        view.innerHTML = html;
+                    });
+                    //总页数大于页码总数
+                    laypage.render({
+                        elem: 'page',
+                        count: d.data.Count,
+                        limit: d.data.PageSize,
+                        curr: d.data.PageIndex,
+                        jump: function (obj, first) {
+                            if (!first) {
+                                pageIndex = obj.curr
+                                loadList()
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    function loadClass() {
+        $.ajax({
+            url: "/api/wechat/group/class",
+            success: function (d) {
+                if (d.ret == 200) {
+                    bindSelect("#area", d.data.area, "area", "area")
+                    bindSelect("#type", d.data.type, "type", "type")
+                }
+            }
+        });
+    }
+
+    function bindSelect(selector, data, val, text, checkKey) {
+        var $sel = $(selector);
+        var option = '';
+        var def = $sel.attr('placeholder') || '';
+        if (def != "") {
+            option += '<option value="">' + def + '</option>'
+        }
+        $.each(data, function (index, key) {
+            option += '<option value="' + eval("data[index]." + val) + '" ' + (val == checkKey ? "selected" : "") + '>'
+                    + eval("data[index]." + text) + '</option>'
+        });
+        $sel.html(option)
+    }
+
+
+    var sendStatus = 0;
+    var checkStatus = true;
+
+    function checkLoginWechat(func) {
+        $.ajax({
+            url: "/wechat/login/check",
+            success: function (d) {
+                if (d.data.state == 1) {
+                    layer.confirm('当前登录账号：【' + d.data.wechatUser.SelfNickName + '】', {
+                        btn: ['切换账号', '继续'] //按钮
+                    }, function () {
+                        loginWechat(func)
+                    }, function () {
+                        func()
+                    });
+                } else {
+                    loginWechat(func)
+                }
+            }
+        });
+    }
+
+    function loginWechat(func) {
+        $.ajax({
+            url: "/wechat/login",
+            success: function (d) {
+                openQrCode(d.data, func)
+            }
+        });
+    }
+
+    function cancelLoginWechat() {
+        $.ajax({
+            url: "/wechat/cancel/login"
+        });
+    }
+
+
+    function sendWechatMsg() {
+        layer.prompt({title: '请输入微信群发消息内容', formType: 2}, function (text, index) {
+            if (text == "") {
+                layer.msg('请输入发送内容');
+                return
+            }
+            layer.close(index);
+            $.ajax({
+                url: "/wechat/send/message",
+                data: {msg: text},
+                success: function (d) {
+                    layer.msg(d.msg)
+                }
+            });
+        });
+    }
+
+    function addWechatUser() {
+        layer.prompt({title: '请输入自动批量添加微信群成员的问候语', formType: 2}, function (text, index) {
+            if (text == "") {
+                layer.msg('请输入发送问候语的内容');
+                return
+            }
+            layer.close(index);
+            $.ajax({
+                url: "/wechat/add/user",
+                data: {content: text},
+                success: function (d) {
+                    layer.msg(d.msg)
+                }
+            });
+        });
+    }
+
+    var qrcodeLayer;
+
+    function openQrCode(uuid,qrcode, func) {
+        checkStatus = true
+        qrcodeLayer = layer.open({
+            type: 1,
+            title: "请用手机微信扫一扫二维码登录",
+            offset: '10px',
+            area: '400px',
+            closeBtn: false,
+            shade: 0.8,
+            id: 'LAY_layuipro',
+            btn: ['取消发送'],
+            moveType: 1,//拖拽模式，0或者1  ,
+            content: '<div style="padding: 50px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;padding-bottom: 10px;">' +
+            '<img src="' + qrcode + '" style="display:black;width: 100%;"><div style="text-align:center">' +
+            '<pre id="sendStatusMsg">扫码登录</pre></div></div>',
+            yes: function () {
+                cancelLoginWechat()
+                checkStatus = false;
+                layer.close(qrcodeLayer)
+            },
+            cancel: function () {
+                cancelLoginWechat()
+                checkStatus = false;
+                layer.close(qrcodeLayer)
+            }
+        });
+        getWechatStatus(uuid,func)
+    }
+
+
+    function getWechatStatus(uuid,func) {
+        $.ajax({
+            load_tip: false,
+            url: "/wechat/list/accountStatus",
+            data:{uuid:uuid},
+            success: function (d) {
+                if (sendStatus = d.data){
+                    setTimeout(function () {
+                        getWechatStatus(func)
+                    }, 300)
+                    return
+                }
+                sendStatus = d.data.sendStatus
+                if (sendStatus != 1 && checkStatus) {
+                    $("#sendStatusMsg").html("【" + d.data.sendStatus + "】" + d.data.sendStatusMsg);
+                    setTimeout(function () {
+                        getWechatStatus(func)
+                    }, 300)
+                } else {
+                    if (sendStatus == 1) {
+                        layer.close(qrcodeLayer)
+                        func()
+                    }
+                }
+            }
+        });
+    }
+
+    var temp='<tr><td>{uuid}</td><td>{nick}</td><td><div class="am-btn-toolbar"><div class="am-btn-group am-btn-group-xs">' +
+            '<button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only">' +
+            '<span class="am-icon-trash-o"></span> 删除</button></div></div></td></tr>';
+
+    function bindLoginWechatList() {
+        $.ajax({
+            url: "/wechat/client/list",
+            success: function (d) {
+                var str="";
+                $("#accountList").html('');
+                if(d.data!=null){
+                    for (var uuid in d.data) {
+                        str+= temp.replace("{uuid}",uuid).replace("{nick}",d.data[uuid].SelfNickName);
+                    }
+                }
+                $("#accountList").html(str)
+            }
+        });
+    }
+
+    function wechatFuncStatus() {
+        $.ajax({
+            load_tip: false,
+            url: "/wechat/funcStatus",
+            success: function (d) {
+                if (!d.data) {
+                    $(".hive-tip").removeClass("am-hide");
+                    getAccount(function (acc) {
+                        $(".hive-tip a").attr("href", "http://pay.tbqbz.com?fid=6&token=" + acc.account.Token +
+                                "&backUrl=" + encodeURIComponent(acc.host + "?lastUrl=/app/page/admin/wechat/index.html"))
+                    });
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

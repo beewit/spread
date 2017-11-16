@@ -17,6 +17,10 @@ import (
 	"sync"
 )
 
+func GetQQClientList(c echo.Context) error {
+	return utils.SuccessNullMsg(c, global.QQClientList)
+}
+
 func GetQQFuncStatus(c echo.Context) error {
 	flog := api.EffectiveFuncById(global.FUNC_QQ)
 	return utils.SuccessNullMsg(c, flog)
