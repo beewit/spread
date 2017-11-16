@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"github.com/beewit/beekit/log"
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/spread/api"
 	"github.com/beewit/spread/dao"
@@ -26,7 +25,7 @@ func SetClientToken(token string) *global.Account {
 		if flog {
 			return acc
 		}
-		log.Logger.Error("Token 写入本地数据库失败")
+		global.Log.Error("Token 写入本地数据库失败")
 		return nil
 	}
 	return nil

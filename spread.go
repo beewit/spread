@@ -15,6 +15,8 @@ import (
 
 	"sync"
 
+	"os"
+
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/beekit/utils/convert"
 	"github.com/beewit/spread-update/update"
@@ -338,7 +340,14 @@ func (mw *MyWindow) addAction(menu *walk.Menu, name string) *walk.Action {
 func main() {
 	defer func() {
 		if err := recover(); err != nil {
-			global.Log.Error("《程序出现严重错误，终止运行！》，ERROR：%v", err)
+			errStr := fmt.Sprintf("《程序出现严重错误，终止运行！》，ERROR：%v", err)
+			file, err := os.Create("error.log")
+			defer file.Close()
+			if err != nil {
+				println(errStr)
+			} else {
+				file.Write([]byte(errStr))
+			}
 		}
 	}()
 	global.Log.Info("启动程序,当前版本：%s", global.VersionStr)
@@ -346,7 +355,7 @@ func main() {
 	_, err := update.CheckUpdate(global.Version, true)
 	if err == nil {
 		//启动更新程序
-		flog, err := utils.PathExists("update.exe")
+		flog, err := utils.PathExists("spread-update.exe")
 		if err != nil || !flog {
 			global.Log.Error("程序已破坏")
 			//提示更新程序错误
@@ -355,10 +364,11 @@ func main() {
 			return
 		} else {
 			global.Log.Info("启动更新程序")
-			err := utils.CallEXE("update.exe")
+			_, err := os.StartProcess("spread-update.exe", nil, &os.ProcAttr{Files: []*os.File{os.Stdin, os.Stdout, os.Stderr}})
 			if err != nil {
 				global.Log.Error(err.Error())
 			}
+			time.Sleep(time.Second)
 			Stop()
 			return
 		}

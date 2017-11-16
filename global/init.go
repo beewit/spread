@@ -8,8 +8,8 @@ import (
 
 	"database/sql"
 	"encoding/json"
-	"github.com/beewit/beekit/conf"
-	"github.com/beewit/beekit/log"
+
+	"github.com/astaxie/beego/logs"
 	"github.com/beewit/beekit/sqlite"
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/spread-update/update"
@@ -17,28 +17,30 @@ import (
 	"github.com/beewit/wechat-ai/smartQQ"
 	"github.com/beewit/wechat-ai/smartWechat"
 	"github.com/sclevine/agouti"
-	"os"
 )
 
 const (
-	API_DOMAIN         = "http://www.tbqbz.com:8080"
-	API_SERVICE_DOMAIN = "http://hive.tbqbz.com:8082"
-	API_SSO_DOMAIN     = "http://sso.tbqbz.com:8081"
-	PAGE_SIZE          = 10
-	FUNC_WECHAT        = 6
-	FUNC_QQ            = 7
-	VersionDB          = 1
+	API_DOMAIN         = "http://www.tbqbz.com"
+	API_SERVICE_DOMAIN = "http://hive.tbqbz.com"
+	API_SSO_DOMAIN     = "http://sso.tbqbz.com"
+	SQLITE_DATABASE    = "app/spread.db"
+
+	PAGE_SIZE   = 10
+	FUNC_WECHAT = 6
+	FUNC_QQ     = 7
+	VERSION_DB  = 1
 )
 
 var (
-	Version      = update.Version{Major: 1, Minor: 0, Patch: 3}
+	//先改版本，在编译后上传到gitee.com做版本维护
+	//请注意，此版本不能大于https://gitee.com/beewit/spread/releases/new  上的版本
+	Version      = update.Version{Major: 1, Minor: 0, Patch: 8}
 	VersionStr   = fmt.Sprintf("V%d.%d.%d", Version.Major, Version.Minor, Version.Patch)
-	CFG          = conf.New("config.json")
 	SLDB         *sqlite.SqlConnPool
 	Driver       *agouti.WebDriver
-	Log          = log.Logger
-	IP           = CFG.Get("server.ip")
-	Port         = CFG.Get("server.port")
+	Log          = logs.GetBeeLogger()
+	IP           = "127.0.0.1"
+	Port         = "8080"
 	Host         = fmt.Sprintf("http://%v:%v", IP, Port)
 	Navigate     = PageNavigate
 	Acc          *Account
@@ -54,13 +56,19 @@ var (
 )
 
 func init() {
+	initLog()
+	iniSqliteDB()
+}
+
+func iniSqliteDB() {
 	var flog bool
 	var err error
-	flog, err = utils.PathExists("spread.db")
+	flog, err = utils.PathExists(SQLITE_DATABASE)
 	if !flog {
 		//创建数据库
-		file, err := os.Create("spread.db")
+		file, err := utils.CreateFile(SQLITE_DATABASE)
 		if err != nil {
+			Log.Error(err.Error())
 			panic(err)
 		}
 		file.Write(static.FileAppSpreadDb)
@@ -68,14 +76,37 @@ func init() {
 	}
 	SLDB = &sqlite.SqlConnPool{
 		DriverName:     "sqlite3",
-		DataSourceName: "spread.db",
+		DataSourceName: SQLITE_DATABASE,
 	}
 	SLDB.SqlDB, err = sql.Open(SLDB.DriverName, SLDB.DataSourceName)
 	if err != nil {
+		Log.Error(err.Error())
+		panic(err)
 		return
 	}
 	//查询版本库，是否与当前程序需要版本一直
+}
 
+func initLog() {
+	conf := fmt.Sprintf(
+		`{
+			"filename": "%s",
+			"maxdays": %s,
+			"daily": %s,
+			"rotate": %s,
+			"level": %s,
+			"separate": "[%s]"
+		}`,
+		"spread.log",
+		"10",
+		"true",
+		"true",
+		"7",
+		"error",
+	)
+	logs.SetLogger(logs.AdapterMultiFile, conf)
+	logs.SetLogger("console")
+	logs.EnableFuncCallDepth(true)
 }
 
 func injection() {
