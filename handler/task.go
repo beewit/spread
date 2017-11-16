@@ -45,7 +45,7 @@ func GetTask(c echo.Context) error {
 			trStr = '<td colspan="3">暂无任务</td>'
 		}
 		document.getElementById("taskList").innerHTML = trStr
-	};document.getElementById("version").innerHTML=%s`, global.Host, global.VersionStr)
+	};document.getElementById("version").innerHTML='%s'`, global.Host, global.VersionStr)
 	return utils.SuccessRespone(c, runTask+";taskCallback("+convert.ToObjStr(global.TaskList)+");")
 }
 

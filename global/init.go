@@ -34,25 +34,27 @@ const (
 var (
 	//先改版本，在编译后上传到gitee.com做版本维护
 	//请注意，此版本不能大于https://gitee.com/beewit/spread/releases/new  上的版本
-	Version      = update.Version{Major: 1, Minor: 0, Patch: 8}
-	VersionStr   = fmt.Sprintf("V%d.%d.%d", Version.Major, Version.Minor, Version.Patch)
-	SLDB         *sqlite.SqlConnPool
-	Driver       *agouti.WebDriver
-	Log          = logs.GetBeeLogger()
-	IP           = "127.0.0.1"
-	Port         = "8080"
-	Host         = fmt.Sprintf("http://%v:%v", IP, Port)
-	Navigate     = PageNavigate
-	Acc          *Account
-	Page         = *new(utils.AgoutiPage)
-	WechatClient *smartWechat.WechatClient
-	QQClient     = smartQQ.NewQQClient(&smartQQ.QQClient{})
-	TaskList     = map[string]*Task{}
-	VoiceSwitch  = true
-	LoadPage     = API_DOMAIN + "/page/load.html"
-	ContactPage  = API_DOMAIN + "/page/about/contact.html"
-	HiveHtml     string
-	HiveJs       string
+	Version          = update.Version{Major: 1, Minor: 0, Patch: 8}
+	VersionStr       = fmt.Sprintf("V%d.%d.%d", Version.Major, Version.Minor, Version.Patch)
+	SLDB             *sqlite.SqlConnPool
+	Driver           *agouti.WebDriver
+	Log              = logs.GetBeeLogger()
+	IP               = "127.0.0.1"
+	Port             = "8080"
+	Host             = fmt.Sprintf("http://%v:%v", IP, Port)
+	Navigate         = PageNavigate
+	Acc              *Account
+	Page             = *new(utils.AgoutiPage)
+	WechatClientList = map[string]smartWechat.WechatClient{}
+	WechatClient     *smartWechat.WechatClient
+	QQClientList     = map[int64]smartQQ.QQClient{}
+	QQClient         = smartQQ.NewQQClient(&smartQQ.QQClient{})
+	TaskList         = map[string]*Task{}
+	VoiceSwitch      = true
+	LoadPage         = API_DOMAIN + "/page/load.html"
+	ContactPage      = API_DOMAIN + "/page/about/contact.html"
+	HiveHtml         string
+	HiveJs           string
 )
 
 func init() {
