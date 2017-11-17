@@ -24,79 +24,86 @@
         <div class="tpl-portlet-components">
             <div class="portlet-">
                 <div class="caption font-green bold">
-                    <span class="am-icon-lock"></span> 修改密码
+                    <i class="am-icon-gear am-icon-spin"></i> 系统设置
                 </div>
             </div>
             <div class="tpl-block">
-                <ul class="am-nav am-nav-tabs">
-                    <li class="am-active"><a data-href="list.html">微信设置</a></li>
-                    <li><a data-href="member.html">QQ设置</a></li>
-                </ul>
-                <div class="am-g am-margin-top">
-                    <div class="am-u-sm-12 am-u-md-6">
-                        <div class="am-btn-toolbar">
-                            <div class="am-btn-group am-btn-group-xs">
-                                <button type="button" class="am-btn am-btn-default am-btn-success"
-                                        data-layer="platform.html" data-layer-w="50%" data-layer-h="70%"
-                                        data-layer-title="添加微信账号">
-                                    <span class="am-icon-plus"></span> 添加微信账号
-                                </button>
-                            </div>
+                <div class="am-g">
+                    <div class="am-u-md-6 am-u-sm-12 row-mb">
+                        <div class="tpl-form-body tpl-form-line">
+                            <form class="am-form tpl-form-line-form margin-auto">
+                                <h3>微信加群设置</h3>
+                                <hr>
+                                <div class="am-form-group ">
+                                    <label for="pwd" class="am-u-sm-3 am-form-label">原密码 <span
+                                            class="tpl-form-line-small-"></span></label>
+                                    <div class="am-u-sm-9">
+                                        <input type="text" class="tpl-form-input" id="pwd" placeholder="请输入原密码">
+                                        <small>密码由6～20位字母、数字、字符组成。</small>
+                                    </div>
+                                </div>
+                                <div class="am-form-group">
+                                    <label for="pwdNew" class="am-u-sm-3 am-form-label">新密码 <span
+                                            class="tpl-form-line-small-"></span></label>
+                                    <div class="am-u-sm-9">
+                                        <input type="text" class="tpl-form-input" id="pwdNew" placeholder="请输入新密码">
+                                        <small>密码由6～20位字母、数字、字符组成。</small>
+                                    </div>
+                                </div>
+                                <div class="am-form-group">
+                                    <label for="pwdNew2" class="am-u-sm-3 am-form-label">确认密码 <span
+                                            class="tpl-form-line-small-"></span></label>
+                                    <div class="am-u-sm-9">
+                                        <input type="text" class="tpl-form-input" id="pwdNew2" placeholder="请输入确认密码">
+                                        <small>密码由6～20位字母、数字、字符组成。</small>
+                                    </div>
+                                </div>
+                                <div class="am-form-group">
+                                    <div class="am-u-sm-9 am-u-sm-push-3">
+                                        <button type="button" class="am-btn am-btn-primary tpl-btn-bg-color-success ">提交
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                </div>
-                <div class="am-u-sm-12">
-                    <form class="am-form">
-                        <table class="am-table am-table-striped am-table-hover table-main table-img table-rang ">
-                            <thead>
-                            <tr>
-                                <th class="table-title">头像</th>
-                                <th class="table-title">昵称</th>
-                                <th class="table-autho">标识</th>
-                                <th class="table-date">登录状态</th>
-                                <th class="table-set">操作</th>
-                            </tr>
-                            </thead>
-                            <tbody id="wechatView">
-                            </tbody>
-                        </table>
-                    </form>
-                </div>
-                <div class="am-g">
-                    <div class="tpl-form-body tpl-form-line">
-                        <form class="am-form tpl-form-line-form am-u-lg-6 margin-auto">
-                            <div class="am-form-group ">
-                                <label for="pwd" class="am-u-sm-3 am-form-label">原密码 <span
-                                        class="tpl-form-line-small-"></span></label>
-                                <div class="am-u-sm-9">
-                                    <input type="text" class="tpl-form-input" id="pwd" placeholder="请输入原密码">
-                                    <small>密码由6～20位字母、数字、字符组成。</small>
+                    <div class="am-u-md-6 am-u-sm-12 row-mb">
+                        <div class="tpl-form-body tpl-form-line">
+                            <form class="am-form tpl-form-line-form  margin-auto">
+                                <h3>QQ加群/加人设置</h3>
+                                <hr>
+                                <div class="am-form-group ">
+                                    <label for="pwd" class="am-u-sm-3 am-form-label">检查登录窗体次数 <span
+                                            class="tpl-form-line-small-"></span></label>
+                                    <div class="am-u-sm-9">
+                                        <input type="text" class="tpl-form-input" name="login_win_count" placeholder="检查登录窗体次数">
+                                        <small>密码由6～20位字母、数字、字符组成。</small>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="am-form-group">
-                                <label for="pwdNew" class="am-u-sm-3 am-form-label">新密码 <span
-                                        class="tpl-form-line-small-"></span></label>
-                                <div class="am-u-sm-9">
-                                    <input type="text" class="tpl-form-input" id="pwdNew" placeholder="请输入新密码">
-                                    <small>密码由6～20位字母、数字、字符组成。</small>
+                                <div class="am-form-group">
+                                    <label for="pwdNew" class="am-u-sm-3 am-form-label">新密码 <span
+                                            class="tpl-form-line-small-"></span></label>
+                                    <div class="am-u-sm-9">
+                                        <input type="text" class="tpl-form-input" id="pwdNew" placeholder="请输入新密码">
+                                        <small>密码由6～20位字母、数字、字符组成。</small>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="am-form-group">
-                                <label for="pwdNew2" class="am-u-sm-3 am-form-label">确认密码 <span
-                                        class="tpl-form-line-small-"></span></label>
-                                <div class="am-u-sm-9">
-                                    <input type="text" class="tpl-form-input" id="pwdNew2" placeholder="请输入确认密码">
-                                    <small>密码由6～20位字母、数字、字符组成。</small>
+                                <div class="am-form-group">
+                                    <label for="pwdNew2" class="am-u-sm-3 am-form-label">确认密码 <span
+                                            class="tpl-form-line-small-"></span></label>
+                                    <div class="am-u-sm-9">
+                                        <input type="text" class="tpl-form-input" id="pwdNew2" placeholder="请输入确认密码">
+                                        <small>密码由6～20位字母、数字、字符组成。</small>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="am-form-group">
-                                <div class="am-u-sm-9 am-u-sm-push-3">
-                                    <button type="button" class="am-btn am-btn-primary tpl-btn-bg-color-success ">提交
-                                    </button>
+                                <div class="am-form-group">
+                                    <div class="am-u-sm-9 am-u-sm-push-3">
+                                        <button type="button" class="am-btn am-btn-primary tpl-btn-bg-color-success ">提交
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
-
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

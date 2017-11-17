@@ -411,7 +411,7 @@
                 layer.close(qrcodeLayer)
             },
             cancel: function () {
-                cancelLoginWechat()
+                cancelLoginWechat();
                 checkStatus = false;
                 layer.close(qrcodeLayer)
             }
@@ -426,13 +426,13 @@
             url: "/wechat/list/accountStatus",
             data:{uuid:uuid},
             success: function (d) {
-                if (sendStatus = d.data){
+                if (d.data==null){
                     setTimeout(function () {
                         getWechatStatus(func)
-                    }, 300)
+                    }, 300);
                     return
                 }
-                sendStatus = d.data.sendStatus
+                sendStatus = d.data.sendStatus;
                 if (sendStatus != 1 && checkStatus) {
                     $("#sendStatusMsg").html("【" + d.data.sendStatus + "】" + d.data.sendStatusMsg);
                     setTimeout(function () {
@@ -440,7 +440,7 @@
                     }, 300)
                 } else {
                     if (sendStatus == 1) {
-                        layer.close(qrcodeLayer)
+                        layer.close(qrcodeLayer);
                         func()
                     }
                 }
@@ -448,7 +448,7 @@
         });
     }
 
-    var temp='<tr><td>{uuid}</td><td>{nick}</td><td><div class="am-btn-toolbar"><div class="am-btn-group am-btn-group-xs">' +
+    var temp='<tr><td>{selfUserName}</td><td>{nick}</td><td><div class="am-btn-toolbar"><div class="am-btn-group am-btn-group-xs">' +
             '<button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only">' +
             '<span class="am-icon-trash-o"></span> 删除</button></div></div></td></tr>';
 
@@ -459,8 +459,8 @@
                 var str="";
                 $("#accountList").html('');
                 if(d.data!=null){
-                    for (var uuid in d.data) {
-                        str+= temp.replace("{uuid}",uuid).replace("{nick}",d.data[uuid].SelfNickName);
+                    for (var selfUserName in d.data) {
+                        str+= temp.replace("{selfUserName}",selfUserName).replace("{nick}",d.data[selfUserName].SelfNickName);
                     }
                 }
                 $("#accountList").html(str)

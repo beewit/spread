@@ -3,7 +3,9 @@ package dao
 import (
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/beekit/utils/convert"
+	"github.com/beewit/beekit/utils/encrypt"
 	"github.com/beewit/spread/global"
+	"strings"
 	"time"
 )
 
@@ -16,20 +18,22 @@ func QueryLoginToken() (string, error) {
 	if len(m) <= 0 {
 		return "", nil
 	}
-	return convert.ToString(m[0]["token"]), nil
+	return strings.Replace(convert.ToString(m[0]["token"]), encrypt.NewRsae().Md532(utils.GetMac()), "", 1), nil
 }
 
 func InsertToken(token string, acc *global.Account) (bool, error) {
+	println("InsertToken 添加Token ")
 	iw, _ := utils.NewIdWorker(1)
 	id, _ := iw.NextId()
 	sql := `DELETE FROM account_token WHERE account_id=?;INSERT INTO account_token(id,account_id,token,ut_time) values(?,?,?,?)`
-	x, err := global.SLDB.Insert(sql, acc.Id, id, acc.Id, token, time.Now().Format("2006-01-02 15:04:05"))
+	x, err := global.SLDB.Insert(sql, acc.Id, id, acc.Id, token+encrypt.NewRsae().Md532(utils.GetMac()), time.Now().Format("2006-01-02 15:04:05"))
 	if err != nil {
 		return false, err
 	}
 	return x > 0, err
 }
 func DeleteToken(acc *global.Account) (bool, error) {
+	println("DeleteToken 删除Token ")
 	sql := `DELETE FROM account_token WHERE account_id=?;`
 	x, err := global.SLDB.Delete(sql, acc.Id)
 	if err != nil {

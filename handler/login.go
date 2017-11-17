@@ -16,7 +16,6 @@ func Index(c echo.Context) error {
 func SetClientToken(token string) *global.Account {
 	acc := api.CheckClientLogin(token)
 	if acc != nil {
-		//insert sqllite
 		flog, err := dao.InsertToken(token, acc)
 		if err != nil {
 			global.Log.Error(err.Error())

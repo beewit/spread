@@ -28,8 +28,8 @@ func GetWechatAccountStatus(c echo.Context) error {
 		return utils.SuccessNullMsg(c, nil)
 	}
 	return utils.SuccessNullMsg(c, map[string]interface{}{
-		"sendStatusMsg": global.WechatClientList[uuid].SendStatusMsg,
-		"sendStatus":    global.WechatClientList[uuid].SendStatus})
+		"sendStatusMsg": global.WechatUUid[uuid].SendStatusMsg,
+		"sendStatus":    global.WechatUUid[uuid].SendStatus})
 }
 
 func LoginWechatListAccount(c echo.Context) error {
@@ -52,91 +52,94 @@ func LoginWechatList(UUid string) (err error) {
 	timeOut := 0
 	for {
 		//thisUrl, _ := global.Page.Page.URL()
-		global.WechatClientList[UUid] = &smartWechat.WechatClient{}
+		global.WechatUUid[UUid] = &smartWechat.WechatLoginStatus{}
 		if WechatLoginCheck {
-			global.WechatClientList[UUid].SendStatusMsg = "【" + UUid + "】正在验证登陆... ..."
-			global.Log.Info(global.WechatClientList[UUid].SendStatusMsg)
+			global.WechatUUid[UUid].SendStatusMsg = "【" + UUid + "】正在验证登陆... ..."
+			global.Log.Info(global.WechatUUid[UUid].SendStatusMsg)
 			status, msg := smartWechat.CheckLogin(UUid)
 			if status == 200 {
-				global.WechatClientList[UUid].SendStatusMsg = "登陆成功,处理登陆信息..."
-				global.Log.Info(global.WechatClientList[UUid].SendStatusMsg)
-				global.WechatClientList[UUid], err = smartWechat.ProcessLoginInfo(msg)
+				global.WechatUUid[UUid].SendStatusMsg = "登陆成功,处理登陆信息..."
+				global.Log.Info(global.WechatUUid[UUid].SendStatusMsg)
+				var wc *smartWechat.WechatClient
+				wc, err = smartWechat.ProcessLoginInfo(msg)
 				if err != nil {
-					global.WechatClientList[UUid].SendStatus = WECHAT_STATUS_FAIL
-					global.WechatClientList[UUid].SendStatusMsg = "错误：登陆成功,处理登陆信息...，error：" + err.Error()
-					global.Log.Info(global.WechatClientList[UUid].SendStatusMsg)
+					global.WechatUUid[UUid].SendStatus = WECHAT_STATUS_FAIL
+					global.WechatUUid[UUid].SendStatusMsg = "错误：登陆成功,处理登陆信息...，error：" + err.Error()
+					global.Log.Info(global.WechatUUid[UUid].SendStatusMsg)
 					return
 				}
-				global.WechatClientList[UUid].SendStatusMsg = "登陆信息处理完毕,正在初始化微信..."
-				global.Log.Info(global.WechatClientList[UUid].SendStatusMsg)
-				global.Log.Info("global.WechatClientList[UUid]：%s", convert.ToObjStr(global.WechatClientList[UUid]))
-				err = smartWechat.InitWX(global.WechatClientList[UUid])
+				selfUserName := wc.SelfUserName
+				wc.UUID = UUid
+				global.WechatClientList[selfUserName] = wc
+				global.WechatUUid[UUid].SendStatusMsg = "登陆信息处理完毕,正在初始化微信..."
+				global.Log.Info(global.WechatUUid[UUid].SendStatusMsg)
+				global.Log.Info("global.WechatClientList[selfUserName]：%s", convert.ToObjStr(global.WechatClientList[selfUserName]))
+				err = smartWechat.InitWX(global.WechatClientList[selfUserName])
 				if err != nil {
-					global.WechatClientList[UUid].SendStatusMsg = "【1】错误：登陆信息处理完毕,正在初始化微信...，error：" + err.Error()
-					global.Log.Info(global.WechatClientList[UUid].SendStatusMsg)
-					if global.WechatClientList[UUid].InitInfo.BaseResponse.Ret == 1010 {
-						err = smartWechat.InitWX(global.WechatClientList[UUid])
+					global.WechatUUid[UUid].SendStatusMsg = "【1】错误：登陆信息处理完毕,正在初始化微信...，error：" + err.Error()
+					global.Log.Info(global.WechatUUid[UUid].SendStatusMsg)
+					if global.WechatClientList[selfUserName].InitInfo.BaseResponse.Ret == 1010 {
+						err = smartWechat.InitWX(global.WechatClientList[selfUserName])
 					}
 					if err != nil {
-						global.WechatClientList[UUid].SendStatusMsg = "【2】错误：登陆信息处理完毕,正在初始化微信...，error：" + err.Error()
-						global.WechatClientList[UUid].SendStatus = WECHAT_STATUS_FAIL
-						global.Log.Info(global.WechatClientList[UUid].SendStatusMsg)
+						global.WechatUUid[UUid].SendStatusMsg = "【2】错误：登陆信息处理完毕,正在初始化微信...，error：" + err.Error()
+						global.WechatUUid[UUid].SendStatus = WECHAT_STATUS_FAIL
+						global.Log.Info(global.WechatUUid[UUid].SendStatusMsg)
 						return
 					}
 				}
-				global.WechatClientList[UUid].SendStatusMsg = "初始化完毕,通知微信服务器登陆状态变更..."
-				global.Log.Info(global.WechatClientList[UUid].SendStatusMsg)
-				err = smartWechat.NotifyStatus(global.WechatClientList[UUid])
+				global.WechatUUid[UUid].SendStatusMsg = "初始化完毕,通知微信服务器登陆状态变更..."
+				global.Log.Info(global.WechatUUid[UUid].SendStatusMsg)
+				err = smartWechat.NotifyStatus(global.WechatClientList[selfUserName])
 				if err != nil {
-					global.WechatClientList[UUid].SendStatus = WECHAT_STATUS_FAIL
-					global.WechatClientList[UUid].SendStatusMsg = "通知微信服务器状态变化失败：" + err.Error()
+					global.WechatUUid[UUid].SendStatus = WECHAT_STATUS_FAIL
+					global.WechatUUid[UUid].SendStatusMsg = "通知微信服务器状态变化失败：" + err.Error()
 					return
 				}
-				global.WechatClientList[UUid].SendStatus = WECHAT_STATUS_SUCCESS
-				global.WechatClientList[UUid].SendStatusMsg = "微信登陆成功"
-				global.Log.Info(global.WechatClientList[UUid].SendStatusMsg)
-				dao.InsertWechatLogin(convert.ToObjStr(global.WechatClientList[UUid]), global.Acc)
-				global.WechatNickName[UUid] = global.WechatClientList[UUid].SelfNickName
+				global.WechatUUid[UUid].SendStatus = WECHAT_STATUS_SUCCESS
+				global.WechatUUid[UUid].SendStatusMsg = "微信登陆成功"
+				global.Log.Info(global.WechatUUid[UUid].SendStatusMsg)
+				dao.InsertWechatLogin(convert.ToObjStr(global.WechatClientList[selfUserName]), global.Acc)
 				//开启心跳检测
-				SyncCheck(UUid)
-				global.WechatClientList[UUid].LoginStatus = true
-				dao.InsertHTTPCache(UUid, global.WechatNickName[UUid], convert.ToObjStr(global.WechatClientList[UUid]), dao.WECHAT, global.Acc)
+				SyncCheck(selfUserName)
+				global.WechatClientList[selfUserName].LoginStatus = true
+				dao.InsertHTTPCache(UUid, wc.SelfNickName, convert.ToObjStr(global.WechatClientList[selfUserName]), dao.WECHAT, global.Acc)
 				break
 			} else if status == 201 {
-				global.WechatClientList[UUid].SendStatusMsg = "请在手机上确认登录"
-				global.Log.Info(global.WechatClientList[UUid].SendStatusMsg)
+				global.WechatUUid[UUid].SendStatusMsg = "请在手机上确认登录"
+				global.Log.Info(global.WechatUUid[UUid].SendStatusMsg)
 			} else if status == 408 {
-				global.WechatClientList[UUid].SendStatusMsg = "请扫描登录二维码"
-				global.Log.Info(global.WechatClientList[UUid].SendStatusMsg)
+				global.WechatUUid[UUid].SendStatusMsg = "请扫描登录二维码"
+				global.Log.Info(global.WechatUUid[UUid].SendStatusMsg)
 			} else {
-				global.WechatClientList[UUid].SendStatusMsg = fmt.Sprintf("未知情况，返回状态码：%d", status)
-				global.Log.Info(global.WechatClientList[UUid].SendStatusMsg)
+				global.WechatUUid[UUid].SendStatusMsg = fmt.Sprintf("未知情况，返回状态码：%d", status)
+				global.Log.Info(global.WechatUUid[UUid].SendStatusMsg)
 			}
 			timeOut++
 			time.Sleep(time.Second)
 			if timeOut > 60*10 {
-				global.WechatClientList[UUid].SendStatus = WECHAT_STATUS_FAIL
-				global.WechatClientList[UUid].SendStatusMsg = "长时间未扫码，登录超时！"
-				err = errors.New(global.WechatClientList[UUid].SendStatusMsg)
+				global.WechatUUid[UUid].SendStatus = WECHAT_STATUS_FAIL
+				global.WechatUUid[UUid].SendStatusMsg = "长时间未扫码，登录超时！"
+				err = errors.New(global.WechatUUid[UUid].SendStatusMsg)
 				return
 			}
 		} else {
-			global.WechatClientList[UUid].SendStatus = WECHAT_STATUS_FAIL
-			global.WechatClientList[UUid].SendStatusMsg = "前台已取消登录，结束登录验证"
-			err = errors.New(global.WechatClientList[UUid].SendStatusMsg)
+			global.WechatUUid[UUid].SendStatus = WECHAT_STATUS_FAIL
+			global.WechatUUid[UUid].SendStatusMsg = "前台已取消登录，结束登录验证"
+			err = errors.New(global.WechatUUid[UUid].SendStatusMsg)
 			return
 		}
 	}
 	return
 }
 
-func SyncCheck(UUid string) {
+func SyncCheck(SelfUserName string) {
 	global.Log.Info("准备开始微信登录状态心跳检测")
 	defer func() {
 		SyncCheckStatus = false
 	}()
 	for {
-		if !LoginCheck(UUid) {
+		if !LoginCheck(SelfUserName) {
 			continue
 		}
 		SyncCheckStatus = true
@@ -145,10 +148,10 @@ func SyncCheck(UUid string) {
 	}
 }
 
-func LoginCheck(UUid string) bool {
+func LoginCheck(SelfUserName string) bool {
 	flog := false
-	if global.WechatClientList[UUid] != nil {
-		ret, selector, err := smartWechat.SyncCheck(global.WechatClientList[UUid])
+	if global.WechatClientList[SelfUserName] != nil {
+		ret, selector, err := smartWechat.SyncCheck(global.WechatClientList[SelfUserName])
 		if err == nil {
 			flog = true
 		} else {
@@ -156,7 +159,7 @@ func LoginCheck(UUid string) bool {
 		}
 	}
 	if !flog {
-		global.WechatClientList[UUid].LoginStatus = false
+		global.WechatClientList[SelfUserName].LoginStatus = false
 	}
 	return flog
 }
@@ -166,9 +169,9 @@ func AddWechatListUser(c echo.Context) error {
 		return utils.ErrorNull(c, "微信营销功能还未开通，请开通此功能后使用")
 	}
 
-	UUIds := c.FormValue("UUIds")
+	SelfUserNames := c.FormValue("SelfUserNames")
 
-	if UUIds == "" {
+	if SelfUserNames == "" {
 		return utils.ErrorNull(c, "请选择可发送的微信或添加登录微信账号")
 	}
 
@@ -184,16 +187,16 @@ func AddWechatListUser(c echo.Context) error {
 			global.DelTask(global.TASK_WECHAT_ADD_GROUP_USER)
 		}()
 
-		uuid := strings.Split(UUIds, ",")
+		SelfUserName := strings.Split(SelfUserNames, ",")
 		sucNum := 0
 		errNum := 0
 		sleep := 10
-		for _, j := range uuid {
+		for _, j := range SelfUserName {
 			if global.WechatClientList[j] == nil {
-				global.PageMsg(fmt.Sprintf("【%s】微信号未登录或登录已失效", global.WechatNickName[j]))
+				global.PageMsg(fmt.Sprintf("【%s】微信号未登录或登录已失效", j))
 				continue
 			}
-			nick := global.WechatNickName[j]
+			nick := global.WechatClientList[j].SelfNickName
 			ContactMap, err := smartWechat.GetAllContact(global.WechatClientList[j])
 			if err != nil {
 				global.Log.Info(fmt.Sprintf("【%s】微信账号，获取联系人信息，ERROR：%s", nick, err.Error()))
@@ -268,8 +271,8 @@ func SendWechatListMsg(c echo.Context) error {
 	if !api.EffectiveFuncById(global.FUNC_WECHAT) {
 		return utils.ErrorNull(c, "微信营销功能还未开通，请开通此功能后使用")
 	}
-	UUIds := c.FormValue("UUIds")
-	if UUIds == "" {
+	selfUserNames := c.FormValue("SelfUserNames")
+	if selfUserNames == "" {
 		return utils.ErrorNull(c, "请选择可发送的微信或添加登录微信账号")
 	}
 	msg := c.FormValue("msg")
@@ -283,43 +286,44 @@ func SendWechatListMsg(c echo.Context) error {
 		return utils.ErrorNull(c, "正在发送中，请勿重复执行")
 	}
 
-	go SendWechatList(msg, UUIds)
+	go SendWechatList(msg, selfUserNames)
 	return utils.SuccessNull(c, "后台发送中...")
 }
 
-func SendWechatList(msg, UUIds string) (err error) {
+func SendWechatList(msg, selfUserNames string) (err error) {
 	defer func() {
 		global.DelTask(global.TASK_WECHAT_SEND_MESSAGE)
 	}()
 	var str string
 	global.UpdateTask(global.TASK_WECHAT_SEND_MESSAGE, "准备开发群发微信消息..")
 
-	uuid := strings.Split(UUIds, ",")
-	for _, j := range uuid {
+	selfUserName := strings.Split(selfUserNames, ",")
+	for _, j := range selfUserName {
 		if global.WechatClientList[j] == nil {
-			global.Log.Info(fmt.Sprintf("【%s】登录账号已失效，请重新登录", global.WechatNickName[j]))
+			global.Log.Info(fmt.Sprintf("【%s】登录账号已失效，请重新登录", j))
 			continue
 		}
-		nick := global.WechatNickName[j]
+		nick := global.WechatClientList[j].SelfNickName
+		wu := global.WechatUUid[global.WechatClientList[j].UUID]
 		/* 轮询服务器判断二维码是否扫过暨是否登陆了 */
-		global.WechatClientList[j].SendStatusMsg = fmt.Sprintf("微信账号【%s】，开始获取联系人信息...", nick)
-		global.Log.Info(global.WechatClientList[j].SendStatusMsg)
+		wu.SendStatusMsg = fmt.Sprintf("微信账号【%s】，开始获取联系人信息...", nick)
+		global.Log.Info(wu.SendStatusMsg)
 		ContactMap, err := smartWechat.GetAllContact(global.WechatClientList[j])
 		if err != nil {
-			global.WechatClientList[j].SendStatusMsg = fmt.Sprintf("微信账号【%s】，获取联系人信息，ERROR："+err.Error(), nick)
-			global.Log.Info(global.WechatClientList[j].SendStatusMsg)
+			wu.SendStatusMsg = fmt.Sprintf("微信账号【%s】，获取联系人信息，ERROR："+err.Error(), nick)
+			global.Log.Info(wu.SendStatusMsg)
 			continue
 		}
 		cm := convert.ToObjStr(ContactMap)
 		if cm == "" {
-			global.WechatClientList[j].SendStatusMsg = fmt.Sprintf("微信账号【%s】，没有获取到待发送的联系人信息", nick)
-			global.Log.Info(global.WechatClientList[j].SendStatusMsg)
+			wu.SendStatusMsg = fmt.Sprintf("微信账号【%s】，没有获取到待发送的联系人信息", nick)
+			global.Log.Info(wu.SendStatusMsg)
 			continue
 		}
 		global.Log.Info(fmt.Sprintf("微信账号【%s】，联系人信息："+cm, nick))
-		global.WechatClientList[j].SendStatusMsg = "【" + convert.ToString(len(ContactMap)) + "】准备群发消息..."
-		global.Log.Info(global.WechatClientList[j].SendStatusMsg)
-		global.WechatClientList[j].SendStatus = WECHAT_STATUS_PROCESS
+		wu.SendStatusMsg = "【" + convert.ToString(len(ContactMap)) + "】准备群发消息..."
+		global.Log.Info(wu.SendStatusMsg)
+		wu.SendStatus = WECHAT_STATUS_PROCESS
 		global.WechatClientList[j].ContactMap = ContactMap
 		for k, v := range ContactMap {
 			//任务记录
@@ -346,19 +350,19 @@ func SendWechatList(msg, UUIds string) (err error) {
 				wxSendMsg.ClientMsgId = wxSendMsg.LocalID
 				bts, err := smartWechat.SendMsg(global.WechatClientList[j], wxSendMsg)
 				if err != nil {
-					global.WechatClientList[j].SendStatusMsg = fmt.Sprintf("微信账号【%s】，错误：发送消息...，json:%s，error：%s", nick, convert.ToObjStr(wxSendMsg), err.Error())
-					global.Log.Info(global.WechatClientList[j].SendStatusMsg)
+					wu.SendStatusMsg = fmt.Sprintf("微信账号【%s】，错误：发送消息...，json:%s，error：%s", nick, convert.ToObjStr(wxSendMsg), err.Error())
+					global.Log.Info(wu.SendStatusMsg)
 				} else {
-					global.WechatClientList[j].SendStatusMsg = fmt.Sprintf("微信账号【%s】，《%s》发送成功", nick, v.NickName)
-					global.Log.Info(global.WechatClientList[j].SendStatusMsg + "，发送结果：" + string(bts))
+					wu.SendStatusMsg = fmt.Sprintf("微信账号【%s】，《%s》发送成功", nick, v.NickName)
+					global.Log.Info(wu.SendStatusMsg + "，发送结果：" + string(bts))
 				}
 				sleep := utils.NewRandom().Number(1)
 				global.UpdateTask(global.TASK_WECHAT_SEND_MESSAGE, fmt.Sprintf("微信账号【%s】，延迟【%v】秒后发送微信消息", nick, sleep))
 				time.Sleep(time.Second * time.Duration(sleep))
 			}
 		}
-		global.WechatClientList[j].SendStatus = WECHAT_STATUS_COMPLETE
-		global.WechatClientList[j].SendStatusMsg = "微信群发消息任务完成！"
+		wu.SendStatus = WECHAT_STATUS_COMPLETE
+		wu.SendStatusMsg = "微信群发消息任务完成！"
 	}
 	err = nil
 	return

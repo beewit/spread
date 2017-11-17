@@ -326,7 +326,6 @@
 
     function getLoginQQInfo() {
         $.ajax({
-            load_tip: false,
             url: "/qq/login/check",
             success: function (d) {
                 if (d.data != null && d.data.QQUser.Status) {
@@ -335,7 +334,8 @@
                     var i = 0;
                     $("#qqList").html('')
                     for (var u in info) {
-                        $("#qqList").append(temp.replace("{img}", "<img src='http://q4.qlogo.cn/g?b=qq&nk=" + info[u].QQ + "&s=140' class='user-pic'/> ").replace("{id}", info[u].QQ).replace("{QQ}", info[u].QQ).replace("{Nick}", info[u].NiceName))
+                        $("#qqList").append(temp.replace("{img}", "<img src='http://q4.qlogo.cn/g?b=qq&nk=" + info[u].QQ +
+                                "&s=140' class='user-pic'/> ").replace("{id}", info[u].QQ).replace("{QQ}", info[u].QQ).replace("{Nick}", info[u].NiceName))
                         i++;
                     }
                     $("#UserCount").html(" " + i);
@@ -370,7 +370,6 @@
                             }
                         });
                     }
-
                 } else {
                     $("#loginBtn").html("登录QQ");
                 }

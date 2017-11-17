@@ -43,12 +43,6 @@ func SelectTables() ([]map[string]interface{}, error) {
 	return OldDB.Query(sql)
 }
 
-//查询所有表所有字段
-func SelectFail(table string) ([]map[string]interface{}, error) {
-	sql := "PRAGMA table_info(?)"
-	return OldDB.Query(sql, table)
-}
-
 func QueryOldDBData(pageIndex int, table string) (*utils.PageData, error) {
 	return OldDB.QueryPage(&utils.PageTable{
 		Fields:    "*",
@@ -67,6 +61,7 @@ func InsertOldDBData(pageIndex int, table string) error {
 	if page.Count <= 0 {
 		return nil
 	}
+	Log.Info(" InsertOldDBData 正在转移本地数据库数据->新数据库中")
 	//执行数据转移
 	for _, v := range page.Data {
 		_, err = NewDB.InsertMap(table, v)
@@ -86,6 +81,7 @@ func InsertOldDBData(pageIndex int, table string) error {
 
 //查询表所有数据并导入新表数据
 func ImportData() error {
+	Log.Info(" ImportData 准备本地数据库升级")
 	//1、查询旧版数据库所有数据库表，进行循环操作获取表字段
 	m, err := SelectTables()
 	if err != nil {
@@ -112,26 +108,28 @@ func CheckUpdateDB() (err error) {
 	if err != nil {
 		return
 	}
-	_, err = update.DBUpdate("app", update.Version{Major: 0, Minor: 0, Patch: version}, func(fileNames []string, rel update.Release) {
+	Log.Info("当前数据库版本：v%v", version)
+	_, err = update.DBUpdate("app", update.Version{Major: 1, Minor: 0, Patch: version}, func(fileNames []string, rel update.Release) {
 		if len(fileNames) > 0 {
 			for _, name := range fileNames {
 				if name == "spread.db" {
+					Log.Info("初始化迁移数据")
 					err2 := InitNewDB()
 					if err2 != nil {
-						println("InitNewDB ERROR", err.Error())
+						Log.Info("InitNewDB ERROR", err.Error())
 						return
 					}
 					defer NewDB.Close()
 					err2 = InitOldDB()
 					if err2 != nil {
-						println("InitOldDB ERROR", err.Error())
+						Log.Info("InitOldDB ERROR", err.Error())
 						return
 					}
 					defer OldDB.Close()
 					Log.Info("准备导入数据")
 					err2 = ImportData()
 					if err2 != nil {
-						println("InitOldDB ERROR", err.Error())
+						Log.Info("InitOldDB ERROR", err.Error())
 						return
 					}
 					Log.Info("导入数据完成")

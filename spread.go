@@ -17,45 +17,16 @@ import (
 
 	"os"
 
-	//"errors"
+	"errors"
+	"io/ioutil"
+	"strconv"
+
 	"github.com/beewit/beekit/utils"
 	"github.com/beewit/beekit/utils/convert"
 	"github.com/beewit/spread-update/update"
 	"github.com/beewit/wechat-ai/ai"
 	"github.com/sclevine/agouti"
-	//"io/ioutil"
-	//"strconv"
 )
-
-//func init() {
-//	iManPid := fmt.Sprint(os.Getpid())
-//	if err := ProcExsit(); err == nil {
-//		pidFile, _ := os.Create("pid.pid")
-//		defer pidFile.Close()
-//		pidFile.WriteString(iManPid)
-//	} else {
-//		global.Logs(fmt.Sprintf("*************************【%s】*************************", err.Error()))
-//		os.Exit(1)
-//	}
-//}
-//
-//// 判断进程是否启动
-//func ProcExsit() (err error) {
-//	pid, err := os.Open("pid.pid")
-//	defer pid.Close()
-//	if err == nil {
-//		filePid, err := ioutil.ReadAll(pid)
-//		if err == nil {
-//			pidStr := fmt.Sprintf("%s", filePid)
-//			pid, _ := strconv.Atoi(pidStr)
-//			_, err := os.FindProcess(pid)
-//			if err == nil {
-//				return errors.New("工蜂小智已启动")
-//			}
-//		}
-//	}
-//	return nil
-//}
 
 type MyWindow struct {
 	*walk.MainWindow
@@ -71,11 +42,11 @@ func NewMyWindow() *MyWindow {
 }
 
 func (mw *MyWindow) init() {
-	utils.CloseChrome()
 	go func() {
 		err := Start()
 		if err != nil {
 			walk.MsgBox(mw, "工蜂小智-系统提示", "工蜂小智启动失败,错误："+err.Error(), walk.MsgBoxIconInformation)
+			Stop()
 		}
 	}()
 }
@@ -377,8 +348,24 @@ func main() {
 			global.Logs(errStr)
 		}
 	}()
-	global.Log.Info("启动程序,当前版本：%s", global.VersionStr)
 	mw := NewMyWindow()
+	iManPid := fmt.Sprint(os.Getpid())
+	if err := ProcExsit(); err == nil {
+		pidFile, _ := os.Create("pid.pid")
+		defer pidFile.Close()
+		pidFile.WriteString(iManPid)
+
+	} else {
+		str := fmt.Sprintf("*************************【%s】*************************", err.Error())
+		global.Logs(str)
+		println(str)
+		walk.MsgBox(mw, "工蜂小智-系统提示", "程序已打开，右下角的图标可打开主界面！", walk.MsgBoxIconInformation)
+		os.Exit(1)
+		return
+	}
+	utils.CloseChrome()
+	global.InitGlobal()
+	global.Log.Info("启动程序,当前版本：%s", global.VersionStr)
 	_, err := update.CheckUpdate(global.Version, true)
 	if err == nil {
 		//启动更新程序
@@ -406,6 +393,24 @@ func main() {
 	mw.Run()
 }
 
+// 判断进程是否启动
+func ProcExsit() (err error) {
+	pid, err := os.Open("pid.pid")
+	defer pid.Close()
+	if err == nil {
+		filePid, err := ioutil.ReadAll(pid)
+		if err == nil {
+			pidStr := fmt.Sprintf("%s", filePid)
+			pid, _ := strconv.Atoi(pidStr)
+			_, err := os.FindProcess(pid)
+			if err == nil {
+				return errors.New("工蜂小智已启动")
+			}
+		}
+	}
+	return nil
+}
+
 func checkError(err error) {
 	if err != nil {
 		log.Fatal(err)
@@ -420,7 +425,6 @@ func Start() error {
 	}()
 	syncMutex = new(sync.Mutex)
 	go router.Router()
-	utils.CloseChrome()
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	load := global.Host
 	acc := handler.CheckClientLogin()
@@ -435,18 +439,18 @@ func Start() error {
 		"--start-maximized",
 		"--disable-infobars",
 		"--app=" + global.LoadPage,
-		"--webkit-text-size-adjust"}))
+		"--webkit-text-size-adjust",
+	}))
 	global.Driver.Start()
 	var err error
 	global.Page.Page, err = global.Driver.NewPage()
 	if err != nil {
-		global.Log.Error("Failed to open page.")
+		global.Log.Error("启动ChromeDriver失败，请重启. Error：%s", err.Error())
 		return err
 	}
 	go func() {
 		global.Page.Navigate(load)
 	}()
-	//global.UpdateTask(global.TASK_WECHAT_ADD_GROUP, fmt.Sprintf("正在前往获取微信群二维码正在前往获取微信群二维码正在前往获取微信群二维码正在前往获取微信群二维码正在前往获取微信群二维码：%s", ""))
 	return nil
 }
 

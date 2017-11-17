@@ -35,7 +35,7 @@ const (
 var (
 	//先改版本，在编译后上传到gitee.com做版本维护
 	//请注意，此版本不能大于https://gitee.com/beewit/spread/releases/new  上的版本
-	Version          = update.Version{Major: 1, Minor: 0, Patch: 8}
+	Version          = update.Version{Major: 1, Minor: 0, Patch: 9}
 	VersionStr       = fmt.Sprintf("V%d.%d.%d", Version.Major, Version.Minor, Version.Patch)
 	SLDB             *sqlite.SqlConnPool
 	Driver           *agouti.WebDriver
@@ -47,7 +47,7 @@ var (
 	Acc              *Account
 	Page             = *new(utils.AgoutiPage)
 	WechatClientList = map[string]*smartWechat.WechatClient{}
-	WechatNickName   = map[string]string{}
+	WechatUUid       = map[string]*smartWechat.WechatLoginStatus{}
 	WechatClient     *smartWechat.WechatClient
 	QQClientList     = map[int64]*smartQQ.QQClient{}
 	QQClient         = smartQQ.NewQQClient(&smartQQ.QQClient{})
@@ -59,7 +59,7 @@ var (
 	HiveJs           string
 )
 
-func init() {
+func InitGlobal() {
 	initLog()
 	err := CheckUpdateDB()
 	if err != nil {
