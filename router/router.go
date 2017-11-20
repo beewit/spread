@@ -6,24 +6,15 @@ import (
 
 	"fmt"
 
-	"io"
 	"os"
 
 	"github.com/beewit/spread/api"
-	//"github.com/beewit/spread/static"
+	"github.com/beewit/spread/static"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
 
 var e *echo.Echo
-
-type LoggerConfig struct {
-	// 可选。默认值是 DefaultLoggerConfig.Format.
-	Format string `json:"format"`
-	// Output 是记录日志的位置。
-	// 可选。默认值是 os.Stdout.
-	Output io.Writer
-}
 
 func Router() {
 	defer func() {
@@ -33,16 +24,12 @@ func Router() {
 	}()
 	e = echo.New()
 	file, _ := os.OpenFile("web.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	//e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-	//	Output: file,
-	//}))
-	//e.Logger.SetLevel(log.OFF)
 	e.Logger.SetOutput(file)
 
-	e.Static("/app", "app")
-	e.File("/", "app/page/index.html")
+	//e.Static("/app", "app")
+	//e.File("/", "app/page/index.html")
 
-	//e.GET("/*", echo.WrapHandler(static.Handler))
+	e.GET("/*", echo.WrapHandler(static.Handler))
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
 	handlerConfig()

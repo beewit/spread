@@ -9,6 +9,8 @@ import (
 	"database/sql"
 	"encoding/json"
 
+	"os"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/beewit/beekit/sqlite"
 	"github.com/beewit/beekit/utils"
@@ -17,7 +19,6 @@ import (
 	"github.com/beewit/wechat-ai/smartQQ"
 	"github.com/beewit/wechat-ai/smartWechat"
 	"github.com/sclevine/agouti"
-	"os"
 )
 
 const (
@@ -35,7 +36,7 @@ const (
 var (
 	//先改版本，在编译后上传到gitee.com做版本维护
 	//请注意，此版本不能大于https://gitee.com/beewit/spread/releases/new  上的版本
-	Version          = update.Version{Major: 1, Minor: 0, Patch: 9}
+	Version          = update.Version{Major: 1, Minor: 0, Patch: 10}
 	VersionStr       = fmt.Sprintf("V%d.%d.%d", Version.Major, Version.Minor, Version.Patch)
 	SLDB             *sqlite.SqlConnPool
 	Driver           *agouti.WebDriver
@@ -61,6 +62,7 @@ var (
 
 func InitGlobal() {
 	initLog()
+	CheckSqliteDB()
 	err := CheckUpdateDB()
 	if err != nil {
 		Log.Error(err.Error())
@@ -68,13 +70,14 @@ func InitGlobal() {
 	iniSqliteDB()
 }
 
-func iniSqliteDB() {
+func CheckSqliteDB() {
 	var flog bool
 	var err error
 	flog, err = utils.PathExists(SQLITE_DATABASE)
 	if !flog {
 		//创建数据库
-		file, err := utils.CreateFile(SQLITE_DATABASE)
+		var file *os.File
+		file, err = utils.CreateFile(SQLITE_DATABASE)
 		if err != nil {
 			Log.Error(err.Error())
 			panic(err)
@@ -82,6 +85,10 @@ func iniSqliteDB() {
 		file.Write(static.FileAppSpreadDb)
 		file.Close()
 	}
+}
+
+func iniSqliteDB() {
+	var err error
 	SLDB = &sqlite.SqlConnPool{
 		DriverName:     "sqlite3",
 		DataSourceName: SQLITE_DATABASE,
@@ -92,7 +99,6 @@ func iniSqliteDB() {
 		panic(err)
 		return
 	}
-	//查询版本库，是否与当前程序需要版本一直
 }
 
 func initLog() {
