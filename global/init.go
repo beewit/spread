@@ -22,9 +22,9 @@ import (
 )
 
 const (
-	API_DOMAIN         = "http://www.tbqbz.com"
-	API_SERVICE_DOMAIN = "http://hive.tbqbz.com"
-	API_SSO_DOMAIN     = "http://sso.tbqbz.com"
+	API_DOMAIN         = "http://www.9ee3.com"
+	API_SERVICE_DOMAIN = "http://hive.9ee3.com"
+	API_SSO_DOMAIN     = "http://sso.9ee3.com"
 	SQLITE_DATABASE    = "app/spread.db"
 
 	PAGE_SIZE   = 10

@@ -115,9 +115,7 @@ func Push(c echo.Context) error {
 							resultMap = map[string]interface{}{}
 							resultMap["status"] = 0
 						}
-						iw, _ := utils.NewIdWorker(1)
-						id, _ := iw.NextId()
-						resultMap["id"] = id
+						resultMap["id"] = utils.ID()
 						resultMap["type"] = 0
 						resultMap["func_id"] = m[j]["id"]
 						resultMap["func_name"] = m[j]["name"]

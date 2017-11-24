@@ -20,8 +20,6 @@ func SetUnionCookies(domain, cookies, localStorage, sessions string, platformId,
 	if global.Acc == nil {
 		return false, nil
 	}
-	iw, _ := utils.NewIdWorker(1)
-	id, _ := iw.NextId()
 	m, err := GetUnionCookie(platformId, accId, platformAcc, -1)
 	if err != nil {
 		return false, err
@@ -32,7 +30,7 @@ func SetUnionCookies(domain, cookies, localStorage, sessions string, platformId,
 		//修改原有Cookie
 		sql := `INSERT INTO account_union_cookie(id,account_id,domain,cookies,ut_time,ct_time,status,platform_account,platform_id,local_storage,sessions) values(?,?,?,?,?,?,1,?,?,?)`
 		nt := time.Now().Format("2006-01-02 15:04:05")
-		x, err2 = global.SLDB.Insert(sql, id, accId, domain, cookies, nt, nt, platformAcc, platformId, localStorage, sessions)
+		x, err2 = global.SLDB.Insert(sql, utils.ID(), accId, domain, cookies, nt, nt, platformAcc, platformId, localStorage, sessions)
 	} else {
 		sql := `UPDATE account_union_cookie SET  cookies=?,local_storage=?,sessions=?,ut_time=? WHERE platform_id=? AND account_id=? AND
 		platform_account=?`

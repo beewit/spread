@@ -23,10 +23,8 @@ func QueryLoginToken() (string, error) {
 
 func InsertToken(token string, acc *global.Account) (bool, error) {
 	println("InsertToken 添加Token ")
-	iw, _ := utils.NewIdWorker(1)
-	id, _ := iw.NextId()
 	sql := `DELETE FROM account_token WHERE account_id=?;INSERT INTO account_token(id,account_id,token,ut_time) values(?,?,?,?)`
-	x, err := global.SLDB.Insert(sql, acc.Id, id, acc.Id, token+encrypt.NewRsae().Md532(utils.GetMac()), time.Now().Format("2006-01-02 15:04:05"))
+	x, err := global.SLDB.Insert(sql, acc.Id, utils.ID(), acc.Id, token+encrypt.NewRsae().Md532(utils.GetMac()), time.Now().Format("2006-01-02 15:04:05"))
 	if err != nil {
 		return false, err
 	}

@@ -11,10 +11,8 @@ const (
 )
 
 func InsertHTTPCache(iden, nickName, cache string, t int, acc *global.Account) (bool, error) {
-	iw, _ := utils.NewIdWorker(1)
-	id, _ := iw.NextId()
 	m := map[string]interface{}{}
-	m["id"] = id
+	m["id"] = utils.ID()
 	m["iden"] = iden
 	m["nick_name"] = nickName
 	m["type"] = t

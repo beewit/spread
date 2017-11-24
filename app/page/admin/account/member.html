@@ -76,7 +76,7 @@
                             <div class="account-overview-item last">
                                 <div class="val-line1" style="box-sizing: border-box; margin-top: 5px;">
                                     <a class="btn bindBtn" onclick="bindWechat(this)">绑定微信</a>&nbsp;
-                                    <!--<a class="btn btn-highlight payBtn" data-href="http://pay.tbqbz.com">解除绑定</a>-->
+                                    <!--<a class="btn btn-highlight payBtn" data-href="http://pay.9ee3.com">解除绑定</a>-->
                                 </div>
                             </div>
                         </div>
@@ -181,7 +181,7 @@
             url: "/member/info",
             success: function (d) {
                 if (d.ret == 200) {
-                    $(".payBtn").attr("href", "http://pay.tbqbz.com?token=" + d.data.account.Token + "&backUrl=" + encodeURIComponent(d.data.host +
+                    $(".payBtn").attr("href", "http://pay.9ee3.com?token=" + d.data.account.Token + "&backUrl=" + encodeURIComponent(d.data.host +
                         "&lastUrl=/app/page/admin/account/member.html"));
                     $("#mobile").html(d.data.account.mobile)
                     if (d.data.account.nickname != null && d.data.account.nickname != "") {

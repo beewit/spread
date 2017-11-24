@@ -176,7 +176,7 @@
         $("#func-view").delegate(".openFunc", "click", function () {
             var id = $(this).parents(".func-item").attr("data-id");
             getAccount(function (acc) {
-                location.href = "http://pay.tbqbz.com?fid=" + id + "&token=" + acc.account.Token +
+                location.href = "http://pay.9ee3.com?fid=" + id + "&token=" + acc.account.Token +
                     "&backUrl=" + encodeURIComponent(acc.host +
                         "?lastUrl=/app/page/admin/index.html")
             })
@@ -205,7 +205,7 @@
                 return
             }
             getAccount(function (acc) {
-                location.href = "http://pay.tbqbz.com?fid=" + fid + "&token=" + acc.account.Token + "&backUrl=" +
+                location.href = "http://pay.9ee3.com?fid=" + fid + "&token=" + acc.account.Token + "&backUrl=" +
                     encodeURIComponent(acc.host +
                         "?lastUrl=/app/page/admin/index.html")
             })

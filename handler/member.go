@@ -12,7 +12,7 @@ func GetMemberInfo(c echo.Context) error {
 }
 
 func CreateWechatQrCode(c echo.Context) error {
-	qrCode, err := utils.CreateQrCode("http://m.tbqbz.com/account/wechatBind?token=" + global.Acc.Token)
+	qrCode, err := utils.CreateQrCode("http://m.9ee3.com/account/wechatBind?token=" + global.Acc.Token)
 	if err != nil {
 		return utils.ErrorNull(c, "生成绑定微信二维码错误！")
 	}

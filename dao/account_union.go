@@ -10,8 +10,6 @@ func SetUnion(platform, platformAcc, platformPwd, remark string, platformId, acc
 	if global.Acc == nil {
 		return false, nil
 	}
-	iw, _ := utils.NewIdWorker(1)
-	id, _ := iw.NextId()
 	m, err := GetUnion(platformId, accId, platformAcc)
 	if err != nil {
 		return false, err
@@ -21,7 +19,7 @@ func SetUnion(platform, platformAcc, platformPwd, remark string, platformId, acc
 	if m == nil {
 		//修改原有Cookie
 		sql := `INSERT INTO account_union(id,platform,status,ct_time,ut_time,platform_account,platform_password,account_id,platform_id,remark) values(?,?,1,?,?,?,?,?,?,?)`
-		x, err = global.SLDB.Insert(sql, id, platform, nt, nt, platformAcc, platformPwd, accId, platformId, remark)
+		x, err = global.SLDB.Insert(sql, utils.ID(), platform, nt, nt, platformAcc, platformPwd, accId, platformId, remark)
 	} else {
 		sql := `UPDATE account_union SET platform_password=?,ut_time=? WHERE platform_id=? AND account_id=? AND platform_account=? AND remark=?`
 		x, err = global.SLDB.Update(sql, platformPwd, nt, platformId, accId, platformAcc, remark)
