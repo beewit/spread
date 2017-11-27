@@ -48,7 +48,7 @@
     background-position: right bottom;
 }
 
-.func .func-item.yes {
+.func .func-item.yes, .func-item.expire {
     background-image: url(/app/page/admin/assets/img/func/yes.png)
 }
 
@@ -172,10 +172,9 @@
 }
 
 .func-item.yes .addCart,
-.func-item.yes .openFunc {
+.func-item.yes .openFunc, .func-item.expire .addCart {
     display: none;
 }
-
 
 .func .func-item .func-handle .time {
     background: none;
@@ -186,7 +185,7 @@
     display: none;
 }
 
-.func-item.yes .func-handle .time {
+.func-item.yes .func-handle .time, .func-item.expire .func-handle .time {
     display: block;
 }
 
@@ -252,4 +251,12 @@
 .func-batch span {
     font-size: 1.4rem;
     color: #757575
+}
+
+.func-item.expire .openFunc{
+     background-color: #ff5858;
+ }
+
+.func-item.expire:hover .openFunc{
+    background-color: #ff6060 !important;
 }

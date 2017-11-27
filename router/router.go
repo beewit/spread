@@ -9,7 +9,7 @@ import (
 	"os"
 
 	"github.com/beewit/spread/api"
-	"github.com/beewit/spread/static"
+	//"github.com/beewit/spread/static"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -26,10 +26,10 @@ func Router() {
 	file, _ := os.OpenFile("web.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	e.Logger.SetOutput(file)
 
-	//e.Static("/app", "app")
-	//e.File("/", "app/page/index.html")
+	e.Static("/app", "app")
+	e.File("/", "app/page/index.html")
 
-	e.GET("/*", echo.WrapHandler(static.Handler))
+	//e.GET("/*", echo.WrapHandler(static.Handler))
 	e.Use(middleware.Gzip())
 	e.Use(middleware.Recover())
 	handlerConfig()

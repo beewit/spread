@@ -44,7 +44,7 @@
                         <i class="am-icon-comments-o"></i>
                     </div>
                     <div class="details">
-                        <div class="number"> --个</div>
+                        <div class="number" id="openFunc"> --个</div>
                         <div class="desc"> 已开通功能</div>
                     </div>
                     <a class="more" href="#"> 查看全部
@@ -58,7 +58,7 @@
                         <i class="am-icon-bar-chart-o"></i>
                     </div>
                     <div class="details">
-                        <div class="number"> --个</div>
+                        <div class="number" id="notExpireFunc"> --个</div>
                         <div class="desc"> 待续费功能</div>
                     </div>
                     <a class="more" href="#"> 点击续费
@@ -126,9 +126,9 @@
     </div>
 </div>
 <script id="list" type="text/html">
-    {{#  layui.each(d, function(index, item){ }}
+    {{#  layui.each(d.Data, function(index, item){ }}
     <li>
-        <div class="func-item {{ AfterTime(item.expiration_time)?'yes':'' }}" data-id="{{ item.id }}">
+        <div class="func-item {{ AfterTime(item.expiration_time) }}" data-id="{{ item.id }}">
             <div class="func-content {{ item.tip=='HOT'?'hot':'' }} {{ item.tip=='NEW'?'new':'' }}">
                 <section class="func-header">
                     <a>
@@ -140,7 +140,7 @@
                         <div class="desc">{{ item.remarks }}</div>
                     </div>
                     <div class="func-handle">
-                        <span class="openFunc">开通</span>
+                        <span class="openFunc">{{ AfterTime(item.expiration_time)=='expire'?'续费':'开通' }}</span>
                         <span class="addCart {{ checkFuncCartClass(item.id) }}"> {{ checkFuncCart(item.id) }}</span>
                         <span class="time">到期时间：{{ GetExpirationTime(item.expiration_time) }}</span>
                     </div>
@@ -161,7 +161,6 @@
 <script src="/app/static/js/plugs/layui/layui.all.js"></script>
 <script src="assets/js/common.js"></script>
 <script src="assets/js/common.ajax.js"></script>
-
 <script>
     var laytpl, laypage;
     var getTpl = list.innerHTML, view = document.getElementById('func-view');
@@ -298,7 +297,12 @@
             data: {pageIndex: pageIndex},
             success: function (d) {
                 if (d.ret == 200) {
-                    laytpl(getTpl).render(d.data.Data, function (html) {
+                    if(d.data.group.ret==200){
+                        $("#openFunc").html(d.data.group.data.openMap.length+" 个");
+                        $("#notExpireFunc").html(d.data.group.data.notExpireMap.length+" 个");
+                    }
+
+                    laytpl(getTpl).render(d.data, function (html) {
                         view.innerHTML = html;
                     });
                     //总页数大于页码总数

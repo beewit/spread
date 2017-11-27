@@ -15,7 +15,11 @@ func GetFuncByList(c echo.Context) error {
 		return utils.ErrorNull(c, "请求失败,"+err.Error())
 	}
 	if r.Data != nil {
+
+		group, _ := GetFuncGroup()
+
 		nd, _ := convert.Obj2Map(r.Data)
+		nd["group"] = group
 		if nd != nil {
 			delete(nd, "rule")
 			r.Data = nd
@@ -73,4 +77,9 @@ func EffectiveFuncById(funcId int64) bool {
 		return false
 	}
 	return r.Ret == utils.SUCCESS_CODE
+}
+
+func GetFuncGroup() (utils.ResultParam, error) {
+	url := fmt.Sprintf("/api/func/account/group")
+	return ApiPost(url, nil)
 }
