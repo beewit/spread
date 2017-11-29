@@ -36,7 +36,7 @@ const (
 var (
 	//先改版本，在编译后上传到gitee.com做版本维护
 	//请注意，此版本不能大于https://gitee.com/beewit/spread/releases/new  上的版本
-	Version          = update.Version{Major: 1, Minor: 0, Patch: 10}
+	Version          = update.Version{Major: 1, Minor: 0, Patch: 11}
 	VersionStr       = fmt.Sprintf("V%d.%d.%d", Version.Major, Version.Minor, Version.Patch)
 	SLDB             *sqlite.SqlConnPool
 	Driver           *agouti.WebDriver

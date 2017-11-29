@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>工蜂小智 </title>
+    <meta name="description" content="QQ营销">
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="icon" type="image/png" href="../assets/i/favicon.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/i/favicon.png">
+    <meta name="apple-mobile-web-app-title" content="工蜂小智"/>
+    <link rel="stylesheet" href="/app/static/js/plugs/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../assets/css/amazeui.min.css"/>
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
+    <link rel="stylesheet" href="/app/static/css/base.css">
+    <style>
+        .am-form-label {
+            font-size: 16px;
+        }
+
+        .input {
+            padding: .5em;
+            font-size: 1.6rem;
+            line-height: 1.2;
+            color: #555;
+            vertical-align: middle;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid #ccc !important;
+            border-radius: 0;
+            -webkit-appearance: none;
+            -webkit-transition: border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+            transition: border-color .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out, -webkit-box-shadow .15s ease-in-out;
+        }
+
+        .hive-4 {
+            width: 40%;
+            float: left;
+        }
+
+        .hive-6 {
+            width: 60%;
+            float: left;
+        }
+
+        @media only screen and (max-width: 1640px) {
+            .hive-6, .hive-4 {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+
+    </style>
+</head>
+<body data-type="generalComponents">
+<div class="tpl-page-container tpl-page-header-fixed">
+    <div class="tpl-content-wrapper">
+        <div class="tpl-portlet-components">
+            <ul class="am-nav am-nav-tabs">
+                <li><a href="../wechat/index.html"><span class="am-icon-weixin"></span> 微信营销</a></li>
+                <li><a href="../wechat/fission.html"><span class="am-icon-weixin"></span> 微信裂变</a></li>
+                <li class="am-active"><a href="../qq/index.html"><span class="am-icon-qq"></span> QQ营销</a></li>
+                <li><a href="../qq/fission.html"><span class="am-icon-qq"></span> QQ裂变</a></li>
+            </ul>
+            <div class="hive-tip am-hide">QQ营销功能未开通，点击<a>立即开通</a></div>
+            <div class="am-g am-margin-top">
+                <div class="am-form">
+                    <div>
+
+                    </div>
+                    <div>
+                        <b class="am-form-label">问候语：</b>
+                        <textarea type="text" class="input am-input-sm" style="width: 250px;display: initial;"
+                                  placeholder="问候语" id="qqRemark"></textarea>
+                        <button type="button" class="am-btn am-btn-sm am-btn-primary" id="saveAccount">
+                            <i class="am-icon-save"></i> 保存
+                        </button>
+                        <br>
+                        <br>
+                    </div>
+                    <div class="hive-4">
+                        <b class="am-form-label">QQ群关键词：</b>
+                        <input type="text" class="input am-input-sm"
+                               style="width: 280px;display: initial;"
+                               placeholder="QQ群关键词" id="keyword">
+                        <button type="button" class="am-btn am-btn-sm" id="searchQQGroup"><span
+                                class="am-icon-search"></span> 搜索
+                        </button>
+                        <!--*<select id="province" class="am-form-select" placeholder="-- 省份 --"
+                                style="width: 150px;float: none;    display: initial;">
+                            <option value=" ">-- 所有省份 --</option>
+                        </select>
+                        <select id="city" class="am-form-select" placeholder="-- 城市 --"
+                                style="width: 150px;float: none;    display: initial;">
+                            <option value=" ">-- 所有城市 --</option>
+                        </select>
+                        <select id="area" placeholder="-- 区 --" style="width: 150px;float: none;display: initial;">
+                            <option value=" ">-- 所有区 --</option>
+                        </select>
+                        <select id="plate" placeholder="-- 县 --" style="width: 150px;float: none;display: initial;">
+                            <option value=" ">-- 所有县 --</option>
+                        </select>-->
+                    </div>
+                    <div class="hive-6">
+                        <b class="am-form-label">加群/群发设置：</b>
+                        <span class="am-form-label">每加/发群：
+                               <input type="text" id="groupCount" class="input am-input-sm"
+                                      style="width: 80px;display: initial;"
+                                      placeholder="3" value="3"> 次
+                        </span>
+                        <span class="am-form-label">延迟：
+                               <input type="text" id="sleepTime" class="input am-input-sm"
+                                      style="width: 80px;display: initial;"
+                                      placeholder="30" value="30"> 秒后再加
+                        </span>
+                        <button type="button" class="am-btn am-btn-sm am-btn-secondary"
+                                onclick="checkLoginQQ(sendQQMsg)">
+                            <span class="am-icon-location-arrow"></span> QQ群发
+                        </button>
+                        <button type="button" class="am-btn am-btn-sm am-btn-success" id="StartAddQQGroup"><span
+                                class="am-icon-plus"></span> 启动QQ加群
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tpl-alert"></div>
+    </div>
+</div>
+</div>
+
+</body>
+</html>

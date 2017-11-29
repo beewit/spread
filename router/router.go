@@ -34,6 +34,7 @@ func Router() {
 	e.Use(middleware.Recover())
 	handlerConfig()
 	//go e.Logger.Fatal(e.Start(fmt.Sprintf(":%v", global.Port)))
+
 	e.Start(fmt.Sprintf(":%v", global.Port))
 }
 

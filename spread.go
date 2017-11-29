@@ -411,6 +411,10 @@ func ProcExsit() (err error) {
 	return nil
 }
 
+func clearPid() {
+	os.Truncate("pid.pid", 0)
+}
+
 func checkError(err error) {
 	if err != nil {
 		log.Fatal(err)
@@ -455,6 +459,7 @@ func Start() error {
 }
 
 func Stop() {
+	clearPid()
 	global.Log.Info("退出桌面应用")
 	if global.Page.Page != nil {
 		global.Page.Page.CloseWindow()

@@ -299,7 +299,7 @@
                 if (d.ret == 200) {
                     if(d.data.group.ret==200){
                         $("#openFunc").html(d.data.group.data.openMap.length+" 个");
-                        $("#notExpireFunc").html(d.data.group.data.notExpireMap.length+" 个");
+                        $("#notExpireFunc").html(d.data.group.data.expireMap.length+" 个");
                     }
 
                     laytpl(getTpl).render(d.data, function (html) {
