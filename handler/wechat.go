@@ -365,8 +365,10 @@ func loginWechat(UUid string) (err error) {
 	WechatLoginCheck = true
 	timeOut := 0
 	for {
-		thisUrl, _ := global.Page.Page.URL()
-		if WechatLoginCheck && strings.Contains(thisUrl, "/app/page/admin/wechat/index.html") {
+		// thisUrl, _ := global.Page.Page.URL()
+		// && strings.Contains(thisUrl, "/app/page/admin/wechat/index.html")
+		//		global.Log.Info("--------- 验证登录 ", thisUrl)
+		if WechatLoginCheck {
 			SendStatusMsg = "【" + UUid + "】正在验证登陆... ..."
 			global.Log.Info(SendStatusMsg)
 			status, msg := smartWechat.CheckLogin(UUid)
